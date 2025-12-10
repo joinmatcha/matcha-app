@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { getProfile } from '@/api/profile';
 import { UserFull } from '@/types/user';
@@ -7,7 +7,9 @@ export function useProfile() {
   const [user, setUser] = useState<UserFull | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
+  const load = useCallback(async () => {
+    setLoading(true);
+
     try {
       const raw = await getProfile();
       const data = raw.user;
@@ -64,11 +66,11 @@ export function useProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   return {
     user,

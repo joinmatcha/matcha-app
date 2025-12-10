@@ -1,4 +1,5 @@
-import React from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,7 +12,13 @@ import { useProfile } from '@/hooks/useProfile';
 import { computeProfileCompletion } from '@/utils/computeProfileCompletion';
 
 export default function HomeScreen({ navigation }: any) {
-  const { user, loading } = useProfile();
+  const { user, loading, refresh } = useProfile();
+
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [refresh]),
+  );
 
   if (loading || !user) return null;
 
