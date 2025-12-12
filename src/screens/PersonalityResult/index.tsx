@@ -14,7 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { resetPersonalityTest } from '@/api/personality';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import {
-  FloatingActionButton,
   ProfileHeader,
   ProfileSection,
   RadarChart,
@@ -68,7 +67,7 @@ export default function PersonalityResultScreen() {
   };
 
   const handleRedoTest = async () => {
-    await resetPersonalityTest(); // appel API
+    await resetPersonalityTest();
     await refreshUser();
     navigation.navigate('PersonalityTest');
   };
@@ -90,7 +89,7 @@ export default function PersonalityResultScreen() {
           {/* HEADER */}
           <ProfileHeader label={result.label} showLogo={false} />
 
-          {/* RADAR CHART */}
+          {/* RADAR */}
           <View style={styles.card}>
             <RadarChart data={radarData} size={280} />
           </View>
@@ -105,12 +104,12 @@ export default function PersonalityResultScreen() {
             <TagList items={result.strengths} variant="success" />
           </ProfileSection>
 
-          {/* FAIBLESSES */}
+          {/* POINTS D'ATTENTION */}
           <ProfileSection title="Points d'attention">
             <TagList items={result.weaknesses} variant="warning" />
           </ProfileSection>
 
-          {/* METIERS */}
+          {/* MÉTIERS */}
           <ProfileSection title="Métiers recommandés" isLast>
             <View style={styles.jobsList}>
               {result.recommendedJobs.map((job, i) => (
@@ -124,31 +123,30 @@ export default function PersonalityResultScreen() {
 
           <View style={{ height: 40 }} />
 
+          {/* REFAIRE TEST */}
           <TouchableOpacity style={styles.redoButton} onPress={handleRedoTest}>
             <Text style={styles.redoButtonText}>Refaire le test</Text>
           </TouchableOpacity>
-        </ScrollView>
 
-        {/* BOUTON FINAL */}
-        <FloatingActionButton scrollY={scrollY} onPress={handleContinue} />
+          <View style={{ height: 20 }} />
+
+          {/* BOUTON RETOUR (REMPLACE FloatingActionButton) */}
+          <TouchableOpacity style={styles.backButton} onPress={handleContinue}>
+            <Text style={styles.backButtonText}>Retour à l'accueil</Text>
+          </TouchableOpacity>
+
+          <View style={{ height: 40 }} />
+        </ScrollView>
       </View>
     </BackgroundRadial>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: 'transparent',
-  },
-  container: {
-    flex: 1,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 40,
-  },
+  safeArea: { backgroundColor: 'transparent' },
+  container: { flex: 1 },
+  scroll: { flex: 1 },
+  scrollContent: { paddingBottom: 40 },
 
   card: {
     backgroundColor: Colors.background,
@@ -169,14 +167,8 @@ const styles = StyleSheet.create({
     color: Colors.greyDark.normal,
   },
 
-  jobsList: {
-    gap: 14,
-  },
-  jobItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
+  jobsList: { gap: 14 },
+  jobItem: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   jobBullet: {
     width: 8,
     height: 8,
@@ -187,24 +179,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.greyDark.normal,
   },
-  redoButton: {
-    backgroundColor: Colors.orange.normal,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 14,
-    alignSelf: 'center',
-    marginBottom: 40,
 
+  redoButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 26,
+    borderRadius: 12,
+    alignSelf: 'center',
+
+    borderWidth: 1,
+    borderColor: Colors.greenDark.normal,
+
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    shadowOpacity: 0,
+  },
+
+  redoButtonText: {
+    color: Colors.greenDark.normal,
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+
+  backButton: {
+    backgroundColor: Colors.greenDark.normal,
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginHorizontal: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 4,
   },
-  redoButtonText: {
+  backButtonText: {
     color: Colors.background,
     fontSize: 16,
     fontWeight: '700',
-    letterSpacing: 0.3,
   },
 });

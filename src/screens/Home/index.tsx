@@ -5,26 +5,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundBubbles from '@/components/Background/BackgroundBubbles';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
+import BilanSummaryCard from '@/components/Bilan/BilanSummaryCard';
 import PersonalitySummaryCard from '@/components/Home/PersonalitySummaryCard';
 import ProfileCompletionCard from '@/components/Home/ProfileCompletionCard';
 import TestCard from '@/components/Home/TestCard';
+import { useBilan } from '@/hooks/useBilan';
 import { useProfile } from '@/hooks/useProfile';
 import { computeProfileCompletion } from '@/utils/computeProfileCompletion';
 
 export default function HomeScreen({ navigation }: any) {
   const { user, loading, refresh } = useProfile();
+  const { bilan, refreshBilan } = useBilan();
 
   useFocusEffect(
     useCallback(() => {
       refresh();
-    }, [refresh]),
+      refreshBilan();
+    }, [refresh, refreshBilan]),
   );
 
   if (loading || !user) return null;
 
   const completion = computeProfileCompletion(user);
-  const personality = user.personality ?? null;
-  const hasPersonality = !!personality;
+  const hasPersonality = !!user.personality;
+  const hasBilan = !!bilan;
 
   return (
     <BackgroundRadial>
@@ -40,33 +44,44 @@ export default function HomeScreen({ navigation }: any) {
             Voici un aperçu de ton profil Matcha.
           </Text>
 
-          {/* PROFILE COMPLETION CARD */}
+          {/* PROFILE COMPLETION */}
           <ProfileCompletionCard
             completion={completion}
             onPress={() => navigation.navigate('Profil')}
           />
 
-          {/* SECTION: Tests */}
+          {/* SECTION: Tests & analyses */}
           <Text style={styles.sectionTitle}>Tests & analyses</Text>
 
-          {/* SI TEST DÉJÀ FAIT → CARD DE RÉSULTAT */}
-          {hasPersonality && (
+          {/* PERSONALITY */}
+          {hasPersonality ? (
             <PersonalitySummaryCard
               personality={user.personality}
               onPress={() =>
                 navigation.navigate('PersonalityResult', {
-                  result: personality,
+                  result: user.personality,
                 })
               }
             />
-          )}
-
-          {/* SINON → CARD POUR PASSER LE TEST */}
-          {!hasPersonality && (
+          ) : (
             <TestCard
               title="Test de personnalité"
-              description="Découvre ton profil Matcha et améliore tes recommandations."
+              description="Découvre ton profil Matcha."
               onPress={() => navigation.navigate('PersonalityTest')}
+            />
+          )}
+
+          {/* BILAN DE COMPÉTENCES */}
+          {hasBilan ? (
+            <BilanSummaryCard
+              bilan={bilan}
+              onPress={() => navigation.navigate('BilanResult', { bilan })}
+            />
+          ) : (
+            <TestCard
+              title="Bilan de compétences"
+              description="Analyse complète : forces, valeurs & métiers."
+              onPress={() => navigation.navigate('BilanIntro')}
             />
           )}
         </View>

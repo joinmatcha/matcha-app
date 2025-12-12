@@ -21,7 +21,7 @@ export default function PersonalitySummaryCard({ personality, onPress }: any) {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text style={styles.buttonText}>Voir mon analyse →</Text>
+        <Text style={styles.buttonText}>Voir mon analyse</Text>
       </TouchableOpacity>
     </View>
   );
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   label: {
-    fontSize: 38,
+    fontSize: 30,
     fontWeight: '800',
     color: Colors.orange.normal,
     marginBottom: 4,

@@ -1,3 +1,4 @@
+import { BilanResult } from '@/api/bilan';
 import { PersonalityResult } from '@/api/personality';
 
 export type AuthStackParamList = {
@@ -14,8 +15,15 @@ export type CommonStackParamList = {
 
 export type HomeStackParamList = {
   HomeMain: undefined;
+
   PersonalityTest: undefined;
   PersonalityResult: {
     result: PersonalityResult;
+  };
+
+  BilanIntro: undefined;
+  BilanQuestions: undefined;
+  BilanResult: {
+    bilan: BilanResult;
   };
 };
