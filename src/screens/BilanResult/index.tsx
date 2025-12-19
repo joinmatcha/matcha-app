@@ -102,7 +102,7 @@ export default function BilanResultScreen() {
 
         {/* MÉTIERS */}
         <ProfileSection title="Pistes métiers à explorer">
-          {conclusion.recommendedJobs.slice(0, 8).map((job) => (
+          {conclusion.recommendedJobs.map((job) => (
             <View key={job.id} style={styles.jobCard}>
               <View style={styles.jobHeader}>
                 <Text style={styles.jobTitle}>{job.title}</Text>
@@ -115,17 +115,24 @@ export default function BilanResultScreen() {
                 <Text style={styles.jobDescription}>{job.description}</Text>
               )}
 
-              <View style={styles.jobFooter}>
-                <Text style={styles.jobScore}>Affinité {job.score}</Text>
+              {/* Raisons */}
+              {job.reasons?.length ? (
+                <View style={{ marginBottom: 10 }}>
+                  {job.reasons.slice(0, 2).map((r, i) => (
+                    <Text key={i} style={styles.jobReason}>
+                      • {r}
+                    </Text>
+                  ))}
+                </View>
+              ) : null}
 
-                <TouchableOpacity
-                  onPress={() => {
-                    // plus tard : navigation.navigate('JobDetail', { jobId: job.id })
-                  }}
-                >
-                  <Text style={styles.jobLink}>Explorer</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('JobDetail', { jobId: job.id })
+                }
+              >
+                <Text style={styles.jobLink}>Explorer le métier</Text>
+              </TouchableOpacity>
             </View>
           ))}
         </ProfileSection>
@@ -312,6 +319,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: Colors.greenDark.normal,
+  },
+
+  jobReason: {
+    marginTop: 6,
+    fontSize: 12,
+    color: 'rgba(0,0,0,0.6)',
   },
 
   bulletText: {

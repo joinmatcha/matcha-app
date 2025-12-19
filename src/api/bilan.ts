@@ -29,6 +29,7 @@ export interface BilanRecommendedJob {
   description?: string;
   sector?: string;
   score: number;
+  reasons: string[];
 }
 
 export interface BilanConclusion {

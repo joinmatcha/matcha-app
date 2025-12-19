@@ -4,6 +4,7 @@ import BilanIntroScreen from '@/screens/BilanIntro';
 import BilanQuestionsScreen from '@/screens/BilanQuestions';
 import BilanResultScreen from '@/screens/BilanResult';
 import HomeScreen from '@/screens/Home';
+import JobDetailScreen from '@/screens/JobDetail';
 import PersonalityResultScreen from '@/screens/PersonalityResult';
 import PersonalityTestScreen from '@/screens/PersonalityTest';
 import { HomeStackParamList } from '@/types/navigation';
@@ -27,6 +28,7 @@ export default function HomeStack() {
       <Stack.Screen name="BilanIntro" component={BilanIntroScreen} />
       <Stack.Screen name="BilanQuestions" component={BilanQuestionsScreen} />
       <Stack.Screen name="BilanResult" component={BilanResultScreen} />
+      <Stack.Screen name="JobDetail" component={JobDetailScreen} />
     </Stack.Navigator>
   );
 }

@@ -26,4 +26,5 @@ export type HomeStackParamList = {
   BilanResult: {
     bilan: BilanResult;
   };
+  JobDetail: { jobId: string };
 };
