@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundBubbles from '@/components/Background/BackgroundBubbles';
@@ -37,54 +37,59 @@ export default function HomeScreen({ navigation }: any) {
       </View>
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          {/* HEADER */}
-          <Text style={styles.title}>Bonjour {user.firstName}</Text>
-          <Text style={styles.subtitle}>
-            Voici un aperçu de ton profil Matcha.
-          </Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            {/* HEADER */}
+            <Text style={styles.title}>Bonjour {user.firstName}</Text>
+            <Text style={styles.subtitle}>
+              Voici un aperçu de ton profil Matcha.
+            </Text>
 
-          {/* PROFILE COMPLETION */}
-          <ProfileCompletionCard
-            completion={completion}
-            onPress={() => navigation.navigate('Profil')}
-          />
+            {/* PROFILE COMPLETION */}
+            <ProfileCompletionCard
+              completion={completion}
+              onPress={() => navigation.navigate('Profil')}
+            />
 
-          {/* SECTION: Tests & analyses */}
-          <Text style={styles.sectionTitle}>Tests & analyses</Text>
+            {/* SECTION: Tests & analyses */}
+            <Text style={styles.sectionTitle}>Tests & analyses</Text>
 
-          {/* PERSONALITY */}
-          {hasPersonality ? (
-            <PersonalitySummaryCard
-              personality={user.personality}
-              onPress={() =>
-                navigation.navigate('PersonalityResult', {
-                  result: user.personality,
-                })
-              }
-            />
-          ) : (
-            <TestCard
-              title="Test de personnalité"
-              description="Découvre ton profil Matcha."
-              onPress={() => navigation.navigate('PersonalityTest')}
-            />
-          )}
+            {/* PERSONALITY */}
+            {hasPersonality ? (
+              <PersonalitySummaryCard
+                personality={user.personality}
+                onPress={() =>
+                  navigation.navigate('PersonalityResult', {
+                    result: user.personality,
+                  })
+                }
+              />
+            ) : (
+              <TestCard
+                title="Test de personnalité"
+                description="Découvre ton profil Matcha."
+                onPress={() => navigation.navigate('PersonalityTest')}
+              />
+            )}
 
-          {/* BILAN DE COMPÉTENCES */}
-          {hasBilan ? (
-            <BilanSummaryCard
-              bilan={bilan}
-              onPress={() => navigation.navigate('BilanResult', { bilan })}
-            />
-          ) : (
-            <TestCard
-              title="Bilan de compétences"
-              description="Analyse complète : forces, valeurs & métiers."
-              onPress={() => navigation.navigate('BilanIntro')}
-            />
-          )}
-        </View>
+            {/* BILAN DE COMPÉTENCES */}
+            {hasBilan ? (
+              <BilanSummaryCard
+                bilan={bilan}
+                onPress={() => navigation.navigate('BilanResult', { bilan })}
+              />
+            ) : (
+              <TestCard
+                title="Bilan de compétences"
+                description="Analyse complète : forces, valeurs & métiers."
+                onPress={() => navigation.navigate('BilanIntro')}
+              />
+            )}
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </BackgroundRadial>
   );
@@ -99,8 +104,10 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     zIndex: 1,
   },
+  scrollContent: {
+    paddingBottom: 40,
+  },
   container: {
-    flex: 1,
     paddingHorizontal: 24,
     paddingTop: 20,
     zIndex: 5,
