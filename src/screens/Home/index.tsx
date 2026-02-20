@@ -3,7 +3,6 @@ import React, { useCallback } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundBubbles from '@/components/Background/BackgroundBubbles';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import BilanSummaryCard from '@/components/Bilan/BilanSummaryCard';
 import PersonalitySummaryCard from '@/components/Home/PersonalitySummaryCard';
@@ -31,11 +30,7 @@ export default function HomeScreen({ navigation }: any) {
   const hasBilan = !!bilan;
 
   return (
-    <BackgroundRadial>
-      <View style={styles.bubblesLayer} pointerEvents="none">
-        <BackgroundBubbles />
-      </View>
-
+    <BackgroundRadial bubbles>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -99,10 +94,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'transparent',
-  },
-  bubblesLayer: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 1,
   },
   scrollContent: {
     paddingBottom: 40,

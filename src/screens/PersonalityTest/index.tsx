@@ -18,7 +18,6 @@ import {
   getActivePersonalityTest,
   submitPersonalityTest,
 } from '@/api/personality';
-import BackgroundBubbles from '@/components/Background/BackgroundBubbles';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import { QuestionCard, TestHeader } from '@/components/Personality';
 import { useAuth } from '@/hooks/useAuth';
@@ -130,10 +129,6 @@ export default function PersonalityTestScreen() {
   if (!test) {
     return (
       <BackgroundRadial>
-        <View style={styles.bubblesLayer}>
-          <BackgroundBubbles />
-        </View>
-
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.centerContainer}>
             <Text style={styles.errorTitle}>Aucun test disponible</Text>
@@ -219,7 +214,6 @@ export default function PersonalityTestScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  bubblesLayer: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
   background: { flex: 1 },
   container: { flex: 1, zIndex: 2 },
   centerContainer: {

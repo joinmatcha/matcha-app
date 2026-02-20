@@ -76,7 +76,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await storeToken(token);
       setUser(user);
     } catch (error) {
-      console.error('[AuthContext] Login error:', error);
       throw error;
     }
   };
@@ -95,7 +94,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await apiRegister(registrationData);
       // await login(data.email, data.password);
     } catch (error) {
-      console.error('[AuthContext] Register error:', error);
       throw error;
     }
   };

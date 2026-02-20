@@ -17,7 +17,11 @@ export default function LoginForm() {
 
   const [errors, setErrors] = useState({ email: '', password: '' });
 
+  const [authError, setAuthError] = useState('');
+
   const handleLogin = async () => {
+    setAuthError('');
+
     const { valid, errors: zodErrors } = validateZod(loginSchema, {
       email,
       password,
@@ -43,17 +47,16 @@ export default function LoginForm() {
         onPress: () => Toast.hide(),
       });
     } catch (error: any) {
+      const status = error?.response?.status;
+
       const errorMessage =
-        error?.response?.data?.message || 'Veuillez réessayer.';
-      Toast.show({
-        type: 'error',
-        text1: 'Échec de la connexion',
-        text2: errorMessage,
-        position: 'top',
-        visibilityTime: 8000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+        status === 401 || status === 403
+          ? 'Email ou mot de passe incorrect.'
+          : error?.response?.data?.message ||
+            error?.response?.data?.error ||
+            'Veuillez réessayer.';
+
+      setAuthError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -68,6 +71,8 @@ export default function LoginForm() {
         mode="outlined"
         keyboardType="email-address"
         autoCapitalize="none"
+        autoCorrect={false}
+        textContentType="emailAddress"
         style={styles.input}
         disabled={loading}
         error={!!errors.email}
@@ -92,6 +97,12 @@ export default function LoginForm() {
       />
       {errors.password && (
         <HelperText type="error">{errors.password}</HelperText>
+      )}
+
+      {!!authError && (
+        <HelperText type="error" visible>
+          {authError}
+        </HelperText>
       )}
 
       <Button

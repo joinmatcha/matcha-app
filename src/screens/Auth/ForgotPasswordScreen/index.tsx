@@ -30,11 +30,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <BackgroundRadial>
-      <View style={styles.bubblesLayer} pointerEvents="none">
-        <BackgroundBubbles />
-      </View>
-
+    <BackgroundRadial bubbles>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
           style={styles.scroll}
@@ -116,10 +112,6 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 32,
     justifyContent: 'center',
-  },
-  bubblesLayer: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 1,
   },
   logoContainer: {
     alignItems: 'center',
