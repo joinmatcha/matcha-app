@@ -3,6 +3,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,14 +22,21 @@ import {
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import { QuestionCard, TestHeader } from '@/components/Personality';
 import { useAuth } from '@/hooks/useAuth';
+import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
 import { HomeStackParamList } from '@/types/navigation';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList>;
 
+type PersonalityDraftData = {
+  answers: [string, number][];
+};
+
 export default function PersonalityTestScreen() {
   const navigation = useNavigation<Nav>();
-  const { refreshUser, logout } = useAuth();
+
+  const { user, refreshUser, logout } = useAuth();
+  const userId = (user as any)?.id ?? (user as any)?._id;
 
   const [test, setTest] = useState<PersonalityTemplate | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,9 +46,47 @@ export default function PersonalityTestScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const questionRefs = useRef<Map<string, View>>(new Map());
 
+  // évite de restaurer plusieurs fois
+  const restoredOnceRef = useRef(false);
+
+  const serializeAnswers = (m: Map<string, number>) => Array.from(m.entries());
+  const deserializeAnswers = (arr: [string, number][]) => new Map(arr);
+
   useEffect(() => {
     loadTest();
   }, []);
+
+  // Restore draft quand userId + test sont dispos
+  useEffect(() => {
+    const restoreDraft = async () => {
+      if (!userId || !test) return;
+      if (restoredOnceRef.current) return;
+
+      restoredOnceRef.current = true;
+
+      const draft = await loadDraft<PersonalityDraftData>(
+        'personality',
+        userId,
+      );
+      if (!draft) return;
+
+      if (
+        draft.templateId === test._id &&
+        draft.templateVersion === test.version
+      ) {
+        setAnswers(deserializeAnswers(draft.data.answers));
+        Toast.show({
+          type: 'info',
+          text1: 'Brouillon restauré',
+          text2: 'Tu peux reprendre le test où tu t’étais arrêté.',
+        });
+      } else {
+        await clearDraft('personality', userId);
+      }
+    };
+
+    restoreDraft().catch(() => {});
+  }, [userId, test]);
 
   const loadTest = async () => {
     try {
@@ -50,7 +96,10 @@ export default function PersonalityTestScreen() {
         await refreshUser();
         return;
       }
-      if (response.test) setTest(response.test);
+
+      if (response.test) {
+        setTest(response.test);
+      }
     } catch (error: any) {
       Toast.show({
         type: 'error',
@@ -62,10 +111,58 @@ export default function PersonalityTestScreen() {
     }
   };
 
+  const persistDraft = (newAnswers: Map<string, number>) => {
+    if (!test || !userId) return;
+
+    saveDraft<PersonalityDraftData>({
+      userId,
+      module: 'personality',
+      schemaVersion: 1,
+      templateId: test._id,
+      templateVersion: test.version,
+      updatedAt: Date.now(),
+      data: { answers: serializeAnswers(newAnswers) },
+    }).catch(() => {});
+  };
+
+  const handleRestart = () => {
+    if (!userId) return;
+
+    Alert.alert(
+      'Repartir de zéro ?',
+      'Tu vas supprimer ton brouillon et recommencer le test.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            await clearDraft('personality', userId);
+            setAnswers(new Map());
+
+            // on évite que le useEffect re-restaure instant
+            restoredOnceRef.current = true;
+
+            Toast.show({
+              type: 'success',
+              text1: 'Brouillon supprimé',
+              text2: 'Tu peux recommencer le test.',
+            });
+
+            scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+          },
+        },
+      ],
+    );
+  };
+
   const handleAnswer = (questionId: string, value: number) => {
     const newAnswers = new Map(answers);
     newAnswers.set(questionId, value);
     setAnswers(newAnswers);
+
+    // persist draft
+    persistDraft(newAnswers);
 
     if (!test) return;
 
@@ -88,6 +185,7 @@ export default function PersonalityTestScreen() {
 
   const handleSubmit = async () => {
     if (!test) return;
+
     if (answers.size !== test.questions.length) {
       return Toast.show({
         type: 'error',
@@ -104,6 +202,9 @@ export default function PersonalityTestScreen() {
       ).map(([id, value]) => ({ questionId: id, value }));
 
       const testResult = await submitPersonalityTest(formattedAnswers);
+
+      // clear draft si submit OK
+      if (userId) await clearDraft('personality', userId);
 
       navigation.navigate('PersonalityResult', { result: testResult });
     } catch (error: any) {
@@ -163,6 +264,18 @@ export default function PersonalityTestScreen() {
             totalQuestions={test.questions.length}
           />
 
+          {/* action "reset draft" */}
+          {answers.size > 0 && (
+            <View style={styles.actionsRow}>
+              <TouchableOpacity
+                onPress={handleRestart}
+                style={styles.restartButton}
+              >
+                <Text style={styles.restartText}>Repartir de zéro</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           <ScrollView
             ref={scrollViewRef}
             style={styles.scrollView}
@@ -172,9 +285,7 @@ export default function PersonalityTestScreen() {
               <View
                 key={q.id}
                 ref={(ref) => {
-                  if (ref) {
-                    questionRefs.current.set(q.id, ref);
-                  }
+                  if (ref) questionRefs.current.set(q.id, ref);
                 }}
               >
                 <QuestionCard
@@ -214,7 +325,6 @@ export default function PersonalityTestScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  background: { flex: 1 },
   container: { flex: 1, zIndex: 2 },
   centerContainer: {
     flex: 1,
@@ -224,6 +334,25 @@ const styles = StyleSheet.create({
   },
   scrollView: { flex: 1 },
   scrollContent: { padding: 20, paddingBottom: 40 },
+
+  actionsRow: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 4,
+    alignItems: 'flex-end',
+  },
+  restartButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+  },
+  restartText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(0,0,0,0.55)',
+  },
+
   submitButton: {
     backgroundColor: '#0A2916',
     paddingVertical: 16,

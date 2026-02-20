@@ -55,10 +55,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         const currentUser = await getUserById(decoded.id);
-        setUser(currentUser);
+
+        const normalizedUser = {
+          ...currentUser,
+          id: (currentUser as any).id ?? (currentUser as any)._id ?? decoded.id,
+        };
+
+        setUser(normalizedUser as any);
       }
     } catch (error) {
-      console.error('Error loading user:', error);
       await removeToken();
       setUser(null);
     } finally {
@@ -74,7 +79,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const { token, user } = await apiLogin(email, password);
       await storeToken(token);
-      setUser(user);
+
+      const normalizedUser = {
+        ...user,
+        id: (user as any).id ?? (user as any)._id,
+      };
+
+      setUser(normalizedUser as any);
     } catch (error) {
       throw error;
     }
@@ -109,7 +120,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await removeToken();
       setUser(null);
     } catch (error) {
-      console.error('[AuthContext] Delete account error:', error);
       throw error;
     }
   };

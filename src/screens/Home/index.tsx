@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,19 +8,38 @@ import BilanSummaryCard from '@/components/Bilan/BilanSummaryCard';
 import PersonalitySummaryCard from '@/components/Home/PersonalitySummaryCard';
 import ProfileCompletionCard from '@/components/Home/ProfileCompletionCard';
 import TestCard from '@/components/Home/TestCard';
+import { useAuth } from '@/hooks/useAuth';
 import { useBilan } from '@/hooks/useBilan';
 import { useProfile } from '@/hooks/useProfile';
+import { loadDraft } from '@/services/draftStorage';
 import { computeProfileCompletion } from '@/utils/computeProfileCompletion';
 
 export default function HomeScreen({ navigation }: any) {
+  const { user: authUser } = useAuth();
+  const userId = (authUser as any)?.id ?? (authUser as any)?._id;
+
   const { user, loading, refresh } = useProfile();
   const { bilan, refreshBilan } = useBilan();
+
+  const [hasPersonalityDraft, setHasPersonalityDraft] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       refresh();
       refreshBilan();
-    }, [refresh, refreshBilan]),
+
+      const checkDraft = async () => {
+        if (!userId) {
+          setHasPersonalityDraft(false);
+          return;
+        }
+
+        const draft = await loadDraft('personality', userId);
+        setHasPersonalityDraft(!!draft);
+      };
+
+      checkDraft().catch(() => {});
+    }, [refresh, refreshBilan, userId]),
   );
 
   if (loading || !user) return null;
@@ -65,7 +84,12 @@ export default function HomeScreen({ navigation }: any) {
             ) : (
               <TestCard
                 title="Test de personnalité"
-                description="Découvre ton profil Matcha."
+                description={
+                  hasPersonalityDraft
+                    ? 'Tu as un test en cours.'
+                    : 'Découvre ton profil Matcha.'
+                }
+                buttonLabel={hasPersonalityDraft ? 'Reprendre' : 'Commencer'}
                 onPress={() => navigation.navigate('PersonalityTest')}
               />
             )}
@@ -80,6 +104,7 @@ export default function HomeScreen({ navigation }: any) {
               <TestCard
                 title="Bilan de compétences"
                 description="Analyse complète : forces, valeurs & métiers."
+                buttonLabel="Commencer"
                 onPress={() => navigation.navigate('BilanIntro')}
               />
             )}
