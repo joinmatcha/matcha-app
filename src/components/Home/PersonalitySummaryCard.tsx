@@ -2,8 +2,17 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Colors from '@/themes/colors';
+import { UserFull } from '@/types/user';
 
-export default function PersonalitySummaryCard({ personality, onPress }: any) {
+type Props = {
+  personality?: UserFull['personality'];
+  onPress: () => void;
+};
+
+export default function PersonalitySummaryCard({
+  personality,
+  onPress,
+}: Props) {
   if (!personality) return null;
 
   return (
@@ -11,6 +20,10 @@ export default function PersonalitySummaryCard({ personality, onPress }: any) {
       <Text style={styles.title}>Ta personnalité</Text>
 
       <Text style={styles.label}>{personality.label}</Text>
+
+      {!!personality.type && (
+        <Text style={styles.type}>{personality.type}</Text>
+      )}
 
       <View style={styles.badges}>
         {personality.strengths.slice(0, 3).map((s: any, i: any) => (
@@ -45,10 +58,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   type: {
-    fontSize: 38,
-    fontWeight: '800',
-    color: Colors.orange.normal,
-    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 3,
+    color: Colors.greyDark.normal,
+    opacity: 0.7,
+    marginBottom: 12,
   },
   label: {
     fontSize: 30,

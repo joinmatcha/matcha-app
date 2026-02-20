@@ -87,7 +87,11 @@ export default function PersonalityResultScreen() {
           )}
         >
           {/* HEADER */}
-          <ProfileHeader label={result.label} showLogo={false} />
+          <ProfileHeader
+            label={result.label}
+            type={result.type}
+            showLogo={false}
+          />
 
           {/* RADAR */}
           <View style={styles.card}>

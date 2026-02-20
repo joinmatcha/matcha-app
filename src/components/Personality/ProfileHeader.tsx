@@ -6,11 +6,13 @@ import Colors from '@/themes/colors';
 
 interface ProfileHeaderProps {
   label: string;
+  type?: string;
   showLogo?: boolean;
 }
 
 export default function ProfileHeader({
   label,
+  type,
   showLogo = true,
 }: ProfileHeaderProps) {
   return (
@@ -20,9 +22,11 @@ export default function ProfileHeader({
           <Branding.Logo width={110} height={34} />
         </View>
       )}
+
       <View style={styles.profileHeader}>
         <Text style={styles.profileTitle}>Ton profil</Text>
         <Text style={styles.profileLabel}>{label}</Text>
+        {!!type && <Text style={styles.profileType}>{type}</Text>}
       </View>
     </>
   );
@@ -62,5 +66,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: Colors.orange.normal,
     textAlign: 'center',
+  },
+  profileType: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 3,
+    color: Colors.greyDark.normal,
+    opacity: 0.7,
+    textTransform: 'uppercase',
   },
 });
