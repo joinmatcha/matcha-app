@@ -29,11 +29,8 @@ export default function SwipeScreen() {
   const currentJobRef = useRef(deck[0] ?? null);
   currentJobRef.current = deck[0] ?? null;
 
-  // Verrou : empêche de déclencher plusieurs swipes simultanément
   const isAnimating = useRef(false);
 
-  // Remet la carte à sa position initiale et relâche le verrou uniquement
-  // quand le deck s'est mis à jour — évite le flash de l'ancienne carte
   useEffect(() => {
     pan.x.setValue(0);
     isAnimating.current = false;
@@ -52,7 +49,6 @@ export default function SwipeScreen() {
       useNativeDriver: false,
     }).start(() => {
       swipe(job.id, action);
-      // pan.x reste hors écran jusqu'au re-render (géré par le useEffect sur deck)
     });
   };
 
@@ -161,7 +157,6 @@ export default function SwipeScreen() {
   return (
     <BackgroundRadial>
       <SafeAreaView style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Découvrir des métiers</Text>
           {remaining !== null && (
@@ -169,16 +164,13 @@ export default function SwipeScreen() {
           )}
         </View>
 
-        {/* Card area */}
         <View style={styles.cardArea}>
-          {/* Carte suivante (derrière) */}
           {deck[1] && (
             <View style={styles.cardBehind} pointerEvents="none">
               <Text style={styles.cardTitle}>{deck[1].title}</Text>
             </View>
           )}
 
-          {/* Carte courante */}
           <Animated.View
             style={[
               styles.card,
@@ -188,7 +180,6 @@ export default function SwipeScreen() {
             ]}
             {...panResponder.panHandlers}
           >
-            {/* LIKE overlay */}
             <Animated.View
               style={[
                 styles.overlay,
@@ -200,7 +191,6 @@ export default function SwipeScreen() {
               <Text style={styles.likeLabel}>J'AIME</Text>
             </Animated.View>
 
-            {/* NOPE overlay */}
             <Animated.View
               style={[
                 styles.overlay,
@@ -238,7 +228,6 @@ export default function SwipeScreen() {
           </Animated.View>
         </View>
 
-        {/* Boutons */}
         <View style={styles.buttons}>
           <TouchableOpacity
             style={[styles.actionBtn, styles.dislikeBtn]}

@@ -34,13 +34,12 @@ export function useSwipe() {
         setRemaining(data.remaining);
         setDeck((prev) => prev.filter((j) => j.id !== jobId));
       } catch {
-        // On ignore les erreurs réseau silencieusement pour ne pas bloquer l'UX
+        // silencieux
       }
     },
     [],
   );
 
-  // Recharge automatiquement si le deck est vide mais qu'il reste du quota
   useEffect(() => {
     if (
       deck.length === 0 &&
