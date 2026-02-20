@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Animated,
   PanResponder,
@@ -29,32 +29,45 @@ export default function SwipeScreen() {
   const currentJobRef = useRef(deck[0] ?? null);
   currentJobRef.current = deck[0] ?? null;
 
-  // Ref pattern : garantit que le PanResponder appelle toujours la version
-  // à jour de animateOut, même après re-render
+  // Verrou : empêche de déclencher plusieurs swipes simultanément
+  const isAnimating = useRef(false);
+
+  // Remet la carte à sa position initiale et relâche le verrou uniquement
+  // quand le deck s'est mis à jour — évite le flash de l'ancienne carte
+  useEffect(() => {
+    pan.x.setValue(0);
+    isAnimating.current = false;
+  }, [deck]);
+
   const animateOutRef = useRef<(action: 'like' | 'dislike') => void>(() => {});
   animateOutRef.current = (action: 'like' | 'dislike') => {
+    if (isAnimating.current) return;
     const job = currentJobRef.current;
     if (!job) return;
+    isAnimating.current = true;
     const toX = action === 'like' ? 500 : -500;
     Animated.timing(pan.x, {
       toValue: toX,
       duration: 250,
       useNativeDriver: false,
     }).start(() => {
-      pan.x.setValue(0);
       swipe(job.id, action);
+      // pan.x reste hors écran jusqu'au re-render (géré par le useEffect sur deck)
     });
   };
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => !isAnimating.current,
       onMoveShouldSetPanResponder: (_, gesture) =>
-        Math.abs(gesture.dx) > Math.abs(gesture.dy) && Math.abs(gesture.dx) > 5,
+        !isAnimating.current &&
+        Math.abs(gesture.dx) > Math.abs(gesture.dy) &&
+        Math.abs(gesture.dx) > 5,
       onPanResponderGrant: () => {
         pan.x.setValue(0);
       },
       onPanResponderMove: (_, gesture) => {
+        if (isAnimating.current) return;
         pan.x.setValue(gesture.dx);
       },
       onPanResponderRelease: (_, gesture) => {
@@ -93,7 +106,7 @@ export default function SwipeScreen() {
 
   const currentJob = deck[0] ?? null;
 
-  if (loading) {
+  if (loading || (deck.length === 0 && remaining !== null && remaining > 0)) {
     return (
       <BackgroundRadial>
         <SafeAreaView style={styles.centered}>

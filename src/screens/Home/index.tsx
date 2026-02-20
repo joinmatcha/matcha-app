@@ -3,17 +3,23 @@ import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getPreferences, Preferences } from '@/api/preferences';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { useAuth } from '@/hooks/useAuth';
+import BackgroundRadial from '@/components/Background/BackgroundRadial';
+import BilanSummaryCard from '@/components/Bilan/BilanSummaryCard';
+import PersonalitySummaryCard from '@/components/Home/PersonalitySummaryCard';
+import ProfileCompletionCard from '@/components/Home/ProfileCompletionCard';
+import TestCard from '@/components/Home/TestCard';
 import { useBilan } from '@/hooks/useBilan';
 import { useProfile } from '@/hooks/useProfile';
-import { loadDraft } from '@/services/draftStorage';
 import { computeProfileCompletion } from '@/utils/computeProfileCompletion';
 
 import BilanSummaryCard from './components/BilanSummaryCard';
 import PersonalitySummaryCard from './components/PersonalitySummaryCard';
 import ProfileCompletionCard from './components/ProfileCompletionCard';
 import TestCard from './components/TestCard';
+import {loadDraft} from '@/services/draftStorage';
 
 export default function HomeScreen({ navigation }: any) {
   const { user: authUser } = useAuth();
@@ -21,6 +27,16 @@ export default function HomeScreen({ navigation }: any) {
 
   const { user, loading, refresh } = useProfile();
   const { bilan, refreshBilan } = useBilan();
+  const [preferences, setPreferences] = useState<Preferences | null>(null);
+
+  const refreshPreferences = useCallback(async () => {
+    try {
+      const data = await getPreferences();
+      setPreferences(data);
+    } catch {
+      // silencieux : la carte ne s'affiche pas si l'appel échoue
+    }
+  }, []);
 
   const [hasPersonalityDraft, setHasPersonalityDraft] = useState(false);
 
@@ -28,6 +44,7 @@ export default function HomeScreen({ navigation }: any) {
     useCallback(() => {
       refresh();
       refreshBilan();
+      refreshPreferences();
 
       const checkDraft = async () => {
         if (!userId) {
@@ -40,7 +57,7 @@ export default function HomeScreen({ navigation }: any) {
       };
 
       checkDraft().catch(() => {});
-    }, [refresh, refreshBilan, userId]),
+    }, [refresh, refreshBilan, userId, refreshPreferences]),
   );
 
   if (loading || !user) return null;
@@ -108,6 +125,17 @@ export default function HomeScreen({ navigation }: any) {
                 buttonLabel="Commencer"
                 onPress={() => navigation.navigate('BilanIntro')}
               />
+            )}
+
+            {/* SECTION: Préférences métiers */}
+            {preferences !== null && (
+              <>
+                <Text style={styles.sectionTitle}>Préférences métiers</Text>
+                <SwipePreferencesCard
+                  preferences={preferences}
+                  onSwipePress={() => navigation.navigate('Swipe')}
+                />
+              </>
             )}
           </View>
         </ScrollView>

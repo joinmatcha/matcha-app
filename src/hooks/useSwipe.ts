@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { DeckJob, getDeck, postSwipe } from '@/api/swipe';
 
@@ -39,6 +39,18 @@ export function useSwipe() {
     },
     [],
   );
+
+  // Recharge automatiquement si le deck est vide mais qu'il reste du quota
+  useEffect(() => {
+    if (
+      deck.length === 0 &&
+      remaining !== null &&
+      remaining > 0 &&
+      !loadingRef.current
+    ) {
+      loadDeck();
+    }
+  }, [deck.length, remaining, loadDeck]);
 
   return {
     deck,
