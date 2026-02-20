@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import axios from 'axios';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
@@ -7,7 +8,7 @@ import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
 import { registrationSchema } from '@/schemas/registration';
-import { AuthStackParamList } from '@/types/navigation';
+import type { AuthStackParamList } from '@/types/navigation';
 import { validateZod } from '@/utils/validation';
 
 type NavProps = NativeStackNavigationProp<AuthStackParamList>;
@@ -30,7 +31,13 @@ export default function RegistrationForm() {
     password: '',
   });
 
+  const [authError, setAuthError] = useState('');
+
+  const resetServerError = () => setAuthError('');
+
   const handleRegister = async () => {
+    resetServerError();
+
     const { valid, errors: zodErrors } = validateZod(registrationSchema, {
       firstName,
       lastName,
@@ -55,15 +62,36 @@ export default function RegistrationForm() {
         type: 'success',
         text1: 'Inscription réussie',
         text2: 'Vérifie tes emails pour activer ton compte.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
       });
 
       navigation.navigate('Login');
-    } catch {
-      Toast.show({
-        type: 'error',
-        text1: "Échec de l'inscription",
-        text2: 'Veuillez réessayer.',
-      });
+    } catch (error: unknown) {
+      let msg = 'Impossible de créer le compte. Réessaie.';
+
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const data: any = error.response?.data;
+
+        if (!error.response) {
+          msg = 'Problème de connexion. Vérifie ton réseau et réessaie.';
+        } else if (status === 409) {
+          msg = 'Un compte existe déjà avec cet email.';
+        } else if (status === 422) {
+          msg = 'Certaines informations sont invalides.';
+        } else if (status === 429) {
+          msg = 'Trop de tentatives. Réessaie dans quelques minutes.';
+        } else if (status && status >= 500) {
+          msg = 'Serveur indisponible. Réessaie plus tard.';
+        } else {
+          msg = data?.message || data?.error || msg;
+        }
+      }
+
+      setAuthError(msg);
     } finally {
       setLoading(false);
     }
@@ -74,47 +102,64 @@ export default function RegistrationForm() {
       <TextInput
         label="Prénom"
         value={firstName}
-        onChangeText={setFirstname}
+        onChangeText={(v) => {
+          setFirstname(v);
+          resetServerError();
+        }}
         mode="outlined"
         style={styles.input}
         disabled={loading}
         error={!!errors.firstName}
       />
-      {errors.firstName && (
+      {errors.firstName ? (
         <HelperText type="error">{errors.firstName}</HelperText>
-      )}
+      ) : null}
 
       <TextInput
         label="Nom"
         value={lastName}
-        onChangeText={setLastname}
+        onChangeText={(v) => {
+          setLastname(v);
+          resetServerError();
+        }}
         mode="outlined"
         style={styles.input}
         disabled={loading}
         error={!!errors.lastName}
       />
-      {errors.lastName && (
+      {errors.lastName ? (
         <HelperText type="error">{errors.lastName}</HelperText>
-      )}
+      ) : null}
 
       <TextInput
         label="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(v) => {
+          setEmail(v);
+          resetServerError();
+        }}
         autoCapitalize="none"
+        autoCorrect={false}
         keyboardType="email-address"
+        textContentType="emailAddress"
         mode="outlined"
         style={styles.input}
         disabled={loading}
         error={!!errors.email}
       />
-      {errors.email && <HelperText type="error">{errors.email}</HelperText>}
+      {errors.email ? (
+        <HelperText type="error">{errors.email}</HelperText>
+      ) : null}
 
       <TextInput
         label="Mot de passe"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(v) => {
+          setPassword(v);
+          resetServerError();
+        }}
         secureTextEntry={!showPassword}
+        textContentType="password"
         mode="outlined"
         style={styles.input}
         disabled={loading}
@@ -122,13 +167,19 @@ export default function RegistrationForm() {
         right={
           <TextInput.Icon
             icon={showPassword ? 'eye-off' : 'eye'}
-            onPress={() => setShowPassword(!showPassword)}
+            onPress={() => setShowPassword((s) => !s)}
           />
         }
       />
-      {errors.password && (
+      {errors.password ? (
         <HelperText type="error">{errors.password}</HelperText>
-      )}
+      ) : null}
+
+      {authError ? (
+        <HelperText type="error" visible style={styles.authError}>
+          {authError}
+        </HelperText>
+      ) : null}
 
       <Button
         mode="contained"
@@ -150,6 +201,10 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 8,
+  },
+  authError: {
+    marginTop: 8,
+    marginBottom: 4,
   },
   continueButton: {
     marginTop: 12,

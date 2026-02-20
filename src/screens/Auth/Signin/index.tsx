@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
 import LoginLink from '@/components/Auth/LoginLink';
-import BackgroundBubbles from '@/components/Background/BackgroundBubbles';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import RegistrationForm from '@/components/Forms/RegistrationForm';
 import CGUModal from '@/components/Modals/CGUModal';
@@ -18,11 +17,7 @@ export default function SigninScreen() {
   const privacyModal = useModal();
 
   return (
-    <BackgroundRadial>
-      <View style={styles.bubblesLayer} pointerEvents="none">
-        <BackgroundBubbles />
-      </View>
-
+    <BackgroundRadial bubbles>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
           style={styles.scroll}
@@ -81,10 +76,6 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 32,
     justifyContent: 'center',
-  },
-  bubblesLayer: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 1,
   },
   logoContainer: {
     alignItems: 'center',
