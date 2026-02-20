@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import LogoutScreen from '@/screens/Auth/Logout';
 import ProfileScreen from '@/screens/Profile';
+import SwipeScreen from '@/screens/Swipe';
 
 import HomeStack from './HomeStack';
 
@@ -23,6 +24,17 @@ export default function TabNavigator() {
           title: 'Accueil',
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" color={color} size={size} />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Swipe"
+        component={SwipeScreen}
+        options={{
+          title: 'Métiers',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="favorite" color={color} size={size} />
           ),
         }}
       />
