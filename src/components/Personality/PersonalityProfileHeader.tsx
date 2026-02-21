@@ -4,13 +4,13 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Branding } from '@/assets';
 import Colors from '@/themes/colors';
 
-interface ProfileHeaderProps {
+interface PersonalityProfileHeaderProps {
   label: string;
   type?: string;
   showLogo?: boolean;
 }
 
-export default function ProfileHeader({
+export default function PersonalityProfileHeader({
   label,
   type,
   showLogo = true,

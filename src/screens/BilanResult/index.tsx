@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import {
-  ProfileHeader,
+  PersonalityProfileHeader,
   ProfileSection,
   TagList,
 } from '@/components/Personality';
@@ -43,7 +43,10 @@ export default function BilanResultScreen() {
           </Text>
         </View>
 
-        <ProfileHeader label={conclusion.archetype.title} showLogo={false} />
+        <PersonalityProfileHeader
+          label={conclusion.archetype.title}
+          showLogo={false}
+        />
 
         <View style={styles.archetypeIntro}>
           <Text style={styles.archetypeSubtitle}>

@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { resetPersonalityTest } from '@/api/personality';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import {
-  ProfileHeader,
+  PersonalityProfileHeader,
   ProfileSection,
   RadarChart,
   TagList,
@@ -87,7 +87,7 @@ export default function PersonalityResultScreen() {
           )}
         >
           {/* HEADER */}
-          <ProfileHeader
+          <PersonalityProfileHeader
             label={result.label}
             type={result.type}
             showLogo={false}
