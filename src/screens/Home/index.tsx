@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { useAuth } from '@/hooks/useAuth';
 import { useBilan } from '@/hooks/useBilan';
 import { useProfile } from '@/hooks/useProfile';

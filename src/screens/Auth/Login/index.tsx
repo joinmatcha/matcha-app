@@ -6,8 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Branding } from '@/assets';
 import ForgotPasswordLink from '@/components/Auth/ForgotPasswordLink';
 import SigninLink from '@/components/Auth/SigninLink';
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import LoginForm from '@/components/Forms/LoginForm';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 
 export default function LoginScreen() {
   return (

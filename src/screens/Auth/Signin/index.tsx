@@ -5,11 +5,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
 import LoginLink from '@/components/Auth/LoginLink';
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import RegistrationForm from '@/components/Forms/RegistrationForm';
 import CGUModal from '@/components/Modals/CGUModal';
 import PrivacyModal from '@/components/Modals/PrivacyModal';
 import TermsAndPrivacyText from '@/components/Texts/TermsAndPrivacyText';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { useModal } from '@/hooks/useModals';
 
 export default function SigninScreen() {

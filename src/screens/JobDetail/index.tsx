@@ -12,11 +12,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getJobById } from '@/api/job';
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import InfoRow from '@/components/Job/InfoRow';
 import SoftCard from '@/components/Job/SoftCard';
 import ProfileSection from '@/components/Personality/ProfileSection';
 import TagList from '@/components/Personality/TagList';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import Colors from '@/themes/colors';
 import { HomeStackParamList } from '@/types/navigation';
 

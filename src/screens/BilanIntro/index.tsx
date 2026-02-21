@@ -4,7 +4,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import Colors from '@/themes/colors';
 import { HomeStackParamList } from '@/types/navigation';
 

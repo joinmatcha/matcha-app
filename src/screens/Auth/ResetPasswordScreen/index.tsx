@@ -7,8 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
 import LoginLink from '@/components/Auth/LoginLink';
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import NewPasswordForm from '@/components/Forms/NewPasswordForm';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { AuthStackParamList } from '@/types/navigation';
 
 type ResetPasswordScreenRouteProp = RouteProp<

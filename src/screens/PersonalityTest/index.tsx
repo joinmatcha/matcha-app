@@ -19,9 +19,9 @@ import {
   getActivePersonalityTest,
   submitPersonalityTest,
 } from '@/api/personality';
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import QuestionCard from '@/components/Personality/QuestionCard';
 import TestHeader from '@/components/Personality/TestHeader';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { useAuth } from '@/hooks/useAuth';
 import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';

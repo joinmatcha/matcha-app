@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import ConfirmDeleteAccountModal from '@/components/Modals/ConfirmDeleteAccountModal';
 import ProfileHeader from '@/components/Profile/ProfileHeader';
 import ProfileInfosReadOnly from '@/components/Profile/ProfileInfosReadOnly';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { useProfile } from '@/hooks/useProfile';
 
 export default function ProfileScreen({ navigation }: any) {

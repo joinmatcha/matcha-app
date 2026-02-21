@@ -8,9 +8,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Branding } from '@/assets';
 import LoginLink from '@/components/Auth/LoginLink';
 import SigninLink from '@/components/Auth/SigninLink';
-import BackgroundBubbles from '@/components/Background/BackgroundBubbles';
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import ForgotPasswordForm from '@/components/Forms/ForgotPasswordForm';
+import BackgroundBubbles from '@/components/layout/BackgroundBubbles';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { AuthStackParamList } from '@/types/navigation';
 
 export default function ForgotPasswordScreen() {

@@ -10,10 +10,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import PersonalityProfileHeader from '@/components/Personality/PersonalityProfileHeader';
 import ProfileSection from '@/components/Personality/ProfileSection';
 import TagList from '@/components/Personality/TagList';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import Colors from '@/themes/colors';
 import { HomeStackParamList } from '@/types/navigation';
 
