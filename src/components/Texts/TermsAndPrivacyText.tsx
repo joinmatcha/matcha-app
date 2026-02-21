@@ -1,8 +1,12 @@
 import React from 'react';
 import { Text } from 'react-native-paper';
 
-import { TermsAndPrivacyTextProps } from '@/components/Texts/types';
 import { styles } from '@/themes/styles';
+
+type TermsAndPrivacyTextProps = {
+  showModalTerms: () => void;
+  showModalPrivacy: () => void;
+};
 
 export default function TermsAndPrivacyText(props: TermsAndPrivacyTextProps) {
   const { showModalTerms, showModalPrivacy } = props;

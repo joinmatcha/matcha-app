@@ -1,8 +1,11 @@
 import { View } from 'react-native';
 import { Divider, Text } from 'react-native-paper';
 
-import { TextDividerProps } from '@/components/Divider/types';
 import { styles } from '@/themes/styles';
+
+type TextDividerProps = {
+  text: string;
+};
 
 export default function TextDivider(props: TextDividerProps) {
   const { text } = props;
