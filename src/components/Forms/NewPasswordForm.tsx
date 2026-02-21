@@ -7,7 +7,10 @@ import { resetPassword } from '@/api/auth';
 import { newPasswordSchema } from '@/schemas/password-reset';
 import { validateZod } from '@/utils/validation';
 
-import { NewPasswordFormProps } from './types';
+interface NewPasswordFormProps {
+  token: string;
+  onSuccess: () => void;
+}
 
 export default function NewPasswordForm({
   token,

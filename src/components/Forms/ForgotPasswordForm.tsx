@@ -7,7 +7,9 @@ import { requestPasswordReset } from '@/api/auth';
 import { forgotPasswordSchema } from '@/schemas/forgot-password';
 import { validateZod } from '@/utils/validation';
 
-import { ForgotPasswordFormProps } from './types';
+interface ForgotPasswordFormProps {
+  setSent: (value: boolean) => void;
+}
 
 export default function ForgotPasswordForm({
   setSent,

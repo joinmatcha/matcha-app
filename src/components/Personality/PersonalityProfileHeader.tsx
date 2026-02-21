@@ -14,7 +14,7 @@ export default function PersonalityProfileHeader({
   label,
   type,
   showLogo = true,
-}: ProfileHeaderProps) {
+}: PersonalityProfileHeaderProps) {
   return (
     <>
       {showLogo && (
