@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export function InfoRow({ label }: { label: string }) {
+export default function InfoRow({ label }: { label: string }) {
   return (
     <View style={styles.row}>
       <View style={styles.dot} />

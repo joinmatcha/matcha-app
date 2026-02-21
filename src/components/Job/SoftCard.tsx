@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export function SoftCard({ children }: { children: React.ReactNode }) {
+export default function SoftCard({ children }: { children: React.ReactNode }) {
   return <View style={styles.card}>{children}</View>;
 }
 
