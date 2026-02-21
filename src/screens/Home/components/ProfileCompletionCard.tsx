@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import ProgressBar from '@/components/Animated/ProgressBar';
+import ProgressBar from '@/components/ui/ProgressBar';
 
 export default function ProfileCompletionCard({
   completion,

@@ -8,8 +8,8 @@ import LoginLink from '@/components/Auth/LoginLink';
 import RegistrationForm from '@/components/Forms/RegistrationForm';
 import CGUModal from '@/components/Modals/CGUModal';
 import PrivacyModal from '@/components/Modals/PrivacyModal';
-import TermsAndPrivacyText from '@/components/Texts/TermsAndPrivacyText';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import TermsAndPrivacyText from '@/components/ui/TermsAndPrivacyText';
 import { useModal } from '@/hooks/useModals';
 
 export default function SigninScreen() {
