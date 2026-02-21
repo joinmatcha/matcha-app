@@ -8,14 +8,14 @@ import {
   requestEmailChange,
   updateProfile,
 } from '@/api/profile';
-import BottomSheetSelect from '@/components/UI/BottomSheetSelect';
+import BottomSheetSelect from '@/components/ui/BottomSheetSelect';
 import { AuthContext } from '@/contexts/AuthContext';
 import { changePasswordSchema } from '@/schemas/change-password';
 import rnpTheme from '@/themes/rnpTheme';
 import { UserFull } from '@/types/user';
 import { validateZod } from '@/utils/validation';
 
-import YearPickerInput from '../UI/YearPickerInput';
+import YearPickerInput from '../ui/YearPickerInput';
 
 export default function ProfileSections({
   section,

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import BottomSheetSelect from '@/components/UI/BottomSheetSelect';
+import BottomSheetSelect from '@/components/ui/BottomSheetSelect';
 
 interface YearPickerInputProps {
   label: string;

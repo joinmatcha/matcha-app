@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import EditableSection from '@/components/UI/EditableSection';
+import EditableSection from '@/components/ui/EditableSection';
 import { UserFull } from '@/types/user';
 
 import ProfileSections from './ProfileSections';
