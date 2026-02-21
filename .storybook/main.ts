@@ -18,7 +18,19 @@ const config: StorybookConfig = {
         __dirname,
         'mocks/codegenNativeComponent.js',
       ),
+      'react-native/Libraries/Utilities/codegenNativeCommands': path.resolve(
+        __dirname,
+        'mocks/codegenNativeCommands.js',
+      ),
       // Packages natifs incompatibles avec le web
+      'expo-linear-gradient': path.resolve(
+        __dirname,
+        'mocks/linearGradient.js',
+      ),
+      'react-native-screens': path.resolve(
+        __dirname,
+        'mocks/reactNativeScreens.js',
+      ),
       '@expo/vector-icons': path.resolve(__dirname, 'mocks/vectorIcons.js'),
       '@expo/vector-icons/MaterialCommunityIcons': path.resolve(
         __dirname,
