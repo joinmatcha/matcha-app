@@ -15,7 +15,8 @@ import { getJobById } from '@/api/job';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import { InfoRow } from '@/components/Job/InfoRow';
 import { SoftCard } from '@/components/Job/SoftCard';
-import { ProfileSection, TagList } from '@/components/Personality';
+import ProfileSection from '@/components/Personality/ProfileSection';
+import TagList from '@/components/Personality/TagList';
 import Colors from '@/themes/colors';
 import { HomeStackParamList } from '@/types/navigation';
 

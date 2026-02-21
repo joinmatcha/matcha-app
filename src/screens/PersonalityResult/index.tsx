@@ -13,12 +13,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { resetPersonalityTest } from '@/api/personality';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
-import {
-  PersonalityProfileHeader,
-  ProfileSection,
-  RadarChart,
-  TagList,
-} from '@/components/Personality';
+import PersonalityProfileHeader from '@/components/Personality/PersonalityProfileHeader';
+import ProfileSection from '@/components/Personality/ProfileSection';
+import RadarChart from '@/components/Personality/RadarChart';
+import TagList from '@/components/Personality/TagList';
 import { useAuth } from '@/hooks/useAuth';
 import Colors from '@/themes/colors';
 import { HomeStackParamList } from '@/types/navigation';

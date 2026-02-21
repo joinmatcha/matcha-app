@@ -20,7 +20,8 @@ import {
   postBilanAnswers,
 } from '@/api/bilan';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
-import { QuestionCard, TestHeader } from '@/components/Personality';
+import QuestionCard from '@/components/Personality/QuestionCard';
+import TestHeader from '@/components/Personality/TestHeader';
 import Colors from '@/themes/colors';
 import { HomeStackParamList } from '@/types/navigation';
 

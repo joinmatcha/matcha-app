@@ -20,7 +20,8 @@ import {
   submitPersonalityTest,
 } from '@/api/personality';
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
-import { QuestionCard, TestHeader } from '@/components/Personality';
+import QuestionCard from '@/components/Personality/QuestionCard';
+import TestHeader from '@/components/Personality/TestHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';

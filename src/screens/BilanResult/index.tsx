@@ -11,11 +11,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundRadial from '@/components/Background/BackgroundRadial';
-import {
-  PersonalityProfileHeader,
-  ProfileSection,
-  TagList,
-} from '@/components/Personality';
+import PersonalityProfileHeader from '@/components/Personality/PersonalityProfileHeader';
+import ProfileSection from '@/components/Personality/ProfileSection';
+import TagList from '@/components/Personality/TagList';
 import Colors from '@/themes/colors';
 import { HomeStackParamList } from '@/types/navigation';
 
