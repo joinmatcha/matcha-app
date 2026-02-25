@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
+import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { useSwipe } from '@/hooks/useSwipe';
 
 const SWIPE_THRESHOLD = 120;

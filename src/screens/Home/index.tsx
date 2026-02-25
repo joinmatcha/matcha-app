@@ -3,23 +3,19 @@ import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getPreferences, Preferences } from '@/api/preferences';
+import { Preferences, getPreferences } from '@/api/preferences';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { useAuth } from '@/hooks/useAuth';
-import BackgroundRadial from '@/components/Background/BackgroundRadial';
-import BilanSummaryCard from '@/components/Bilan/BilanSummaryCard';
-import PersonalitySummaryCard from '@/components/Home/PersonalitySummaryCard';
-import ProfileCompletionCard from '@/components/Home/ProfileCompletionCard';
-import TestCard from '@/components/Home/TestCard';
 import { useBilan } from '@/hooks/useBilan';
 import { useProfile } from '@/hooks/useProfile';
+import { loadDraft } from '@/services/draftStorage';
 import { computeProfileCompletion } from '@/utils/computeProfileCompletion';
 
 import BilanSummaryCard from './components/BilanSummaryCard';
 import PersonalitySummaryCard from './components/PersonalitySummaryCard';
 import ProfileCompletionCard from './components/ProfileCompletionCard';
+import SwipePreferencesCard from './components/SwipePreferencesCard';
 import TestCard from './components/TestCard';
-import {loadDraft} from '@/services/draftStorage';
 
 export default function HomeScreen({ navigation }: any) {
   const { user: authUser } = useAuth();
