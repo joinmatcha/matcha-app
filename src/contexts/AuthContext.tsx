@@ -5,7 +5,7 @@ import {
   deleteAccount as apiDeleteAccount,
   login as apiLogin,
   register as apiRegister,
-  getUserById,
+  getCurrentUser,
 } from '@/api/auth';
 import { User } from '@/types';
 import { getToken, removeToken, storeToken } from '@/utils/storage';
@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           return;
         }
 
-        const currentUser = await getUserById(decoded.id);
+        const currentUser = await getCurrentUser();
 
         const normalizedUser = {
           ...currentUser,
@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setUser(normalizedUser as any);
       }
-    } catch (error) {
+    } catch {
       await removeToken();
       setUser(null);
     } finally {
