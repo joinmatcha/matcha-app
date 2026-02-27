@@ -26,7 +26,7 @@ export interface SwipeResponse {
 }
 
 export const getDeck = async (): Promise<DeckResponse> => {
-  const res = await api.get('/api/job/deck');
+  const res = await api.get('/api/jobs/deck');
   return res.data as DeckResponse;
 };
 
@@ -34,6 +34,6 @@ export const postSwipe = async (
   jobId: string,
   action: 'like' | 'dislike',
 ): Promise<SwipeResponse> => {
-  const res = await api.post('/api/job/swipe', { jobId, action });
+  const res = await api.post('/api/jobs/swipe', { jobId, action });
   return res.data as SwipeResponse;
 };

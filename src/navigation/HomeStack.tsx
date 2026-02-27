@@ -6,7 +6,7 @@ import {
   BilanResultScreen,
 } from '@/features/bilan';
 import { HomeScreen } from '@/features/home';
-import { JobDetailScreen } from '@/features/job';
+import { JobDetailScreen } from '@/features/jobs';
 import {
   PersonalityResultScreen,
   PersonalityTestScreen,

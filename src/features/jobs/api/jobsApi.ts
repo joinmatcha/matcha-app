@@ -55,6 +55,6 @@ export const getJobs = async (params?: {
  * (fiche métier complète)
  */
 export const getJobById = async (jobId: string) => {
-  const res = await api.get(`/api/job/${jobId}`);
+  const res = await api.get(`/api/jobs/${jobId}`);
   return res.data as { job: JobDetail };
 };
