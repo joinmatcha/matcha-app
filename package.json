@@ -9,7 +9,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --passWithNoTests",
+    "test": "jest --config jest.config.cjs --passWithNoTests",
+    "test:coverage": "jest --config jest.config.cjs --passWithNoTests --coverage --watch=false",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "storybook": "storybook dev -p 6006",
@@ -68,11 +69,5 @@
     "ts-jest": "^29.4.0",
     "typescript": "~5.9.2"
   },
-  "private": true,
-  "jest": {
-    "preset": "jest-expo",
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
-    }
-  }
+  "private": true
 }
