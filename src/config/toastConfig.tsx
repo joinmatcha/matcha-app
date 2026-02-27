@@ -3,8 +3,14 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import rnpTheme from '@/themes/rnpTheme';
 
+type ToastRenderProps = {
+  text1?: string;
+  text2?: string;
+  onPress?: () => void;
+};
+
 export const toastConfig = {
-  success: (props: any) => (
+  success: (props: ToastRenderProps) => (
     <TouchableOpacity
       style={styles.successToast}
       onPress={props.onPress}
@@ -16,7 +22,7 @@ export const toastConfig = {
       </View>
     </TouchableOpacity>
   ),
-  error: (props: any) => (
+  error: (props: ToastRenderProps) => (
     <TouchableOpacity
       style={styles.errorToast}
       onPress={props.onPress}

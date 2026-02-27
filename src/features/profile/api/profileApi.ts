@@ -1,0 +1,46 @@
+import api from '@/api/api';
+
+export type UpdateProfilePayload = {
+  firstName?: string;
+  lastName?: string;
+  birthYear?: number;
+  gender?: 'male' | 'female' | 'other' | 'undisclosed';
+  addressStreet?: string;
+  addressCity?: string;
+  addressPostalCode?: string;
+  addressCountry?: string;
+  locationPref?: 'remote' | 'hybrid' | 'on-site';
+  remote?: boolean | null;
+  consentAccepted?: boolean;
+};
+
+export async function changePassword(data: {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}) {
+  const response = await api.post('/api/profile/change-password', data);
+  return response.data;
+}
+
+export async function getProfile() {
+  const response = await api.get('/api/profile');
+  return response.data;
+}
+
+export async function updateProfile(data: UpdateProfilePayload) {
+  const response = await api.patch('/api/profile', data);
+  return response.data;
+}
+
+export async function deleteAccount() {
+  const response = await api.delete('/api/profile/account');
+  return response.data;
+}
+
+export async function requestEmailChange(newEmail: string) {
+  const response = await api.post('/api/profile/request-email-change', {
+    newEmail,
+  });
+  return response.data;
+}

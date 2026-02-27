@@ -16,11 +16,6 @@ export async function login(email: string, password: string) {
   return response.data;
 }
 
-export async function getUserById(id: string) {
-  const response = await api.get(`/api/users/${id}`);
-  return response.data;
-}
-
 export async function getCurrentUser() {
   const response = await api.get('/api/users/me');
   return response.data;

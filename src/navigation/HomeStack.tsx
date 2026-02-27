@@ -1,12 +1,16 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import BilanIntroScreen from '@/screens/BilanIntro';
-import BilanQuestionsScreen from '@/screens/BilanQuestions';
-import BilanResultScreen from '@/screens/BilanResult';
-import HomeScreen from '@/screens/Home';
-import JobDetailScreen from '@/screens/JobDetail';
-import PersonalityResultScreen from '@/screens/PersonalityResult';
-import PersonalityTestScreen from '@/screens/PersonalityTest';
+import {
+  BilanIntroScreen,
+  BilanQuestionsScreen,
+  BilanResultScreen,
+} from '@/features/bilan';
+import { HomeScreen } from '@/features/home';
+import { JobDetailScreen } from '@/features/job';
+import {
+  PersonalityResultScreen,
+  PersonalityTestScreen,
+} from '@/features/personality';
 import { HomeStackParamList } from '@/types/navigation';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();

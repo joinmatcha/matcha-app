@@ -2,7 +2,7 @@ import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 
-import AnswerButton from '@/components/Personality/AnswerButton';
+import AnswerButton from '@/features/personality/components/AnswerButton';
 
 const defaultProps = {
   value: 1,

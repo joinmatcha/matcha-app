@@ -1,6 +1,6 @@
 import { ZodSchema } from 'zod';
 
-export function validateZod<T>(schema: ZodSchema<T>, data: any) {
+export function validateZod<T>(schema: ZodSchema<T>, data: unknown) {
   const result = schema.safeParse(data);
   if (result.success) return { valid: true, errors: {} };
 

@@ -1,13 +1,14 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import LogoutScreen from '@/screens/Auth/Logout';
-import ProfileScreen from '@/screens/Profile';
-import SwipeScreen from '@/screens/Swipe';
+import { LogoutScreen } from '@/features/auth';
+import { ProfileScreen } from '@/features/profile';
+import { SwipeScreen } from '@/features/swipe';
+import { TabParamList } from '@/types/navigation';
 
 import HomeStack from './HomeStack';
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function TabNavigator() {
   return (

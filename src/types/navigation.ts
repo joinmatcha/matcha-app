@@ -1,5 +1,8 @@
-import { BilanResult } from '@/api/bilan';
-import { PersonalityResult } from '@/api/personality';
+import { NavigatorScreenParams } from '@react-navigation/native';
+
+import { BilanResult } from '@/features/bilan/api/bilanApi';
+import { PersonalityResult } from '@/features/personality/api/personalityApi';
+import { PersonalitySummary } from '@/types/user';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -8,17 +11,12 @@ export type AuthStackParamList = {
   ResetPassword: { token: string };
 };
 
-export type CommonStackParamList = {
-  Home: undefined;
-  PersonalityTest: undefined;
-};
-
 export type HomeStackParamList = {
   HomeMain: undefined;
 
   PersonalityTest: undefined;
   PersonalityResult: {
-    result: PersonalityResult;
+    result: PersonalityResult | PersonalitySummary;
   };
 
   BilanIntro: undefined;
@@ -27,4 +25,16 @@ export type HomeStackParamList = {
     bilan: BilanResult;
   };
   JobDetail: { jobId: string };
+};
+
+export type TabParamList = {
+  Home: NavigatorScreenParams<HomeStackParamList>;
+  Swipe: undefined;
+  Profil: undefined;
+  Deconnexion: undefined;
+};
+
+export type RootStackParamList = {
+  Auth: NavigatorScreenParams<AuthStackParamList>;
+  Main: NavigatorScreenParams<TabParamList>;
 };

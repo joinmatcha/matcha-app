@@ -38,8 +38,6 @@ export interface UserFull {
 
   isEmailVerified: boolean;
   consentAccepted: boolean;
-  consentEmail?: boolean;
-  consentData?: boolean;
 
   personalityTestId?: string;
   skillsAssessmentId?: string;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button, Modal, Portal, Text } from 'react-native-paper';
 
 import { modalStyles } from '@/components/Modals/styles';
@@ -36,32 +36,25 @@ export default function DeleteAccountModal(props: DeleteAccountModalProps) {
           Impossible de faire marche arrière.
         </Text>
 
-        <Text style={[modalStyles.section, { fontWeight: 'bold' }]}>
+        <Text style={[modalStyles.section, styles.boldSection]}>
           Tu es sûr(e) ?
         </Text>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: rnpTheme.spacing.lg,
-            gap: rnpTheme.spacing.md,
-          }}
-        >
+        <View style={styles.actionsRow}>
           <Button
             mode="contained"
             onPress={onConfirm}
-            style={{ flex: 1 }}
+            style={styles.actionButton}
             buttonColor={rnpTheme.colors.greenDark.normal}
           >
             Adieu !
           </Button>
           <Button
             onPress={onDismiss}
-            style={{ flex: 1 }}
+            style={styles.actionButton}
             textColor={rnpTheme.colors.error}
             buttonColor="transparent"
-            labelStyle={{ textDecorationLine: 'underline' }}
+            labelStyle={styles.underlineLabel}
           >
             C'est une erreur !
           </Button>
@@ -70,3 +63,21 @@ export default function DeleteAccountModal(props: DeleteAccountModalProps) {
     </Portal>
   );
 }
+
+const styles = StyleSheet.create({
+  boldSection: {
+    fontWeight: 'bold',
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: rnpTheme.spacing.lg,
+    gap: rnpTheme.spacing.md,
+  },
+  actionButton: {
+    flex: 1,
+  },
+  underlineLabel: {
+    textDecorationLine: 'underline',
+  },
+});

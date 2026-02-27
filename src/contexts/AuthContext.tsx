@@ -35,6 +35,17 @@ interface JWTPayload {
   exp: number;
 }
 
+type RawUser = Partial<User> & { _id?: string };
+
+const normalizeUser = (
+  raw: RawUser | null | undefined,
+  fallbackId?: string,
+): User =>
+  ({
+    ...(raw ?? {}),
+    id: raw?.id ?? raw?._id ?? fallbackId ?? '',
+  }) as User;
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -44,25 +55,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const loadUser = async () => {
     try {
       const token = await getToken();
-      if (token) {
-        const decoded = jwtDecode<JWTPayload>(token);
-
-        // Vérifier si le token n'est pas expiré
-        if (decoded.exp * 1000 < Date.now()) {
-          await removeToken();
-          setUser(null);
-          return;
-        }
-
-        const currentUser = await getCurrentUser();
-
-        const normalizedUser = {
-          ...currentUser,
-          id: (currentUser as any).id ?? (currentUser as any)._id ?? decoded.id,
-        };
-
-        setUser(normalizedUser as any);
+      if (!token) {
+        setUser(null);
+        return;
       }
+
+      const decoded = jwtDecode<JWTPayload>(token);
+
+      // Vérifier si le token n'est pas expiré
+      if (decoded.exp * 1000 < Date.now()) {
+        await removeToken();
+        setUser(null);
+        return;
+      }
+
+      const currentUser = await getCurrentUser();
+      setUser(normalizeUser(currentUser, decoded.id));
     } catch {
       await removeToken();
       setUser(null);
@@ -76,19 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const { token, user } = await apiLogin(email, password);
-      await storeToken(token);
-
-      const normalizedUser = {
-        ...user,
-        id: (user as any).id ?? (user as any)._id,
-      };
-
-      setUser(normalizedUser as any);
-    } catch (error) {
-      throw error;
-    }
+    const { token, user } = await apiLogin(email, password);
+    await storeToken(token);
+    setUser(normalizeUser(user));
   };
 
   const register = async (data: {
@@ -97,16 +95,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     firstName: string;
     lastName: string;
   }) => {
-    try {
-      const registrationData = {
-        ...data,
-        consentAccepted: true,
-      };
-      await apiRegister(registrationData);
-      // await login(data.email, data.password);
-    } catch (error) {
-      throw error;
-    }
+    const registrationData = {
+      ...data,
+      consentAccepted: true,
+    };
+    await apiRegister(registrationData);
+    // await login(data.email, data.password);
   };
 
   const logout = async () => {
@@ -115,13 +109,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const deleteAccount = async () => {
-    try {
-      await apiDeleteAccount();
-      await removeToken();
-      setUser(null);
-    } catch (error) {
-      throw error;
-    }
+    await apiDeleteAccount();
+    await removeToken();
+    setUser(null);
   };
 
   const refreshUser = async () => {
