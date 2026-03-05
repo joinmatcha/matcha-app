@@ -4,6 +4,8 @@ import { BilanResult } from '@/features/bilan/api/bilanApi';
 import { PersonalityResult } from '@/features/personality/api/personalityApi';
 import { PersonalitySummary } from '@/types/user';
 
+export type BilanIntroMode = 'start' | 'restart' | 'resume';
+
 export type AuthStackParamList = {
   Login: undefined;
   Signin: undefined;
@@ -14,12 +16,13 @@ export type AuthStackParamList = {
 export type HomeStackParamList = {
   HomeMain: undefined;
 
+  PersonalityIntro: { hasDraft?: boolean } | undefined;
   PersonalityTest: undefined;
   PersonalityResult: {
     result: PersonalityResult | PersonalitySummary;
   };
 
-  BilanIntro: undefined;
+  BilanIntro: { mode?: BilanIntroMode } | undefined;
   BilanQuestions: undefined;
   BilanResult: {
     bilan: BilanResult;
@@ -31,7 +34,6 @@ export type TabParamList = {
   Home: NavigatorScreenParams<HomeStackParamList>;
   Swipe: undefined;
   Profil: undefined;
-  Deconnexion: undefined;
 };
 
 export type RootStackParamList = {

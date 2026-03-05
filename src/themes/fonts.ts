@@ -1,6 +1,8 @@
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+
 const Fonts = {
-  title: 'PolySans Trial',
-  body: 'Montserrat-Regular',
+  title: titleFontFamily,
+  body: bodyFontFamily,
   logo: 'Croist',
 };
 

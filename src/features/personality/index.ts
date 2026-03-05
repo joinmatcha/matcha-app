@@ -1,3 +1,4 @@
+export { default as PersonalityIntroScreen } from './screens/PersonalityIntro';
 export { default as PersonalityTestScreen } from './screens/PersonalityTest';
 export { default as PersonalityResultScreen } from './screens/PersonalityResult';
 

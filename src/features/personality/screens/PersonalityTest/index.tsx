@@ -11,7 +11,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import {
@@ -25,6 +24,8 @@ import TestHeader from '@/features/personality/components/TestHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+import { primaryButton, primaryButtonText } from '@/themes/ui';
 import { HomeStackParamList } from '@/types/navigation';
 import { getApiErrorMessage } from '@/utils/apiError';
 
@@ -77,11 +78,6 @@ export default function PersonalityTestScreen() {
         draft.templateVersion === test.version
       ) {
         setAnswers(deserializeAnswers(draft.data.answers));
-        Toast.show({
-          type: 'info',
-          text1: 'Brouillon restauré',
-          text2: 'Tu peux reprendre le test où tu t’étais arrêté.',
-        });
       } else {
         await clearDraft('personality', userId);
       }
@@ -103,11 +99,10 @@ export default function PersonalityTestScreen() {
         setTest(response.test);
       }
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Erreur',
-        text2: getApiErrorMessage(error, 'Impossible de charger le test'),
-      });
+      Alert.alert(
+        'Erreur',
+        getApiErrorMessage(error, 'Impossible de charger le test'),
+      );
     } finally {
       setLoading(false);
     }
@@ -145,12 +140,6 @@ export default function PersonalityTestScreen() {
             // on évite que le useEffect re-restaure instant
             restoredOnceRef.current = true;
 
-            Toast.show({
-              type: 'success',
-              text1: 'Brouillon supprimé',
-              text2: 'Tu peux recommencer le test.',
-            });
-
             scrollViewRef.current?.scrollTo({ y: 0, animated: true });
           },
         },
@@ -187,11 +176,8 @@ export default function PersonalityTestScreen() {
     if (!test) return;
 
     if (answers.size !== test.questions.length) {
-      return Toast.show({
-        type: 'error',
-        text1: 'Test incomplet',
-        text2: 'Veuillez répondre à toutes les questions',
-      });
+      Alert.alert('Test incomplet', 'Veuillez répondre à toutes les questions');
+      return;
     }
 
     setSubmitting(true);
@@ -208,11 +194,10 @@ export default function PersonalityTestScreen() {
 
       navigation.navigate('PersonalityResult', { result: testResult });
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Erreur',
-        text2: getApiErrorMessage(error, 'Impossible de soumettre le test'),
-      });
+      Alert.alert(
+        'Erreur',
+        getApiErrorMessage(error, 'Impossible de soumettre le test'),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -229,7 +214,7 @@ export default function PersonalityTestScreen() {
   if (!test) {
     return (
       <BackgroundRadial>
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
           <View style={styles.centerContainer}>
             <Text style={styles.errorTitle}>Aucun test disponible</Text>
             <Text style={styles.errorMessage}>
@@ -254,11 +239,11 @@ export default function PersonalityTestScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <View style={styles.container}>
           <TestHeader
-            title={test.title}
-            summary={test.summary}
+            title="Test de personnalité"
+            summary="Réponds spontanément, sans trop réfléchir."
             currentQuestion={answers.size}
             totalQuestions={test.questions.length}
           />
@@ -300,6 +285,16 @@ export default function PersonalityTestScreen() {
               </View>
             ))}
 
+            <View style={styles.scrollSpacer} />
+          </ScrollView>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerMeta}>
+              {isComplete
+                ? 'Parfait, tu peux finaliser.'
+                : `${test.questions.length - answers.size} question(s) restante(s)`}
+            </Text>
+
             <TouchableOpacity
               style={[
                 styles.submitButton,
@@ -309,16 +304,16 @@ export default function PersonalityTestScreen() {
               onPress={handleSubmit}
             >
               {submitting ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color="#4F4741" />
               ) : (
                 <Text style={styles.submitButtonText}>
                   {isComplete
                     ? 'Terminer le test'
-                    : 'Complétez toutes les questions'}
+                    : 'Complète toutes les questions'}
                 </Text>
               )}
             </TouchableOpacity>
-          </ScrollView>
+          </View>
         </View>
       </SafeAreaView>
     </BackgroundRadial>
@@ -335,7 +330,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   scrollView: { flex: 1 },
-  scrollContent: { padding: 20, paddingBottom: 40 },
+  scrollContent: { padding: 20, paddingBottom: 24 },
+  scrollSpacer: { height: 8 },
 
   actionsRow: {
     paddingHorizontal: 20,
@@ -347,50 +343,89 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.55)',
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   restartText: {
     fontSize: 13,
-    fontWeight: '700',
-    color: 'rgba(0,0,0,0.55)',
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: '#232323',
   },
 
   submitButton: {
-    backgroundColor: '#0A2916',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 20,
+    ...primaryButton,
+    backgroundColor: '#2F7A5F',
+    shadowColor: '#1D4E3C',
+    minHeight: 52,
   },
   submitButtonDisabled: { opacity: 0.5 },
-  submitButtonText: { color: 'white', fontWeight: '600', fontSize: 16 },
+  submitButtonText: {
+    ...primaryButtonText,
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: titleFontFamily,
+  },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: '#EEE7DF',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 14,
+    backgroundColor: 'rgba(255,255,255,0.96)',
+  },
+  footerMeta: {
+    fontSize: 12,
+    fontFamily: titleFontFamily,
+    color: '#2A2725',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
   errorTitle: {
     color: 'red',
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
     marginBottom: 12,
   },
   errorMessage: {
     fontSize: 15,
+    fontFamily: bodyFontFamily,
     textAlign: 'center',
     marginBottom: 22,
-    color: '#333',
+    color: '#3D3834',
     lineHeight: 22,
   },
   retryButton: {
-    backgroundColor: '#0A2916',
-    paddingVertical: 12,
+    ...primaryButton,
+    minHeight: 48,
     paddingHorizontal: 28,
-    borderRadius: 12,
     marginBottom: 12,
   },
-  retryButtonText: { color: 'white', fontWeight: '600' },
+  retryButtonText: {
+    ...primaryButtonText,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+  },
   logoutButton: {
-    borderWidth: 1.5,
     paddingVertical: 12,
     paddingHorizontal: 28,
     borderRadius: 12,
-    borderColor: '#0A2916',
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  logoutButtonText: { color: '#0A2916', fontWeight: '600' },
+  logoutButtonText: {
+    color: '#232323',
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+  },
 });

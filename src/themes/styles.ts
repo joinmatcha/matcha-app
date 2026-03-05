@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     marginBottom: rnpTheme.spacing.md,
     fontWeight: 'bold',
     color: rnpTheme.colors.primary,
-    fontFamily: 'Montserrat_700Bold',
+    fontFamily: rnpTheme.customFonts.title,
   },
   inputContainer: {
     gap: rnpTheme.spacing.sm,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   loginText: {
     textAlign: 'center',
-    color: '#666',
+    color: '#2A2A2A',
   },
   safeAreaView: {
     flex: 1,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     margin: 0,
     minWidth: 0,
     textAlign: 'center',
-    color: '#666',
+    color: '#2A2A2A',
   },
   deleteAccountText: {
     color: rnpTheme.colors.error,

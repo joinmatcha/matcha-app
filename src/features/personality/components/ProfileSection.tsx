@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import Colors from '@/themes/colors';
+import { titleFontFamily } from '@/themes/typography';
+import { cardSurface } from '@/themes/ui';
 
 interface ProfileSectionProps {
   title: string;
@@ -24,25 +26,20 @@ export default function ProfileSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: 'rgba(255,255,255,0.97)',
+    ...cardSurface,
     marginHorizontal: 20,
     marginTop: 16,
     paddingVertical: 20,
     paddingHorizontal: 18,
-    borderRadius: 18,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
   },
   lastSection: {
     marginBottom: 32,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
-    color: Colors.greenDark.normal,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: Colors.text.base,
     marginBottom: 14,
   },
 });

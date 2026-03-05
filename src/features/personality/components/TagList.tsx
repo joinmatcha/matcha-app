@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import Colors from '@/themes/colors';
+import { bodyFontFamily } from '@/themes/typography';
 
 interface TagListProps {
   items: string[];
@@ -37,23 +38,21 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   tag: {
-    backgroundColor: 'rgba(232,244,238,0.9)',
-    borderWidth: 1,
-    borderColor: Colors.greenLight.normal,
+    backgroundColor: Colors.accent.soft,
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 999,
   },
   tagWarning: {
-    backgroundColor: 'rgba(255,241,230,0.95)',
-    borderColor: Colors.orange.normal,
+    backgroundColor: '#F3EFED',
   },
   tagText: {
     fontSize: 13,
-    fontWeight: '500',
-    color: Colors.greenDark.normal,
+    fontWeight: '600',
+    fontFamily: bodyFontFamily,
+    color: Colors.accent.strong,
   },
   tagTextWarning: {
-    color: Colors.orange.dark.normal,
+    color: '#6A5A51',
   },
 });

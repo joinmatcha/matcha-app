@@ -8,6 +8,7 @@ import {
 import { HomeScreen } from '@/features/home';
 import { JobDetailScreen } from '@/features/jobs';
 import {
+  PersonalityIntroScreen,
   PersonalityResultScreen,
   PersonalityTestScreen,
 } from '@/features/personality';
@@ -22,6 +23,10 @@ export default function HomeStack() {
       <Stack.Screen name="HomeMain" component={HomeScreen} />
 
       {/* PERSONALITY FLOW */}
+      <Stack.Screen
+        name="PersonalityIntro"
+        component={PersonalityIntroScreen}
+      />
       <Stack.Screen name="PersonalityTest" component={PersonalityTestScreen} />
       <Stack.Screen
         name="PersonalityResult"

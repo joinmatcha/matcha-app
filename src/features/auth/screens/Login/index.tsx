@@ -8,11 +8,13 @@ import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import ForgotPasswordLink from '@/features/auth/components/ForgotPasswordLink';
 import SigninLink from '@/features/auth/components/SigninLink';
 import LoginForm from '@/features/auth/forms/LoginForm';
+import { bodyFontFamily, displayFontFamily } from '@/themes/typography';
+import { cardSurface } from '@/themes/ui';
 
 export default function LoginScreen() {
   return (
     <BackgroundRadial bubbles>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.contentContainer}
@@ -22,7 +24,6 @@ export default function LoginScreen() {
             <Branding.Logo />
           </View>
 
-          {/* CARD BLANCHE */}
           <View style={styles.card}>
             <Text style={styles.title}>Connexion</Text>
             <Text style={styles.subtitle}>
@@ -59,36 +60,33 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     zIndex: 5,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    paddingHorizontal: 20,
+    ...cardSurface,
+    paddingHorizontal: 22,
     paddingVertical: 24,
     zIndex: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#062314',
-    marginBottom: 6,
+    fontSize: 28,
+    fontWeight: '700',
+    fontFamily: displayFontFamily,
+    color: '#1F1F1F',
+    marginBottom: 8,
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: 14,
-    color: 'rgba(0,0,0,0.55)',
-    lineHeight: 20,
-    marginBottom: 20,
+    fontSize: 15,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(45,33,27,0.72)',
+    lineHeight: 22,
+    marginBottom: 22,
   },
   linksContainer: {
-    marginTop: 12,
-    alignItems: 'center', // <-- ici
+    marginTop: 10,
+    alignItems: 'center',
     gap: 4,
   },
 });

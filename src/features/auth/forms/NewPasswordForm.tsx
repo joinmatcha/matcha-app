@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
-import Toast from 'react-native-toast-message';
 
 import { resetPassword } from '@/api/auth';
 import { newPasswordSchema } from '@/schemas/password-reset';
+import { titleFontFamily } from '@/themes/typography';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
 
@@ -43,12 +43,6 @@ export default function NewPasswordForm({
     try {
       await resetPassword(token, password);
 
-      Toast.show({
-        type: 'success',
-        text1: 'Mot de passe réinitialisé',
-        text2: 'Vous pouvez maintenant vous connecter.',
-      });
-
       setTimeout(onSuccess, 1200);
     } catch (err) {
       const errorMessage = getApiErrorMessage(
@@ -56,12 +50,6 @@ export default function NewPasswordForm({
         'Le token est invalide ou expiré.',
       );
       setError(errorMessage);
-
-      Toast.show({
-        type: 'error',
-        text1: 'Échec de la réinitialisation',
-        text2: errorMessage,
-      });
     } finally {
       setLoading(false);
     }
@@ -110,7 +98,10 @@ export default function NewPasswordForm({
         onPress={handleSubmit}
         loading={loading}
         disabled={loading}
+        buttonColor="#E9E6E2"
+        textColor="#2B2A29"
         style={styles.continueButton}
+        labelStyle={styles.continueButtonLabel}
       >
         Réinitialiser le mot de passe
       </Button>
@@ -128,6 +119,10 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     marginTop: 12,
-    borderRadius: 12,
+    borderRadius: 16,
+  },
+  continueButtonLabel: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
   },
 });

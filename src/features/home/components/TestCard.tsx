@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import Colors from '@/themes/colors';
+import { titleFontFamily } from '@/themes/typography';
+import { cardSurface, secondaryButton, secondaryButtonText } from '@/themes/ui';
 
 export default function TestCard({
   title,
@@ -20,7 +21,11 @@ export default function TestCard({
 
       <Text style={styles.description}>{description}</Text>
 
-      <TouchableOpacity onPress={onPress} style={styles.button}>
+      <TouchableOpacity
+        activeOpacity={0.88}
+        onPress={onPress}
+        style={styles.button}
+      >
         <Text style={styles.buttonLabel}>{buttonLabel}</Text>
       </TouchableOpacity>
     </View>
@@ -29,42 +34,33 @@ export default function TestCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffffdd',
-    borderRadius: 20,
+    ...cardSurface,
     padding: 20,
     marginTop: 16,
     marginBottom: 16,
-
-    shadowColor: '#000',
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 3,
   },
 
   title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#062314',
+    fontSize: 19,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: '#1F1F1F',
   },
 
   description: {
-    marginTop: 6,
-    fontSize: 15,
-    color: 'rgba(0,0,0,0.55)',
-    lineHeight: 22,
-    marginBottom: 18,
+    marginTop: 8,
+    fontSize: 14,
+    color: 'rgba(0,0,0,0.78)',
+    lineHeight: 21,
+    marginBottom: 16,
   },
 
   button: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
+    ...secondaryButton,
+    marginTop: 10,
   },
 
   buttonLabel: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '700',
+    ...secondaryButtonText,
   },
 });

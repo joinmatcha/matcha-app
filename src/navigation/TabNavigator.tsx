@@ -1,9 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import { LogoutScreen } from '@/features/auth';
 import { ProfileScreen } from '@/features/profile';
 import { SwipeScreen } from '@/features/swipe';
+import Colors from '@/themes/colors';
 import { TabParamList } from '@/types/navigation';
 
 import HomeStack from './HomeStack';
@@ -15,7 +15,8 @@ export default function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#000000',
+        tabBarActiveTintColor: Colors.accent.primary,
+        tabBarInactiveTintColor: '#8B9097',
       }}
     >
       <Tab.Screen
@@ -47,17 +48,6 @@ export default function TabNavigator() {
           title: 'Profil',
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="person" color={color} size={size} />
-          ),
-        }}
-      />
-
-      <Tab.Screen
-        name="Deconnexion"
-        component={LogoutScreen}
-        options={{
-          title: 'Deconnexion',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="logout" color={color} size={size} />
           ),
         }}
       />

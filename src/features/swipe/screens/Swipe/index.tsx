@@ -1,7 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   PanResponder,
   StyleSheet,
@@ -11,10 +13,57 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { useSwipe } from '@/features/swipe/hooks/useSwipe';
+import Colors from '@/themes/colors';
+import {
+  bodyFontFamily,
+  displayFontFamily,
+  titleFontFamily,
+} from '@/themes/typography';
+import { cardSurface, primaryButton, primaryButtonText } from '@/themes/ui';
 
 const SWIPE_THRESHOLD = 120;
+
+function SwipeBackground({ children }: { children: React.ReactNode }) {
+  return (
+    <View style={styles.backgroundRoot}>
+      <LinearGradient
+        colors={['#11151C', '#0D1117', '#090C12']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
+
+      <LinearGradient
+        colors={[
+          'rgba(255,107,138,0.22)',
+          'rgba(255,107,138,0.06)',
+          'transparent',
+        ]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0.7 }}
+        style={styles.backgroundWash}
+      />
+
+      <LinearGradient
+        colors={[
+          'rgba(45,190,139,0.24)',
+          'rgba(45,190,139,0.06)',
+          'transparent',
+        ]}
+        start={{ x: 1, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.backgroundWash}
+      />
+
+      <View style={styles.diagonalBandOne} pointerEvents="none" />
+      <View style={styles.diagonalBandTwo} pointerEvents="none" />
+      <View style={styles.diagonalBandThree} pointerEvents="none" />
+
+      <View style={styles.backgroundContent}>{children}</View>
+    </View>
+  );
+}
 
 export default function SwipeScreen() {
   const { deck, remaining, loading, error, loadDeck, swipe } = useSwipe();
@@ -34,15 +83,17 @@ export default function SwipeScreen() {
   useEffect(() => {
     pan.x.setValue(0);
     isAnimating.current = false;
-  }, [deck]);
+  }, [deck, pan.x]);
 
   const animateOutRef = useRef<(action: 'like' | 'dislike') => void>(() => {});
   animateOutRef.current = (action: 'like' | 'dislike') => {
     if (isAnimating.current) return;
     const job = currentJobRef.current;
     if (!job) return;
+
     isAnimating.current = true;
     const toX = action === 'like' ? 500 : -500;
+
     Animated.timing(pan.x, {
       toValue: toX,
       duration: 250,
@@ -83,8 +134,8 @@ export default function SwipeScreen() {
   ).current;
 
   const cardRotation = pan.x.interpolate({
-    inputRange: [-200, 0, 200],
-    outputRange: ['-10deg', '0deg', '10deg'],
+    inputRange: [-220, 0, 220],
+    outputRange: ['-12deg', '0deg', '12deg'],
     extrapolate: 'clamp',
   });
 
@@ -100,74 +151,139 @@ export default function SwipeScreen() {
     extrapolate: 'clamp',
   });
 
+  const likeScale = pan.x.interpolate({
+    inputRange: [0, SWIPE_THRESHOLD],
+    outputRange: [0.9, 1],
+    extrapolate: 'clamp',
+  });
+
+  const nopeScale = pan.x.interpolate({
+    inputRange: [-SWIPE_THRESHOLD, 0],
+    outputRange: [1, 0.9],
+    extrapolate: 'clamp',
+  });
+
   const currentJob = deck[0] ?? null;
+  const nextJob = deck[1] ?? null;
+  const afterNextJob = deck[2] ?? null;
 
   if (loading || (deck.length === 0 && remaining !== null && remaining > 0)) {
     return (
-      <BackgroundRadial>
-        <SafeAreaView style={styles.centered}>
-          <Text style={styles.statusText}>Chargement...</Text>
+      <SwipeBackground>
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.centered}>
+          <View style={styles.stateCard}>
+            <ActivityIndicator size="large" color={Colors.greenDark.normal} />
+            <Text style={styles.stateTitle}>Préparation de ton deck</Text>
+            <Text style={styles.stateSubtitle}>
+              On sélectionne les prochains métiers à te proposer.
+            </Text>
+          </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </SwipeBackground>
     );
   }
 
   if (error) {
     return (
-      <BackgroundRadial>
-        <SafeAreaView style={styles.centered}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadDeck}>
-            <Text style={styles.retryText}>Réessayer</Text>
-          </TouchableOpacity>
+      <SwipeBackground>
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.centered}>
+          <View style={styles.stateCard}>
+            <MaterialIcons
+              name="wifi-off"
+              size={36}
+              color={Colors.orange.normal}
+            />
+            <Text style={styles.stateTitle}>
+              Impossible de charger les métiers
+            </Text>
+            <Text style={styles.stateSubtitle}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={loadDeck}>
+              <Text style={styles.retryText}>Réessayer</Text>
+            </TouchableOpacity>
+          </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </SwipeBackground>
     );
   }
 
   if (remaining === 0) {
     return (
-      <BackgroundRadial>
-        <SafeAreaView style={styles.centered}>
-          <MaterialIcons name="check-circle" size={64} color="#2DAC5C" />
-          <Text style={styles.quotaTitle}>C'est tout pour aujourd'hui !</Text>
-          <Text style={styles.quotaSubtitle}>
-            Tu as utilisé tous tes swipes du jour.{'\n'}Reviens demain pour
-            découvrir de nouveaux métiers.
-          </Text>
+      <SwipeBackground>
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.centered}>
+          <View style={styles.stateCard}>
+            <View style={styles.stateIconWrap}>
+              <MaterialIcons
+                name="favorite"
+                size={30}
+                color={Colors.greenDark.normal}
+              />
+            </View>
+            <Text style={styles.stateTitle}>
+              Tu as tout vu pour aujourd&apos;hui
+            </Text>
+            <Text style={styles.stateSubtitle}>
+              Tu as utilisé tous tes swipes du jour. Reviens demain pour
+              découvrir de nouveaux métiers.
+            </Text>
+          </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </SwipeBackground>
     );
   }
 
   if (deck.length === 0) {
     return (
-      <BackgroundRadial>
-        <SafeAreaView style={styles.centered}>
-          <MaterialIcons name="work-off" size={64} color="#888" />
-          <Text style={styles.quotaTitle}>Aucun métier disponible</Text>
-          <Text style={styles.quotaSubtitle}>
-            Tu as déjà vu tous les métiers récemment.{'\n'}Reviens plus tard !
-          </Text>
+      <SwipeBackground>
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.centered}>
+          <View style={styles.stateCard}>
+            <View style={styles.stateIconWrap}>
+              <MaterialIcons
+                name="work-outline"
+                size={30}
+                color={Colors.greenDark.normal}
+              />
+            </View>
+            <Text style={styles.stateTitle}>Aucun métier disponible</Text>
+            <Text style={styles.stateSubtitle}>
+              Tu as déjà vu les métiers disponibles récemment. Reviens plus
+              tard.
+            </Text>
+          </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </SwipeBackground>
     );
   }
 
   return (
-    <BackgroundRadial>
-      <SafeAreaView style={styles.container}>
+    <SwipeBackground>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Découvrir des métiers</Text>
+          <View style={styles.headerCopy}>
+            <Text style={styles.eyebrow}>MATCHING MÉTIERS</Text>
+            <Text style={styles.headerTitle}>
+              Swipe les métiers qui te parlent
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              Passe ou garde en un geste.
+            </Text>
+          </View>
+
           {remaining !== null && (
-            <Text style={styles.remaining}>{remaining} restant(s)</Text>
+            <View style={styles.remainingPill}>
+              <Text style={styles.remainingValue}>{remaining}</Text>
+              <Text style={styles.remainingLabel}>restants</Text>
+            </View>
           )}
         </View>
 
         <View style={styles.cardArea}>
-          {deck[1] && (
-            <View style={styles.cardBehind} pointerEvents="none">
-              <Text style={styles.cardTitle}>{deck[1].title}</Text>
+          {afterNextJob && <View style={styles.cardShadowBackMost} />}
+
+          {nextJob && (
+            <View style={styles.cardShadowBack}>
+              <Text numberOfLines={1} style={styles.backCardTitle}>
+                {nextJob.title}
+              </Text>
             </View>
           )}
 
@@ -184,45 +300,66 @@ export default function SwipeScreen() {
               style={[
                 styles.overlay,
                 styles.likeOverlay,
-                { opacity: likeOpacity },
+                {
+                  opacity: likeOpacity,
+                  transform: [{ translateY: 8 }, { scale: likeScale }],
+                },
               ]}
               pointerEvents="none"
             >
-              <Text style={styles.likeLabel}>J'AIME</Text>
+              <Text style={styles.likeLabel}>LIKE</Text>
             </Animated.View>
 
             <Animated.View
               style={[
                 styles.overlay,
                 styles.nopeOverlay,
-                { opacity: nopeOpacity },
+                {
+                  opacity: nopeOpacity,
+                  transform: [{ translateY: 8 }, { scale: nopeScale }],
+                },
               ]}
               pointerEvents="none"
             >
-              <Text style={styles.nopeLabel}>PASSER</Text>
+              <Text style={styles.nopeLabel}>NON</Text>
             </Animated.View>
 
-            {currentJob?.sector && (
-              <View style={styles.sectorTag}>
-                <Text style={styles.sectorText}>{currentJob.sector}</Text>
-              </View>
-            )}
+            <LinearGradient
+              colors={['rgba(255,255,255,0.04)', 'rgba(255,255,255,0)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradient}
+            />
 
-            <Text style={styles.cardTitle}>{currentJob?.title}</Text>
+            <View style={styles.cardTop}>
+              {currentJob?.sector ? (
+                <View style={styles.sectorTag}>
+                  <Text style={styles.sectorText}>{currentJob.sector}</Text>
+                </View>
+              ) : (
+                <View />
+              )}
+            </View>
 
-            {currentJob?.description && (
-              <Text style={styles.cardDescription} numberOfLines={6}>
-                {currentJob.description}
-              </Text>
-            )}
+            <View style={styles.heroPanel}>
+              <Text style={styles.cardTitle}>{currentJob?.title}</Text>
+
+              {currentJob?.description && (
+                <Text style={styles.cardDescription} numberOfLines={5}>
+                  {currentJob.description}
+                </Text>
+              )}
+            </View>
 
             {currentJob?.tags && currentJob.tags.length > 0 && (
-              <View style={styles.tagsRow}>
-                {currentJob.tags.slice(0, 4).map((tag) => (
-                  <View key={tag} style={styles.tag}>
-                    <Text style={styles.tagText}>{tag}</Text>
-                  </View>
-                ))}
+              <View style={styles.tagsSection}>
+                <View style={styles.tagsRow}>
+                  {currentJob.tags.slice(0, 5).map((tag) => (
+                    <View key={tag} style={styles.tag}>
+                      <Text style={styles.tagText}>{tag}</Text>
+                    </View>
+                  ))}
+                </View>
               </View>
             )}
           </Animated.View>
@@ -233,22 +370,62 @@ export default function SwipeScreen() {
             style={[styles.actionBtn, styles.dislikeBtn]}
             onPress={() => animateOutRef.current('dislike')}
           >
-            <MaterialIcons name="close" size={32} color="#DC2626" />
+            <MaterialIcons name="close" size={28} color="#FFFFFF" />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionBtn, styles.likeBtn]}
             onPress={() => animateOutRef.current('like')}
           >
-            <MaterialIcons name="favorite" size={32} color="#2DAC5C" />
+            <MaterialIcons name="favorite" size={28} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    </BackgroundRadial>
+    </SwipeBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundRoot: {
+    flex: 1,
+    backgroundColor: '#0B0D11',
+  },
+  backgroundWash: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.95,
+  },
+  backgroundContent: {
+    flex: 1,
+    position: 'relative',
+    zIndex: 1,
+  },
+  diagonalBandOne: {
+    position: 'absolute',
+    top: -40,
+    right: -90,
+    width: 280,
+    height: 640,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    transform: [{ rotate: '22deg' }],
+  },
+  diagonalBandTwo: {
+    position: 'absolute',
+    top: 180,
+    left: -120,
+    width: 260,
+    height: 560,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    transform: [{ rotate: '-18deg' }],
+  },
+  diagonalBandThree: {
+    position: 'absolute',
+    bottom: -80,
+    right: 10,
+    width: 220,
+    height: 420,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    transform: [{ rotate: '28deg' }],
+  },
   container: {
     flex: 1,
   },
@@ -256,110 +433,244 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
-    gap: 16,
+    paddingHorizontal: 24,
+  },
+  stateCard: {
+    ...cardSurface,
+    width: '100%',
+    maxWidth: 360,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 28,
+    backgroundColor: 'rgba(19,22,28,0.92)',
+  },
+  stateIconWrap: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#EEF4F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  stateTitle: {
+    fontSize: 22,
+    lineHeight: 28,
+    fontFamily: titleFontFamily,
+    fontWeight: '700',
+    color: '#F5F7FA',
+    textAlign: 'center',
+  },
+  stateSubtitle: {
+    marginTop: 8,
+    fontSize: 15,
+    lineHeight: 22,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(233,238,244,0.78)',
+    textAlign: 'center',
+  },
+  retryButton: {
+    ...primaryButton,
+    marginTop: 18,
+    minHeight: 48,
+    paddingHorizontal: 24,
+  },
+  retryText: {
+    ...primaryButtonText,
+    fontFamily: titleFontFamily,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 12,
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 6,
+  },
+  headerCopy: {
+    flex: 1,
+  },
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    letterSpacing: 1.1,
+    color: 'rgba(255,255,255,0.56)',
   },
   headerTitle: {
-    fontSize: 20,
+    marginTop: 4,
+    fontSize: 24,
+    lineHeight: 28,
+    fontFamily: displayFontFamily,
     fontWeight: '700',
-    color: '#0A2916',
+    color: '#F8FAFC',
+    letterSpacing: -0.3,
   },
-  remaining: {
-    fontSize: 14,
-    color: '#555',
+  headerSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(235,239,244,0.9)',
+  },
+  remainingPill: {
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    alignItems: 'center',
+    minWidth: 70,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+  },
+  remainingValue: {
+    fontSize: 18,
+    lineHeight: 22,
+    fontFamily: titleFontFamily,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  remainingLabel: {
+    marginTop: 2,
+    fontSize: 11,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(255,255,255,0.78)',
   },
   cardArea: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 8,
+    paddingBottom: 2,
   },
-  cardBehind: {
+  cardShadowBackMost: {
     position: 'absolute',
-    width: '88%',
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 24,
-    opacity: 0.5,
-    transform: [{ scale: 0.96 }, { translateY: 10 }],
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
+    width: '84%',
+    height: '72%',
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderRadius: 30,
+    transform: [{ translateX: -10 }, { translateY: 18 }, { rotate: '-4deg' }],
+  },
+  cardShadowBack: {
+    position: 'absolute',
+    width: '86%',
+    height: '70%',
+    ...cardSurface,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 30,
+    paddingHorizontal: 22,
+    paddingTop: 24,
+    opacity: 0.98,
+    transform: [{ translateX: 12 }, { translateY: 12 }, { rotate: '3deg' }],
+  },
+  backCardTitle: {
+    fontSize: 19,
+    fontFamily: titleFontFamily,
+    fontWeight: '600',
+    color: 'rgba(25,28,34,0.45)',
   },
   card: {
-    width: '88%',
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
-    maxHeight: '85%',
+    width: '90%',
+    minHeight: '68%',
+    maxHeight: '74%',
+    ...cardSurface,
+    backgroundColor: 'rgba(13,18,26,0.96)',
+    overflow: 'hidden',
+    borderRadius: 32,
+    paddingHorizontal: 22,
+    paddingVertical: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    shadowColor: '#000000',
+    shadowOpacity: 0.28,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 14 },
+    elevation: 10,
   },
   overlay: {
     position: 'absolute',
-    top: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 3,
+    top: 86,
+    alignSelf: 'center',
+    minWidth: 176,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 16,
     zIndex: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   likeOverlay: {
-    left: 20,
-    borderColor: '#2DAC5C',
-    transform: [{ rotate: '-15deg' }],
+    backgroundColor: 'rgba(45,190,139,0.22)',
   },
   nopeOverlay: {
-    right: 20,
-    borderColor: '#DC2626',
-    transform: [{ rotate: '15deg' }],
+    backgroundColor: 'rgba(255,96,122,0.18)',
   },
   likeLabel: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#2DAC5C',
+    fontSize: 26,
+    fontWeight: '700',
+    fontFamily: titleFontFamily,
+    color: '#75F7C8',
+    letterSpacing: 1.4,
   },
   nopeLabel: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#DC2626',
+    fontSize: 26,
+    fontWeight: '700',
+    fontFamily: titleFontFamily,
+    color: '#FF6B8A',
+    letterSpacing: 1.4,
+  },
+  cardGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 14,
   },
   sectorTag: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E8F5EE',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 12,
+    backgroundColor: 'rgba(45,190,139,0.2)',
+    borderRadius: 999,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
   },
   sectorText: {
     fontSize: 12,
-    color: '#0A2916',
+    fontFamily: titleFontFamily,
+    color: '#B7FEE1',
     fontWeight: '600',
   },
+  cardBody: {
+    flex: 1,
+  },
+  heroPanel: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 24,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 20,
+    minHeight: 260,
+    justifyContent: 'space-between',
+  },
   cardTitle: {
-    fontSize: 22,
+    fontSize: 28,
+    lineHeight: 32,
+    fontFamily: titleFontFamily,
     fontWeight: '700',
-    color: '#0A2916',
-    marginBottom: 12,
+    color: '#FFFFFF',
+    letterSpacing: -0.4,
   },
   cardDescription: {
-    fontSize: 14,
-    color: '#444',
+    marginTop: 14,
+    fontSize: 15,
     lineHeight: 22,
-    marginBottom: 16,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(235,239,244,0.95)',
+  },
+  tagsSection: {
+    paddingTop: 16,
   },
   tagsRow: {
     flexDirection: 'row',
@@ -367,73 +678,42 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tag: {
-    backgroundColor: '#F0F0F0',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 999,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
   },
   tagText: {
     fontSize: 12,
-    color: '#555',
+    fontFamily: titleFontFamily,
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   buttons: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 40,
-    paddingBottom: 24,
-    paddingTop: 12,
+    gap: 24,
+    paddingTop: 6,
+    paddingBottom: 22,
   },
   actionBtn: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 84,
+    height: 84,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowColor: '#9A8A79',
+    shadowOpacity: 0.2,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
   },
   dislikeBtn: {
-    backgroundColor: '#FFF0F0',
-    borderWidth: 2,
-    borderColor: '#DC2626',
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
   },
   likeBtn: {
-    backgroundColor: '#F0FFF4',
-    borderWidth: 2,
-    borderColor: '#2DAC5C',
-  },
-  statusText: {
-    fontSize: 16,
-    color: '#555',
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#DC2626',
-    textAlign: 'center',
-  },
-  retryButton: {
-    backgroundColor: '#0A2916',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  retryText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  quotaTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#0A2916',
-    textAlign: 'center',
-    marginTop: 16,
-  },
-  quotaSubtitle: {
-    fontSize: 15,
-    color: '#555',
-    textAlign: 'center',
-    lineHeight: 22,
+    backgroundColor: '#1F8A65',
   },
 });

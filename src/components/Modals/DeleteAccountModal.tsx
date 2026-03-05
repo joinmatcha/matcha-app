@@ -45,7 +45,7 @@ export default function DeleteAccountModal(props: DeleteAccountModalProps) {
             mode="contained"
             onPress={onConfirm}
             style={styles.actionButton}
-            buttonColor={rnpTheme.colors.greenDark.normal}
+            buttonColor={rnpTheme.colors.error}
           >
             Adieu !
           </Button>

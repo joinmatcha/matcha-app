@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
-import Toast from 'react-native-toast-message';
 
 import BottomSheetSelect from '@/components/ui/BottomSheetSelect';
 import YearPickerInput from '@/components/ui/YearPickerInput';
@@ -13,7 +12,9 @@ import {
   updateProfile,
 } from '@/features/profile/api/profileApi';
 import { changePasswordSchema } from '@/schemas/change-password';
+import Colors from '@/themes/colors';
 import rnpTheme from '@/themes/rnpTheme';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { UserFull } from '@/types/user';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
@@ -70,42 +71,28 @@ export default function ProfileSections({
         const trimmed = newEmail.trim();
 
         if (!trimmed) {
-          Toast.show({
-            type: 'error',
-            text1: 'Erreur',
-            text2: 'Veuillez saisir une adresse e-mail.',
-          });
+          Alert.alert('Erreur', 'Veuillez saisir une adresse e-mail.');
           return;
         }
 
         if (!trimmed.includes('@')) {
-          Toast.show({
-            type: 'error',
-            text1: 'Erreur',
-            text2: 'Adresse e-mail invalide.',
-          });
+          Alert.alert('Erreur', 'Adresse e-mail invalide.');
           return;
         }
 
         if (trimmed === user.email) {
-          Toast.show({
-            type: 'info',
-            text1: 'Aucun changement',
-            text2: 'Cette adresse est déjà celle de ton compte.',
-          });
+          Alert.alert(
+            'Aucun changement',
+            'Cette adresse est déjà celle de ton compte.',
+          );
           return;
         }
 
         await requestEmailChange(trimmed);
-
-        Toast.show({
-          type: 'success',
-          text1: 'Vérification envoyée',
-          text2:
-            'Un e-mail de confirmation a été envoyé à ta nouvelle adresse. ' +
-            'Clique sur le lien pour finaliser le changement.',
-          position: 'top',
-        });
+        Alert.alert(
+          'Vérification envoyée',
+          'Un e-mail de confirmation a été envoyé à ta nouvelle adresse. Clique sur le lien pour finaliser le changement.',
+        );
 
         setTimeout(async () => {
           await logout?.();
@@ -122,14 +109,13 @@ export default function ProfileSections({
           confirmNewPassword: confirmPassword,
         });
         if (!valid) {
-          Toast.show({
-            type: 'error',
-            text1: 'Erreur',
-            text2:
-              errors.oldPassword ||
+          Alert.alert(
+            'Erreur',
+            errors.oldPassword ||
               errors.newPassword ||
-              errors.confirmNewPassword,
-          });
+              errors.confirmNewPassword ||
+              'Erreur de validation',
+          );
           return;
         }
 
@@ -137,12 +123,6 @@ export default function ProfileSections({
           oldPassword: currentPassword,
           newPassword,
           confirmNewPassword: confirmPassword,
-        });
-
-        Toast.show({
-          type: 'success',
-          text1: 'Mot de passe mis à jour',
-          position: 'top',
         });
 
         setCurrentPassword('');
@@ -188,12 +168,6 @@ export default function ProfileSections({
 
       await updateProfile(payload);
 
-      Toast.show({
-        type: 'success',
-        text1: 'Modifications enregistrées',
-        position: 'top',
-      });
-
       onSaved();
     } catch (error) {
       const message = getApiErrorMessage(
@@ -201,11 +175,7 @@ export default function ProfileSections({
         'Impossible de modifier tes informations.',
       );
 
-      Toast.show({
-        type: 'error',
-        text1: 'Erreur',
-        text2: message,
-      });
+      Alert.alert('Erreur', message);
     } finally {
       setLoading(false);
     }
@@ -382,7 +352,12 @@ export default function ProfileSections({
       )}
 
       <View style={styles.actions}>
-        <Button mode="text" onPress={onCancel} disabled={loading}>
+        <Button
+          mode="text"
+          onPress={onCancel}
+          disabled={loading}
+          labelStyle={styles.cancelLabel}
+        >
           Annuler
         </Button>
 
@@ -390,7 +365,11 @@ export default function ProfileSections({
           mode="contained"
           onPress={handleSave}
           loading={loading}
-          buttonColor={rnpTheme.colors.greenDark.normal}
+          buttonColor={Colors.accent.primary}
+          textColor={Colors.text.inverse}
+          contentStyle={styles.saveButtonContent}
+          style={styles.saveButton}
+          labelStyle={styles.saveButtonLabel}
         >
           Enregistrer
         </Button>
@@ -401,15 +380,9 @@ export default function ProfileSections({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFF',
-    padding: rnpTheme.spacing.lg,
-    borderRadius: 16,
-    marginBottom: rnpTheme.spacing.md,
+    backgroundColor: 'transparent',
+    paddingTop: 4,
     gap: rnpTheme.spacing.md,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 3,
   },
   input: {
     backgroundColor: rnpTheme.colors.background,
@@ -417,12 +390,31 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 20,
+    alignItems: 'center',
+    gap: 12,
     marginTop: 12,
+  },
+  cancelLabel: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
+    color: '#5A534E',
+  },
+  saveButton: {
+    borderRadius: 999,
+  },
+  saveButtonContent: {
+    minHeight: 46,
+    paddingHorizontal: 8,
+  },
+  saveButtonLabel: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
+    color: Colors.text.inverse,
   },
   infoText: {
     fontSize: 13,
-    color: '#666',
+    fontFamily: bodyFontFamily,
+    color: '#2A2A2A',
     marginTop: 4,
   },
 });

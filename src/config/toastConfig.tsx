@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   toastTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 4,
   },

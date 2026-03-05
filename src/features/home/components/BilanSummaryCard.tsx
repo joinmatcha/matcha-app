@@ -3,6 +3,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { BilanResult } from '@/features/bilan/api/bilanApi';
 import Colors from '@/themes/colors';
+import { displayFontFamily, titleFontFamily } from '@/themes/typography';
+import {
+  cardSurface,
+  neutralBadge,
+  neutralBadgeText,
+  secondaryButton,
+  secondaryButtonText,
+  softBadge,
+  softBadgeText,
+} from '@/themes/ui';
 
 type Props = {
   bilan: BilanResult;
@@ -54,7 +64,11 @@ export default function BilanSummaryCard({ bilan, onPress }: Props) {
       </View>
 
       {/* CTA */}
-      <TouchableOpacity style={styles.button} onPress={onPress}>
+      <TouchableOpacity
+        activeOpacity={0.88}
+        style={styles.button}
+        onPress={onPress}
+      >
         <Text style={styles.buttonText}>Voir mon bilan</Text>
       </TouchableOpacity>
     </View>
@@ -63,27 +77,24 @@ export default function BilanSummaryCard({ bilan, onPress }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffffdd',
-    borderRadius: 20,
+    ...cardSurface,
     padding: 20,
     marginBottom: 28,
-    shadowColor: '#000',
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 3,
   },
 
   title: {
     fontSize: 16,
-    color: '#062314',
+    fontFamily: titleFontFamily,
+    color: '#1F1F1F',
     opacity: 0.7,
     marginBottom: 6,
   },
 
   label: {
     fontSize: 30,
-    fontWeight: '800',
-    color: Colors.orange.normal,
+    fontWeight: '600',
+    fontFamily: displayFontFamily,
+    color: Colors.accent.strong,
     marginBottom: 4,
   },
 
@@ -92,7 +103,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 13,
-    color: 'rgba(0,0,0,0.6)',
+    color: 'rgba(0,0,0,0.82)',
     fontWeight: '600',
     marginBottom: 6,
   },
@@ -104,45 +115,30 @@ const styles = StyleSheet.create({
   },
 
   badge: {
-    backgroundColor: Colors.greenLight.light.normal,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
+    ...softBadge,
   },
   badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.greenLight.dark.normal,
+    ...softBadgeText,
   },
 
   badgeLight: {
-    backgroundColor: 'rgba(0,0,0,0.04)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
+    ...neutralBadge,
   },
   badgeLightText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.greyDark.normal,
+    ...neutralBadgeText,
   },
 
   placeholder: {
     fontSize: 13,
-    color: 'rgba(0,0,0,0.45)',
+    color: 'rgba(0,0,0,0.68)',
     fontStyle: 'italic',
   },
 
   button: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
+    ...secondaryButton,
     marginTop: 10,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '700',
+    ...secondaryButtonText,
   },
 });

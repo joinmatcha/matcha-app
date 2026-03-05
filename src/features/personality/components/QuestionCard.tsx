@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 
 import AnswerButton from './AnswerButton';
 
@@ -57,37 +57,39 @@ export default function QuestionCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(255,255,255,0.98)',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 20,
-    marginBottom: 20,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.07,
+    shadowOpacity: 0.06,
     shadowRadius: 7,
-    elevation: 3,
+    elevation: 2,
   },
   badge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: 'rgba(10,41,22,0.06)',
+    backgroundColor: '#DEF1E7',
     marginBottom: 10,
   },
   badgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: Colors.greenDark.normal,
+    fontFamily: titleFontFamily,
+    color: '#2C7056',
     textTransform: 'uppercase',
     letterSpacing: 0.7,
   },
   questionText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#062314',
-    marginBottom: 22,
-    lineHeight: 24,
+    fontFamily: titleFontFamily,
+    color: '#20201F',
+    marginBottom: 18,
+    lineHeight: 25,
   },
   optionsWrapper: {
     gap: 12,
@@ -102,12 +104,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 2,
-    marginTop: 8,
+    marginTop: 10,
   },
   labelText: {
-    fontSize: 12,
-    color: Colors.greyDark.normal,
+    fontSize: 11,
+    fontFamily: bodyFontFamily,
+    color: '#2A2A2A',
     maxWidth: '45%',
-    fontStyle: 'italic',
+    fontWeight: '600',
   },
 });

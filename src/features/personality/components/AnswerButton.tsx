@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import Colors from '@/themes/colors';
-
 interface AnswerButtonProps {
   value: number;
   index: number;
@@ -12,6 +10,7 @@ interface AnswerButtonProps {
 }
 
 export default function AnswerButton({
+  value,
   index,
   totalOptions,
   isSelected,
@@ -20,24 +19,21 @@ export default function AnswerButton({
   const middleIndex = (totalOptions - 1) / 2;
   const distanceFromMiddle = Math.abs(index - middleIndex);
 
-  const sizeScale = 0.8 + (distanceFromMiddle / middleIndex) * 0.4;
-  const circleSize = 30 * sizeScale;
+  const sizeScale = 0.82 + (distanceFromMiddle / middleIndex) * 0.34;
+  const circleSize = 34 * sizeScale;
 
-  // Base neutre
-  let circleColor = 'rgba(255,255,255,0.9)';
-  let borderColor = 'rgba(0,0,0,0.06)';
+  let circleColor = '#F5F3F0';
+  let shadowOpacity = 0.05;
 
   if (isSelected) {
     if (index < 2) {
-      circleColor = Colors.orange.light.normal;
-      borderColor = Colors.orange.normal;
+      circleColor = '#BFDCCF';
     } else if (index === 2) {
-      circleColor = Colors.greyLight.active;
-      borderColor = Colors.greyLight.dark.normal;
+      circleColor = '#8DBBA6';
     } else {
-      circleColor = Colors.greenLight.normal;
-      borderColor = Colors.greenLight.dark.normal;
+      circleColor = '#2F7A5F';
     }
+    shadowOpacity = 0.16;
   }
 
   const dynamicCircleStyle = {
@@ -45,8 +41,7 @@ export default function AnswerButton({
     height: circleSize,
     borderRadius: circleSize / 2,
     backgroundColor: circleColor,
-    borderColor,
-    shadowOpacity: isSelected ? 0.25 : 0.08,
+    shadowOpacity,
   };
 
   return (
@@ -54,8 +49,12 @@ export default function AnswerButton({
       style={styles.button}
       onPress={onPress}
       activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={`Réponse ${value}`}
     >
-      <View style={[styles.circle, dynamicCircleStyle]} />
+      <View style={[styles.circle, dynamicCircleStyle]}>
+        {isSelected ? <View style={styles.innerDot} /> : null}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -65,10 +64,17 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   circle: {
-    borderWidth: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#6A5D4E',
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
     elevation: 2,
+  },
+  innerDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 7,
+    backgroundColor: 'rgba(255,255,255,0.9)',
   },
 });

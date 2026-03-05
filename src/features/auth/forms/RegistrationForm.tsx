@@ -3,10 +3,10 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
-import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
 import { registrationSchema } from '@/schemas/registration';
+import { titleFontFamily } from '@/themes/typography';
 import type { AuthStackParamList } from '@/types/navigation';
 import { getApiErrorMessage, getApiErrorStatus } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
@@ -57,16 +57,6 @@ export default function RegistrationForm() {
     setLoading(true);
     try {
       await register({ email, password, firstName, lastName });
-
-      Toast.show({
-        type: 'success',
-        text1: 'Inscription réussie',
-        text2: 'Vérifie tes emails pour activer ton compte.',
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
 
       navigation.navigate('Login');
     } catch (error) {
@@ -179,7 +169,10 @@ export default function RegistrationForm() {
         mode="contained"
         loading={loading}
         disabled={loading}
+        buttonColor="#E9E6E2"
+        textColor="#2B2A29"
         style={styles.continueButton}
+        labelStyle={styles.continueButtonLabel}
         onPress={handleRegister}
       >
         Continuer
@@ -202,6 +195,10 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     marginTop: 12,
-    borderRadius: 12,
+    borderRadius: 16,
+  },
+  continueButtonLabel: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
   },
 });

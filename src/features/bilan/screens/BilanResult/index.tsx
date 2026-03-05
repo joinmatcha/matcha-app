@@ -13,27 +13,62 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import PersonalityProfileHeader from '@/features/personality/components/PersonalityProfileHeader';
 import ProfileSection from '@/features/personality/components/ProfileSection';
-import TagList from '@/features/personality/components/TagList';
+import { useAuth } from '@/hooks/useAuth';
+import { clearDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
+import {
+  bodyFontFamily,
+  displayFontFamily,
+  titleFontFamily,
+} from '@/themes/typography';
+import {
+  cardSurface,
+  primaryButton,
+  primaryButtonText,
+  secondaryButton,
+  secondaryButtonText,
+  softBadge,
+  softBadgeText,
+} from '@/themes/ui';
 import { HomeStackParamList } from '@/types/navigation';
 
 type ResultRoute = RouteProp<HomeStackParamList, 'BilanResult'>;
 type ResultNav = NativeStackNavigationProp<HomeStackParamList, 'BilanResult'>;
+type BilanDraftData = {
+  answers: [string, number | string][];
+};
 
 export default function BilanResultScreen() {
   const route = useRoute<ResultRoute>();
   const navigation = useNavigation<ResultNav>();
+  const { user } = useAuth();
 
   const { bilan } = route.params;
   const { conclusion, investigation } = bilan;
 
+  const handleRedo = async () => {
+    if (user?.id) {
+      await clearDraft('bilan', user.id);
+      await saveDraft<BilanDraftData>({
+        userId: user.id,
+        module: 'bilan',
+        schemaVersion: 1,
+        templateVersion: String(bilan.version),
+        updatedAt: Date.now(),
+        data: { answers: [] },
+      });
+    }
+
+    navigation.navigate('BilanIntro', { mode: 'restart' });
+  };
+
   return (
     <BackgroundRadial>
-      <SafeAreaView style={styles.safeArea} />
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea} />
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* HERO */}
         <View style={styles.hero}>
+          <Text style={styles.eyebrow}>BILAN TERMINÉ</Text>
           <Text style={styles.heroTitle}>Ton profil professionnel</Text>
           <Text style={styles.heroSubtitle}>
             Ce bilan met en lumière ce qui te motive, ce que tu sais bien faire
@@ -43,48 +78,93 @@ export default function BilanResultScreen() {
 
         <PersonalityProfileHeader
           label={conclusion.archetype.title}
+          type={conclusion.archetype.subtitle}
           showLogo={false}
         />
 
-        <View style={styles.archetypeIntro}>
-          <Text style={styles.archetypeSubtitle}>
-            {conclusion.archetype.subtitle}
-          </Text>
-
-          <Text style={styles.archetypeDescription}>
-            {conclusion.archetype.description}
-          </Text>
+        <View style={styles.overviewRow}>
+          <View style={styles.overviewCard}>
+            <Text style={styles.overviewValue}>
+              {conclusion.keyStrengths.length}
+            </Text>
+            <Text style={styles.overviewLabel}>forces clés</Text>
+          </View>
+          <View style={styles.overviewCard}>
+            <Text style={styles.overviewValue}>
+              {investigation.topValues.length}
+            </Text>
+            <Text style={styles.overviewLabel}>valeurs fortes</Text>
+          </View>
+          <View style={styles.overviewCard}>
+            <Text style={styles.overviewValue}>
+              {conclusion.recommendedJobs.length}
+            </Text>
+            <Text style={styles.overviewLabel}>métiers à explorer</Text>
+          </View>
         </View>
 
-        {/* FORCES */}
         <ProfileSection title="Tes forces dominantes">
-          <TagList items={conclusion.keyStrengths} variant="success" />
+          <Text style={styles.sectionIntro}>
+            Les points sur lesquels tu peux t&apos;appuyer en priorité.
+          </Text>
+          <View style={styles.gridList}>
+            {conclusion.keyStrengths.map((item) => (
+              <View key={item} style={styles.gridItem}>
+                <View style={styles.gridIcon}>
+                  <View style={styles.gridIconDot} />
+                </View>
+                <Text style={styles.gridItemText}>{item}</Text>
+              </View>
+            ))}
+          </View>
         </ProfileSection>
 
-        {/* VALEURS & CONDITIONS */}
         <ProfileSection title="Ce qui est important pour toi">
           <Text style={styles.sectionLabel}>Valeurs clés</Text>
-          <TagList items={investigation.topValues} />
+          <View style={styles.inlineList}>
+            {investigation.topValues.map((item) => (
+              <View key={item} style={styles.inlineItem}>
+                <Text style={styles.inlineItemText}>{item}</Text>
+              </View>
+            ))}
+          </View>
 
           <View style={styles.spacerSm} />
 
           <Text style={styles.sectionLabel}>Conditions de travail idéales</Text>
-          <TagList items={investigation.topWorkConditions} />
+          <View style={styles.conditionList}>
+            {investigation.topWorkConditions.map((item) => (
+              <View key={item} style={styles.conditionRow}>
+                <View style={styles.conditionMarker} />
+                <Text style={styles.conditionText}>{item}</Text>
+              </View>
+            ))}
+          </View>
         </ProfileSection>
 
-        {/* AXES DE PROGRESSION */}
         <ProfileSection title="Pistes de développement">
           <Text style={styles.helperText}>
             Des compétences à renforcer pour continuer à progresser sereinement.
           </Text>
-          <TagList items={conclusion.improvementAxes} variant="warning" />
+          <View style={styles.improvementList}>
+            {conclusion.improvementAxes.map((item) => (
+              <View key={item} style={styles.improvementRow}>
+                <View style={styles.improvementPill}>
+                  <Text style={styles.improvementPillText}>À travailler</Text>
+                </View>
+                <Text style={styles.improvementText}>{item}</Text>
+              </View>
+            ))}
+          </View>
         </ProfileSection>
 
-        {/* ENVIRONNEMENTS */}
         <ProfileSection title="Environnements où tu peux t’épanouir">
           {conclusion.recommendedEnvironments.map((env, idx) => (
             <View key={idx} style={styles.envCard}>
-              <Text style={styles.envTitle}>{env}</Text>
+              <View style={styles.envTitleRow}>
+                <View style={styles.envAccent} />
+                <Text style={styles.envTitle}>{env}</Text>
+              </View>
 
               <Text style={styles.envText}>
                 Tu es particulièrement à l’aise dans des contextes où la
@@ -101,7 +181,6 @@ export default function BilanResultScreen() {
           ))}
         </ProfileSection>
 
-        {/* MÉTIERS */}
         <ProfileSection title="Pistes métiers à explorer">
           {conclusion.recommendedJobs.map((job) => (
             <View key={job.id} style={styles.jobCard}>
@@ -120,38 +199,38 @@ export default function BilanResultScreen() {
               {job.reasons?.length ? (
                 <View style={styles.reasonsContainer}>
                   {job.reasons.slice(0, 2).map((r, i) => (
-                    <Text key={i} style={styles.jobReason}>
-                      • {r}
-                    </Text>
+                    <View key={i} style={styles.reasonRow}>
+                      <View style={styles.reasonDot} />
+                      <Text style={styles.jobReason}>{r}</Text>
+                    </View>
                   ))}
                 </View>
               ) : null}
 
               <TouchableOpacity
+                style={styles.jobLinkButton}
                 onPress={() =>
                   navigation.navigate('JobDetail', { jobId: job.id })
                 }
               >
-                <Text style={styles.jobLink}>Explorer le métier</Text>
+                <Text style={styles.jobLink}>Explorer ce métier</Text>
               </TouchableOpacity>
             </View>
           ))}
         </ProfileSection>
 
-        {/* PLAN D’ACTION */}
         <ProfileSection title="Prochaines étapes" isLast>
           {conclusion.actionPlan.slice(0, 3).map((step, idx) => (
-            <Text key={idx} style={styles.bulletText}>
-              {idx + 1}. {step}
-            </Text>
+            <View key={idx} style={styles.actionRow}>
+              <View style={styles.actionIndex}>
+                <Text style={styles.actionIndexText}>{idx + 1}</Text>
+              </View>
+              <Text style={styles.bulletText}>{step}</Text>
+            </View>
           ))}
         </ProfileSection>
 
-        {/* ACTIONS */}
-        <TouchableOpacity
-          style={styles.redoButton}
-          onPress={() => navigation.navigate('BilanIntro')}
-        >
+        <TouchableOpacity style={styles.redoButton} onPress={handleRedo}>
           <Text style={styles.redoButtonText}>Refaire le bilan</Text>
         </TouchableOpacity>
 
@@ -177,22 +256,61 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
   },
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    letterSpacing: 1.1,
+    color: Colors.accent.strong,
+    marginBottom: 4,
+  },
   heroTitle: {
     fontSize: 26,
-    fontWeight: '800',
-    color: Colors.greyDark.normal,
+    fontWeight: '700',
+    fontFamily: displayFontFamily,
+    color: '#232220',
   },
   heroSubtitle: {
     marginTop: 6,
-    fontSize: 14,
-    color: 'rgba(0,0,0,0.7)',
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 21,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(0,0,0,0.9)',
+  },
+  overviewRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginHorizontal: 20,
+    marginBottom: 2,
+  },
+  overviewCard: {
+    ...cardSurface,
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  overviewValue: {
+    fontSize: 18,
+    lineHeight: 22,
+    fontFamily: titleFontFamily,
+    fontWeight: '700',
+    color: Colors.greenDark.normal,
+  },
+  overviewLabel: {
+    marginTop: 3,
+    fontSize: 11,
+    lineHeight: 14,
+    textAlign: 'center',
+    fontFamily: bodyFontFamily,
+    color: Colors.text.muted,
   },
 
   sectionLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(0,0,0,0.6)',
+    fontFamily: titleFontFamily,
+    color: 'rgba(0,0,0,0.82)',
     marginBottom: 6,
   },
   spacerSm: {
@@ -203,61 +321,158 @@ const styles = StyleSheet.create({
   },
   reasonsContainer: {
     marginBottom: 10,
+    gap: 8,
   },
 
   helperText: {
     fontSize: 13,
-    color: 'rgba(0,0,0,0.65)',
+    lineHeight: 19,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(0,0,0,0.86)',
     marginBottom: 8,
   },
-
-  archetypeIntro: {
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 18,
-    borderRadius: 20,
-
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+  sectionIntro: {
+    fontSize: 13,
+    lineHeight: 19,
+    fontFamily: bodyFontFamily,
+    color: Colors.text.muted,
+    marginBottom: 10,
   },
 
-  archetypeSubtitle: {
-    fontSize: 16,
+  gridList: {
+    gap: 10,
+  },
+  gridItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#F8FBF9',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  gridIcon: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#E9F2ED',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gridIconDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: Colors.greenDark.normal,
+  },
+  gridItemText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: bodyFontFamily,
+    color: '#232220',
+  },
+  inlineList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  inlineItem: {
+    ...softBadge,
+    backgroundColor: '#F5F1EC',
+  },
+  inlineItemText: {
+    ...softBadgeText,
+    fontFamily: titleFontFamily,
+    color: '#5F5A56',
+  },
+  conditionList: {
+    gap: 10,
+  },
+  conditionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  conditionMarker: {
+    width: 6,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: Colors.greenDark.normal,
+  },
+  conditionText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: bodyFontFamily,
+    color: '#232220',
+  },
+  improvementList: {
+    gap: 12,
+  },
+  improvementRow: {
+    backgroundColor: '#FFF6EF',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  improvementPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#F1ECE7',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 8,
+  },
+  improvementPillText: {
+    fontSize: 11,
+    fontFamily: titleFontFamily,
     fontWeight: '600',
-    color: Colors.greyDark.normal,
-    textAlign: 'center',
-    marginBottom: 8,
+    color: '#6B605A',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  improvementText: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: bodyFontFamily,
+    color: '#232220',
   },
 
-  archetypeDescription: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(0,0,0,0.7)',
-    textAlign: 'center',
-  },
-
-  /* ENVIRONNEMENTS */
   envCard: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    ...cardSurface,
     borderRadius: 14,
     padding: 14,
     marginBottom: 12,
+    backgroundColor: '#F8FBF9',
+  },
+  envTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  envAccent: {
+    width: 4,
+    height: 18,
+    borderRadius: 999,
+    backgroundColor: Colors.greenDark.normal,
   },
   envTitle: {
     fontSize: 15,
-    fontWeight: '700',
-    color: Colors.greyDark.normal,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: '#232220',
   },
   envText: {
     marginTop: 6,
-    fontSize: 13,
-    color: 'rgba(0,0,0,0.7)',
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(0,0,0,0.86)',
   },
   envTags: {
     flexDirection: 'row',
@@ -266,26 +481,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   envTag: {
+    ...softBadge,
+    backgroundColor: '#ECF3EF',
     paddingVertical: 4,
     paddingHorizontal: 10,
-    borderRadius: 12,
-    backgroundColor: 'rgba(46,125,50,0.1)',
     fontSize: 12,
-    color: Colors.greenDark.normal,
+    fontFamily: titleFontFamily,
+    color: '#456457',
   },
 
-  /* JOB CARDS */
   jobCard: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    ...cardSurface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
+    backgroundColor: '#FFFFFF',
   },
 
   jobHeader: {
@@ -297,80 +507,106 @@ const styles = StyleSheet.create({
 
   jobTitle: {
     fontSize: 16,
-    fontWeight: '700',
-    color: Colors.greyDark.normal,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: '#232220',
   },
 
   jobSector: {
     fontSize: 12,
-    color: Colors.orange.normal,
+    fontFamily: titleFontFamily,
+    color: Colors.greenDark.normal,
     fontWeight: '600',
   },
 
   jobDescription: {
     fontSize: 14,
     lineHeight: 20,
-    color: 'rgba(0,0,0,0.7)',
+    fontFamily: bodyFontFamily,
+    color: 'rgba(0,0,0,0.9)',
     marginBottom: 10,
   },
-
-  jobFooter: {
+  reasonRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    gap: 8,
   },
-
-  jobScore: {
-    fontSize: 12,
-    color: 'rgba(0,0,0,0.6)',
+  reasonDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: Colors.greenDark.normal,
+    marginTop: 5,
   },
 
   jobLink: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
-    color: Colors.greenDark.normal,
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
+  },
+  jobLinkButton: {
+    ...secondaryButton,
+    minHeight: 44,
+    marginTop: 2,
   },
 
   jobReason: {
-    marginTop: 6,
-    fontSize: 12,
-    color: 'rgba(0,0,0,0.6)',
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(0,0,0,0.82)',
   },
 
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 10,
+  },
+  actionIndex: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#EAF4EF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 1,
+  },
+  actionIndexText: {
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: Colors.accent.strong,
+  },
   bulletText: {
+    flex: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: Colors.greyDark.normal,
-    marginBottom: 6,
+    fontFamily: bodyFontFamily,
+    color: '#232220',
   },
 
   redoButton: {
-    alignSelf: 'center',
+    ...secondaryButton,
     marginTop: 24,
     marginBottom: 20,
-    paddingVertical: 12,
-    paddingHorizontal: 26,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.greenDark.normal,
-    backgroundColor: 'rgba(255,255,255,0.6)',
+    marginHorizontal: 16,
   },
   redoButtonText: {
-    color: Colors.greenDark.normal,
+    ...secondaryButtonText,
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: titleFontFamily,
   },
 
   backButton: {
+    ...primaryButton,
     marginHorizontal: 16,
-    backgroundColor: Colors.greenDark.normal,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
   },
   backButtonText: {
-    color: Colors.background,
-    fontSize: 16,
-    fontWeight: '700',
+    ...primaryButtonText,
+    fontFamily: titleFontFamily,
   },
 });

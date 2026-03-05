@@ -2,13 +2,31 @@ import { DefaultTheme } from 'react-native-paper';
 
 const Colors = {
   ...DefaultTheme.colors,
-  primary: '#0A2916',
-  secondary: '#f5ede2',
-  background: '#ffffff',
+  primary: '#1F8A65',
+  secondary: '#EEF6F2',
+  background: '#F8F7F4',
   surface: '#ffffff',
   success: '#2DAC5C',
   error: '#DC2626',
-  grey: '#121212',
+  grey: '#151B23',
+  text: {
+    strong: '#0F141C',
+    base: '#1D2530',
+    muted: '#424D5B',
+    soft: '#5E6A78',
+    inverse: '#F7F9FC',
+  },
+  accent: {
+    primary: '#1F8A65',
+    strong: '#176B4E',
+    soft: '#E6F4EE',
+    glow: '#2DBE8B',
+  },
+  ui: {
+    borderSoft: '#E7ECEF',
+    surfaceSoft: '#F1F5F5',
+    surfaceMuted: '#E2E9ED',
+  },
   brown: {
     normal: '#edac7b',
     hover: '#d59b6f',
@@ -26,9 +44,9 @@ const Colors = {
     },
   },
   orange: {
-    normal: '#e66b14',
-    hover: '#cf6012',
-    active: '#b85610',
+    normal: '#D97745',
+    hover: '#C96E3F',
+    active: '#B86238',
     light: {
       normal: '#fdf0e8',
       hover: '#fbe9dc',
@@ -42,9 +60,9 @@ const Colors = {
     },
   },
   greenDark: {
-    normal: '#0a2916',
-    hover: '#092514',
-    active: '#082112',
+    normal: '#1F3A2F',
+    hover: '#193226',
+    active: '#14291F',
     light: {
       normal: '#e7eae8',
       hover: '#dadfdc',

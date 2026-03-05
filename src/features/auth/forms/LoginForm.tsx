@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
-import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
 import { loginSchema } from '@/schemas/login';
+import { titleFontFamily } from '@/themes/typography';
 import { getApiErrorMessage, getApiErrorStatus } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
 
@@ -38,15 +38,6 @@ export default function LoginForm() {
     setLoading(true);
     try {
       await login(email, password);
-      Toast.show({
-        type: 'success',
-        text1: 'Connexion réussie',
-        text2: 'Bienvenue.',
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
     } catch (error) {
       const status = getApiErrorStatus(error);
       if (status === 401) {
@@ -115,7 +106,10 @@ export default function LoginForm() {
         onPress={handleLogin}
         loading={loading}
         disabled={loading}
+        buttonColor="#E9E6E2"
+        textColor="#2B2A29"
         style={styles.continueButton}
+        labelStyle={styles.continueButtonLabel}
       >
         Continuer
       </Button>
@@ -133,6 +127,10 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     marginTop: 12,
-    borderRadius: 12,
+    borderRadius: 16,
+  },
+  continueButtonLabel: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
   },
 });

@@ -1,8 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
-  Animated,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,11 +13,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import { resetPersonalityTest } from '@/features/personality/api/personalityApi';
 import PersonalityProfileHeader from '@/features/personality/components/PersonalityProfileHeader';
-import ProfileSection from '@/features/personality/components/ProfileSection';
 import RadarChart from '@/features/personality/components/RadarChart';
 import TagList from '@/features/personality/components/TagList';
 import { useAuth } from '@/hooks/useAuth';
 import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+import {
+  cardSurface,
+  primaryButton,
+  primaryButtonText,
+  secondaryButton,
+  secondaryButtonText,
+} from '@/themes/ui';
 import { HomeStackParamList } from '@/types/navigation';
 
 type ResultRoute = RouteProp<HomeStackParamList, 'PersonalityResult'>;
@@ -33,17 +39,6 @@ export default function PersonalityResultScreen() {
   const { refreshUser } = useAuth();
 
   const { result } = route.params;
-
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const anim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(anim, {
-      toValue: 1,
-      duration: 900,
-      useNativeDriver: false,
-    }).start();
-  }, []);
 
   const normalizeScore = (score: number) => (score + 12) / 24;
 
@@ -67,52 +62,67 @@ export default function PersonalityResultScreen() {
   const handleRedoTest = async () => {
     await resetPersonalityTest();
     await refreshUser();
-    navigation.navigate('PersonalityTest');
+    navigation.navigate('PersonalityIntro', { hasDraft: false });
   };
+
+  const insightCards = [
+    { label: 'Type', value: result.type ?? 'Profil' },
+    { label: 'Forces clés', value: `${result.strengths.length}` },
+    { label: 'Pistes métiers', value: `${result.recommendedJobs.length}` },
+  ];
 
   return (
     <BackgroundRadial>
-      <SafeAreaView style={styles.safeArea} />
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea} />
 
       <View style={styles.container}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
-          scrollEventThrottle={16}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false },
-          )}
+          showsVerticalScrollIndicator={false}
         >
-          {/* HEADER */}
           <PersonalityProfileHeader
             label={result.label}
             type={result.type}
             showLogo={false}
           />
 
-          {/* RADAR */}
+          <View style={styles.insightsRow}>
+            {insightCards.map((item) => (
+              <View key={item.label} style={styles.insightCard}>
+                <Text style={styles.insightLabel}>{item.label}</Text>
+                <Text style={styles.insightValue}>{item.value}</Text>
+              </View>
+            ))}
+          </View>
+
           <View style={styles.card}>
+            <View style={styles.blockHead}>
+              <Text style={styles.blockTitle}>Ta dynamique globale</Text>
+              <Text style={styles.blockSubtitle}>
+                Lecture visuelle de tes tendances dominantes
+              </Text>
+            </View>
             <RadarChart data={radarData} size={280} />
           </View>
 
-          {/* DESCRIPTION */}
-          <ProfileSection title="Description">
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Description</Text>
             <Text style={styles.description}>{result.description}</Text>
-          </ProfileSection>
+          </View>
 
-          {/* FORCES */}
-          <ProfileSection title="Forces">
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Forces</Text>
             <TagList items={result.strengths} variant="success" />
-          </ProfileSection>
+          </View>
 
-          {/* POINTS D'ATTENTION */}
-          <ProfileSection title="Points d'attention">
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Points d'attention</Text>
             <TagList items={result.weaknesses} variant="warning" />
-          </ProfileSection>
+          </View>
 
-          {/* MÉTIERS */}
-          <ProfileSection title="Métiers recommandés" isLast>
+          <View style={[styles.sectionCard, styles.lastSectionCard]}>
+            <Text style={styles.sectionTitle}>Métiers recommandés</Text>
             <View style={styles.jobsList}>
               {result.recommendedJobs.map((job, i) => (
                 <View key={i} style={styles.jobItem}>
@@ -121,18 +131,16 @@ export default function PersonalityResultScreen() {
                 </View>
               ))}
             </View>
-          </ProfileSection>
+          </View>
 
           <View style={styles.spacerLg} />
 
-          {/* REFAIRE TEST */}
           <TouchableOpacity style={styles.redoButton} onPress={handleRedoTest}>
             <Text style={styles.redoButtonText}>Refaire le test</Text>
           </TouchableOpacity>
 
           <View style={styles.spacerMd} />
 
-          {/* BOUTON RETOUR (REMPLACE FloatingActionButton) */}
           <TouchableOpacity style={styles.backButton} onPress={handleContinue}>
             <Text style={styles.backButtonText}>Retour à l'accueil</Text>
           </TouchableOpacity>
@@ -148,76 +156,120 @@ const styles = StyleSheet.create({
   safeArea: { backgroundColor: 'transparent' },
   container: { flex: 1 },
   scroll: { flex: 1 },
-  scrollContent: { paddingBottom: 40 },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 40 },
   spacerLg: { height: 40 },
   spacerMd: { height: 20 },
+  insightsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  insightCard: {
+    ...cardSurface,
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  insightLabel: {
+    fontSize: 11,
+    fontFamily: bodyFontFamily,
+    color: '#6A615C',
+  },
+  insightValue: {
+    marginTop: 2,
+    fontSize: 14,
+    fontFamily: titleFontFamily,
+    fontWeight: '400',
+    color: '#232220',
+  },
 
   card: {
-    backgroundColor: Colors.background,
-    paddingVertical: 30,
+    ...cardSurface,
+    paddingVertical: 22,
     alignItems: 'center',
-    marginBottom: 20,
-    marginHorizontal: 16,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    marginBottom: 14,
+    paddingHorizontal: 14,
+  },
+  blockHead: {
+    alignSelf: 'stretch',
+    marginBottom: 8,
+    paddingHorizontal: 6,
+  },
+  blockTitle: {
+    fontSize: 16,
+    fontFamily: titleFontFamily,
+    fontWeight: '600',
+    color: '#232220',
+    letterSpacing: -0.2,
+  },
+  blockSubtitle: {
+    marginTop: 3,
+    fontSize: 13,
+    fontFamily: bodyFontFamily,
+    color: '#5A534E',
+  },
+  sectionCard: {
+    ...cardSurface,
+    marginTop: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+  },
+  lastSectionCard: {
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontFamily: titleFontFamily,
+    fontWeight: '600',
+    color: '#232220',
+    marginBottom: 12,
+    letterSpacing: -0.1,
   },
 
   description: {
-    fontSize: 16,
-    lineHeight: 22,
-    color: Colors.greyDark.normal,
+    fontSize: 15,
+    lineHeight: 23,
+    fontFamily: bodyFontFamily,
+    color: '#1F1F1F',
   },
 
-  jobsList: { gap: 14 },
+  jobsList: { gap: 12 },
   jobItem: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   jobBullet: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.greenLight.normal,
+    width: 7,
+    height: 7,
+    borderRadius: 99,
+    backgroundColor: Colors.primary,
   },
   jobText: {
-    fontSize: 16,
-    color: Colors.greyDark.normal,
+    fontSize: 15,
+    fontFamily: bodyFontFamily,
+    color: '#1F1F1F',
   },
 
   redoButton: {
+    ...secondaryButton,
     paddingVertical: 12,
     paddingHorizontal: 26,
-    borderRadius: 12,
-    alignSelf: 'center',
-
-    borderWidth: 1,
-    borderColor: Colors.greenDark.normal,
-
-    backgroundColor: 'rgba(255,255,255,0.6)',
-    shadowOpacity: 0,
+    marginHorizontal: 14,
   },
 
   redoButtonText: {
-    color: Colors.greenDark.normal,
+    ...secondaryButtonText,
     fontSize: 15,
     fontWeight: '600',
-    letterSpacing: 0.2,
+    fontFamily: titleFontFamily,
+    letterSpacing: 0.1,
   },
 
   backButton: {
-    backgroundColor: Colors.greenDark.normal,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
+    ...primaryButton,
+    marginHorizontal: 14,
   },
   backButtonText: {
-    color: Colors.background,
-    fontSize: 16,
-    fontWeight: '700',
+    ...primaryButtonText,
+    fontFamily: titleFontFamily,
+    fontWeight: '600',
   },
 });

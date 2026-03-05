@@ -9,6 +9,8 @@ import { Branding } from '@/assets';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import LoginLink from '@/features/auth/components/LoginLink';
 import NewPasswordForm from '@/features/auth/forms/NewPasswordForm';
+import { bodyFontFamily, displayFontFamily } from '@/themes/typography';
+import { cardSurface } from '@/themes/ui';
 import { AuthStackParamList } from '@/types/navigation';
 
 type ResetPasswordScreenRouteProp = RouteProp<
@@ -34,7 +36,7 @@ export default function ResetPasswordScreen() {
 
   return (
     <BackgroundRadial bubbles>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.contentContainer}
@@ -63,6 +65,8 @@ export default function ResetPasswordScreen() {
                 <Button
                   mode="contained"
                   onPress={() => navigation.navigate('ForgotPassword')}
+                  buttonColor="#E9E6E2"
+                  textColor="#2B2A29"
                   style={styles.continueButton}
                 >
                   Demander un nouveau lien
@@ -97,32 +101,28 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     zIndex: 5,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    paddingHorizontal: 20,
+    ...cardSurface,
+    paddingHorizontal: 22,
     paddingVertical: 24,
     zIndex: 5,
-
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#062314',
-    marginBottom: 6,
+    fontSize: 28,
+    fontWeight: '700',
+    fontFamily: displayFontFamily,
+    color: '#1F1F1F',
+    marginBottom: 8,
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: 14,
-    color: 'rgba(0,0,0,0.55)',
-    lineHeight: 20,
+    fontSize: 15,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(45,33,27,0.72)',
+    lineHeight: 22,
     marginBottom: 20,
     textAlign: 'left',
   },
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     marginTop: 12,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   linksContainer: {
     marginTop: 16,

@@ -1,6 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import Colors from '@/themes/colors';
+import { titleFontFamily } from '@/themes/typography';
+import { cardSurface } from '@/themes/ui';
+
 export default function EditableSection({
   title,
   isEditing,
@@ -31,12 +35,9 @@ export default function EditableSection({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'white',
-    borderRadius: 18,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+    ...cardSurface,
+    borderRadius: 24,
+    padding: 22,
     marginBottom: 22,
   },
 
@@ -49,14 +50,20 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#062314',
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: '#1F1F1F',
   },
 
   editButton: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#0A2916',
+    fontFamily: titleFontFamily,
+    color: Colors.accent.strong,
+    backgroundColor: Colors.accent.soft,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
   },
 
   content: {

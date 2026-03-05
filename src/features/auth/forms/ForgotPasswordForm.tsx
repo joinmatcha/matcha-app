@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
-import Toast from 'react-native-toast-message';
 
 import { requestPasswordReset } from '@/api/auth';
 import { forgotPasswordSchema } from '@/schemas/forgot-password';
+import { titleFontFamily } from '@/themes/typography';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
 
@@ -34,19 +34,8 @@ export default function ForgotPasswordForm({
       await requestPasswordReset(email);
 
       setSent(true);
-
-      Toast.show({
-        type: 'success',
-        text1: 'Email envoyé',
-        text2: 'Vérifiez votre boîte de réception.',
-      });
     } catch (err) {
-      const errorMessage = getApiErrorMessage(err, 'Veuillez réessayer.');
-      Toast.show({
-        type: 'error',
-        text1: "Échec de l'envoi",
-        text2: errorMessage,
-      });
+      setError(getApiErrorMessage(err, 'Veuillez réessayer.'));
     } finally {
       setLoading(false);
     }
@@ -73,7 +62,10 @@ export default function ForgotPasswordForm({
         onPress={handleSubmit}
         loading={loading}
         disabled={loading}
+        buttonColor="#E9E6E2"
+        textColor="#2B2A29"
         style={styles.continueButton}
+        labelStyle={styles.continueButtonLabel}
       >
         Envoyer le lien
       </Button>
@@ -91,6 +83,10 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     marginTop: 12,
-    borderRadius: 12,
+    borderRadius: 16,
+  },
+  continueButtonLabel: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
   },
 });

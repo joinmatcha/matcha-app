@@ -62,13 +62,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '600',
     marginBottom: 12,
     color: rnpTheme.colors.primary,
   },
   text: {
     fontSize: 14,
-    color: '#555',
+    color: '#222',
     marginBottom: 24,
   },
   actions: {

@@ -18,41 +18,42 @@ import {
   titleFontFamily,
 } from '@/themes/typography';
 import { cardSurface, primaryButton, primaryButtonText } from '@/themes/ui';
-import { BilanIntroMode, HomeStackParamList } from '@/types/navigation';
+import { HomeStackParamList } from '@/types/navigation';
 
-type Nav = NativeStackNavigationProp<HomeStackParamList, 'BilanIntro'>;
-type IntroRoute = RouteProp<HomeStackParamList, 'BilanIntro'>;
+type Nav = NativeStackNavigationProp<HomeStackParamList, 'PersonalityIntro'>;
+type IntroRoute = RouteProp<HomeStackParamList, 'PersonalityIntro'>;
 
-const benefitCards = [
-  {
-    title: 'Forces clés',
-    subtitle: 'Ce que tu mobilises naturellement',
-  },
-  {
-    title: 'Valeurs',
-    subtitle: 'Ce qui compte vraiment dans ton travail',
-  },
-  {
-    title: 'Environnements',
-    subtitle: 'Les contextes où tu progresses le mieux',
-  },
-  {
-    title: 'Pistes métiers',
-    subtitle: 'Des idées concrètes à explorer',
-  },
-];
+const mbtiAxes = ['E / I', 'S / N', 'T / F', 'J / P'];
 
 const firstRunFlow = [
-  'Tu réponds avec honnêteté, sans chercher la bonne réponse',
-  'On consolide tes forces, tes valeurs et tes préférences de travail',
-  "Tu récupères une synthèse claire avec des pistes d'action",
+  'Tu réponds vite et spontanément',
+  'On calcule ton profil dominant',
+  'Tu obtiens des pistes métier claires',
 ];
 
-export default function BilanIntroScreen() {
+const resultCards = [
+  {
+    title: 'Ton type',
+    subtitle: 'Un profil lisible',
+  },
+  {
+    title: 'Tes forces',
+    subtitle: 'Ce qui te porte',
+  },
+  {
+    title: "Points d'attention",
+    subtitle: 'Ce à quoi faire attention',
+  },
+  {
+    title: 'Métiers cibles',
+    subtitle: 'Des pistes concrètes',
+  },
+];
+
+export default function PersonalityIntroScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<IntroRoute>();
-  const mode: BilanIntroMode = route.params?.mode ?? 'start';
-  const isResume = mode === 'resume';
+  const hasDraft = !!route.params?.hasDraft;
 
   return (
     <BackgroundRadial>
@@ -63,38 +64,38 @@ export default function BilanIntroScreen() {
         >
           <View style={styles.hero}>
             <Text style={styles.eyebrow}>
-              {isResume ? 'POUR RAPPEL' : 'BILAN DE COMPÉTENCES'}
+              {hasDraft ? 'POUR RAPPEL' : 'TEST DE PERSONNALITÉ'}
             </Text>
             <Text style={styles.title}>
-              {isResume
-                ? 'Reprends ton bilan là où tu en étais'
-                : 'Prendre du recul, concrètement'}
+              {hasDraft
+                ? "Reprends où tu t'es arrêté"
+                : 'Mieux te connaître, vite'}
             </Text>
             <Text style={styles.subtitle}>
-              {isResume
-                ? "Ton brouillon est enregistré. Relis l'essentiel, puis reprends quand tu veux."
-                : 'Une lecture structurée de ton profil professionnel pour mieux comprendre ce qui te porte aujourd&apos;hui et ce que tu peux explorer ensuite.'}
+              {hasDraft
+                ? "Ton brouillon est bien enregistré. Relis l'essentiel, puis continue."
+                : 'Un test court pour comprendre ton style, ton énergie et les environnements qui te correspondent.'}
             </Text>
           </View>
 
           <View style={styles.quickStats}>
             <View style={styles.quickStat}>
-              <Text style={styles.quickStatValue}>~15 min</Text>
+              <Text style={styles.quickStatValue}>24</Text>
+              <Text style={styles.quickStatLabel}>questions</Text>
+            </View>
+            <View style={styles.quickStat}>
+              <Text style={styles.quickStatValue}>~3 min</Text>
               <Text style={styles.quickStatLabel}>à ton rythme</Text>
             </View>
             <View style={styles.quickStat}>
-              <Text style={styles.quickStatValue}>Mixte</Text>
-              <Text style={styles.quickStatLabel}>notes + réponses libres</Text>
-            </View>
-            <View style={styles.quickStat}>
-              <Text style={styles.quickStatValue}>Actionnable</Text>
-              <Text style={styles.quickStatLabel}>synthèse utile</Text>
+              <Text style={styles.quickStatValue}>0</Text>
+              <Text style={styles.quickStatLabel}>bonne réponse</Text>
             </View>
           </View>
 
-          {!isResume && (
+          {!hasDraft && (
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Comment ça se passe</Text>
+              <Text style={styles.cardTitle}>Comment ça marche</Text>
               {firstRunFlow.map((step, index) => (
                 <View key={step} style={styles.stepRow}>
                   <View style={styles.stepIndex}>
@@ -109,7 +110,7 @@ export default function BilanIntroScreen() {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Ce que tu récupères</Text>
             <View style={styles.resultGrid}>
-              {benefitCards.map((item) => (
+              {resultCards.map((item) => (
                 <View key={item.title} style={styles.resultItem}>
                   <Text style={styles.resultTitle}>{item.title}</Text>
                   <Text style={styles.resultSubtitle}>{item.subtitle}</Text>
@@ -119,20 +120,29 @@ export default function BilanIntroScreen() {
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>À garder en tête</Text>
+            <Text style={styles.cardTitle}>MBTI en 20 secondes</Text>
+            <Text style={styles.cardText}>
+              Le modèle combine 4 axes de préférence. Leur combinaison forme 16
+              profils.
+            </Text>
+            <View style={styles.axisRow}>
+              {mbtiAxes.map((axis) => (
+                <View key={axis} style={styles.axisPill}>
+                  <Text style={styles.axisPillText}>{axis}</Text>
+                </View>
+              ))}
+            </View>
             <Text style={styles.note}>
-              Ce bilan sert à clarifier une direction, pas à t&apos;enfermer
-              dans une case. Le plus utile est de répondre simplement, en
-              pensant à ta réalité actuelle.
+              Résultat indicatif: utile pour te guider, pas pour t'enfermer.
             </Text>
           </View>
 
           <TouchableOpacity
-            style={styles.startButton}
-            onPress={() => navigation.navigate('BilanQuestions')}
+            style={styles.primaryButton}
+            onPress={() => navigation.navigate('PersonalityTest')}
           >
-            <Text style={styles.startButtonText}>
-              {isResume ? 'Reprendre le bilan' : 'Commencer le bilan'}
+            <Text style={styles.primaryButtonText}>
+              {hasDraft ? 'Reprendre le test' : 'Commencer le test'}
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -203,7 +213,6 @@ const styles = StyleSheet.create({
     fontFamily: bodyFontFamily,
     color: Colors.text.muted,
     fontWeight: '600',
-    textAlign: 'center',
   },
   card: {
     ...cardSurface,
@@ -238,10 +247,10 @@ const styles = StyleSheet.create({
   },
   stepText: {
     flex: 1,
+    color: Colors.text.muted,
     fontSize: 14,
     lineHeight: 20,
     fontFamily: bodyFontFamily,
-    color: Colors.text.muted,
   },
   resultGrid: {
     flexDirection: 'row',
@@ -268,20 +277,44 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     fontFamily: bodyFontFamily,
   },
-  startButton: {
-    ...primaryButton,
-    marginTop: 6,
+  cardText: {
+    color: Colors.text.muted,
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: bodyFontFamily,
   },
-  startButtonText: {
-    ...primaryButtonText,
-    fontSize: 15,
+  axisRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  axisPill: {
+    backgroundColor: '#EEF4F1',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  axisPillText: {
+    fontSize: 12,
+    fontWeight: '600',
     fontFamily: titleFontFamily,
+    color: Colors.accent.strong,
   },
   note: {
-    marginTop: 2,
+    marginTop: 10,
     fontSize: 13,
     lineHeight: 18,
     fontFamily: bodyFontFamily,
     color: Colors.text.muted,
+  },
+  primaryButton: {
+    marginTop: 6,
+    ...primaryButton,
+  },
+  primaryButtonText: {
+    ...primaryButtonText,
+    fontSize: 15,
+    fontFamily: titleFontFamily,
   },
 });

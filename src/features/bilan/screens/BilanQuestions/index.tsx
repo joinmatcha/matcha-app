@@ -3,6 +3,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,17 +23,27 @@ import {
 } from '@/features/bilan/api/bilanApi';
 import QuestionCard from '@/features/personality/components/QuestionCard';
 import TestHeader from '@/features/personality/components/TestHeader';
+import { useAuth } from '@/hooks/useAuth';
+import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+import { cardSurface, primaryButton, primaryButtonText } from '@/themes/ui';
 import { HomeStackParamList } from '@/types/navigation';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList>;
+type BilanDraftData = {
+  answers: [string, number | string][];
+};
 
 export default function BilanQuestionsScreen() {
   const navigation = useNavigation<Nav>();
+  const { user } = useAuth();
+  const userId = user?.id;
 
   const scrollRef = useRef<ScrollView>(null);
   const questionPositions = useRef<Map<string, number>>(new Map());
+  const restoredOnceRef = useRef(false);
 
   const [questions, setQuestions] = useState<BilanQuestion[]>([]);
   const [version, setVersion] = useState(1);
@@ -50,6 +61,18 @@ export default function BilanQuestionsScreen() {
         const res = await getBilanQuestions();
         setQuestions(res.questions);
         setVersion(res.version);
+
+        if (userId && !restoredOnceRef.current) {
+          restoredOnceRef.current = true;
+          const draft = await loadDraft<BilanDraftData>('bilan', userId);
+
+          if (draft && draft.templateVersion === String(res.version)) {
+            setAnswers(Object.fromEntries(draft.data.answers));
+          } else if (draft) {
+            await clearDraft('bilan', userId);
+          }
+        }
+
         setErrorMessage(null);
       } catch (error) {
         setErrorMessage(
@@ -63,15 +86,60 @@ export default function BilanQuestionsScreen() {
       }
     };
     load();
-  }, []);
+  }, [userId]);
+
+  const persistDraft = (nextAnswers: Record<string, number | string>) => {
+    if (!userId || !version) return;
+
+    saveDraft<BilanDraftData>({
+      userId,
+      module: 'bilan',
+      schemaVersion: 1,
+      templateVersion: String(version),
+      updatedAt: Date.now(),
+      data: {
+        answers: Object.entries(nextAnswers),
+      },
+    }).catch(() => {});
+  };
+
+  const handleRestart = () => {
+    if (!userId) return;
+
+    Alert.alert(
+      'Repartir de zéro ?',
+      'Tu vas supprimer ton brouillon et recommencer le bilan.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            await clearDraft('bilan', userId);
+            setAnswers({});
+            restoredOnceRef.current = true;
+            scrollRef.current?.scrollTo({ y: 0, animated: true });
+          },
+        },
+      ],
+    );
+  };
 
   const handleLikertAnswer = (code: string, value: number, index: number) => {
-    setAnswers((prev) => ({ ...prev, [code]: value }));
+    setAnswers((prev) => {
+      const nextAnswers = { ...prev, [code]: value };
+      persistDraft(nextAnswers);
+      return nextAnswers;
+    });
     scrollToNext(index);
   };
 
   const handleTextAnswer = (code: string, text: string) => {
-    setAnswers((prev) => ({ ...prev, [code]: text }));
+    setAnswers((prev) => {
+      const nextAnswers = { ...prev, [code]: text };
+      persistDraft(nextAnswers);
+      return nextAnswers;
+    });
   };
 
   const scrollToNext = (currentIndex: number) => {
@@ -103,6 +171,7 @@ export default function BilanQuestionsScreen() {
     try {
       await postBilanAnswers(version, payload);
       const generated = await generateBilan(version);
+      if (userId) await clearDraft('bilan', userId);
       setErrorMessage(null);
       navigation.navigate('BilanResult', { bilan: generated.bilan });
     } catch (error) {
@@ -128,14 +197,25 @@ export default function BilanQuestionsScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <View style={styles.container}>
           <TestHeader
             title="Bilan de compétences"
-            summary="Réponds aux questions pour générer ton analyse."
+            summary="Réponds simplement. L'objectif est de faire ressortir ce qui te correspond aujourd'hui."
             currentQuestion={answeredCount}
             totalQuestions={totalQuestions}
           />
+
+          {answeredCount > 0 && (
+            <View style={styles.actionsRow}>
+              <TouchableOpacity
+                onPress={handleRestart}
+                style={styles.restartButton}
+              >
+                <Text style={styles.restartButtonText}>Repartir de zéro</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
@@ -179,35 +259,57 @@ export default function BilanQuestionsScreen() {
                 )}
 
                 {/* ---------------- OPEN TEXT --------------- */}
-                {q.type === 'open_text' && (
-                  <View style={styles.textCard}>
-                    <Text style={styles.badge}>Question {index + 1}</Text>
-                    <Text style={styles.textQuestion}>{q.question}</Text>
+                {q.type === 'open_text' &&
+                  (() => {
+                    const answerValue = answers[q.code];
+                    const hasTextAnswer =
+                      typeof answerValue === 'string' &&
+                      answerValue.trim().length > 0;
 
-                    <TextInput
-                      style={styles.input}
-                      multiline
-                      placeholder="Écris ta réponse..."
-                      value={
-                        typeof answers[q.code] === 'string'
-                          ? (answers[q.code] as string)
-                          : ''
-                      }
-                      onChangeText={(t) => handleTextAnswer(q.code, t)}
-                    />
+                    return (
+                      <View style={styles.textCard}>
+                        <Text style={styles.badge}>Question {index + 1}</Text>
+                        <Text style={styles.textQuestion}>{q.question}</Text>
+                        <Text style={styles.textHint}>
+                          Quelques lignes suffisent. Va droit au plus utile.
+                        </Text>
 
-                    <TouchableOpacity
-                      style={styles.nextBtn}
-                      onPress={() => scrollToNext(index)}
-                    >
-                      <Text style={styles.nextBtnText}>Continuer</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
+                        <TextInput
+                          style={[
+                            styles.input,
+                            hasTextAnswer && styles.inputAnswered,
+                          ]}
+                          multiline
+                          placeholder="Écris ta réponse..."
+                          placeholderTextColor="rgba(87, 82, 77, 0.62)"
+                          value={
+                            typeof answerValue === 'string' ? answerValue : ''
+                          }
+                          onChangeText={(t) => handleTextAnswer(q.code, t)}
+                        />
+
+                        <TouchableOpacity
+                          style={styles.nextBtn}
+                          onPress={() => scrollToNext(index)}
+                        >
+                          <Text style={styles.nextBtnText}>Continuer</Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })()}
               </View>
             ))}
 
-            {/* -------------------- SUBMIT ---------------------- */}
+            <View style={styles.scrollSpacer} />
+          </ScrollView>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerMeta}>
+              {isComplete
+                ? 'Parfait, tu peux finaliser.'
+                : `${totalQuestions - answeredCount} question(s) restante(s)`}
+            </Text>
+
             <TouchableOpacity
               style={[
                 styles.submitButton,
@@ -217,7 +319,7 @@ export default function BilanQuestionsScreen() {
               onPress={handleSubmit}
             >
               {submitting ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color="#4F4741" />
               ) : (
                 <Text style={styles.submitButtonText}>
                   {isComplete
@@ -226,7 +328,7 @@ export default function BilanQuestionsScreen() {
                 </Text>
               )}
             </TouchableOpacity>
-          </ScrollView>
+          </View>
         </View>
       </SafeAreaView>
     </BackgroundRadial>
@@ -239,63 +341,123 @@ const styles = StyleSheet.create({
   container: { flex: 1, zIndex: 2 },
 
   scroll: { flex: 1 },
-  scrollContent: { padding: 20, paddingBottom: 60 },
+  scrollContent: { padding: 20, paddingBottom: 24 },
+  scrollSpacer: { height: 8 },
 
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  actionsRow: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 4,
+    alignItems: 'flex-end',
+  },
+  restartButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  restartButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: '#232323',
+  },
   errorText: {
     marginHorizontal: 20,
     marginBottom: 8,
     color: Colors.error,
     fontWeight: '600',
+    fontFamily: titleFontFamily,
   },
 
   textCard: {
-    backgroundColor: '#ffffffdd',
-    borderRadius: 20,
+    ...cardSurface,
     padding: 18,
     marginBottom: 20,
   },
   badge: {
     fontSize: 12,
-    fontWeight: '700',
-    color: Colors.greenDark.normal,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: '#6A615C',
     marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
   },
   textQuestion: {
     fontSize: 17,
     fontWeight: '600',
-    color: Colors.greyDark.normal,
+    fontFamily: titleFontFamily,
+    color: '#232220',
+    marginBottom: 8,
+    lineHeight: 24,
+  },
+  textHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: bodyFontFamily,
+    color: '#5A534E',
     marginBottom: 12,
   },
   input: {
     minHeight: 120,
-    backgroundColor: '#eef1ee',
+    backgroundColor: '#FAF5EF',
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
     fontSize: 15,
+    fontFamily: bodyFontFamily,
+    color: '#232220',
+    lineHeight: 21,
     textAlignVertical: 'top',
+  },
+  inputAnswered: {
+    backgroundColor: '#EEF6F1',
   },
 
   nextBtn: {
-    backgroundColor: Colors.greenDark.normal,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
+    ...primaryButton,
+    minHeight: 46,
   },
   nextBtnText: {
-    color: 'white',
+    ...primaryButtonText,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: titleFontFamily,
   },
 
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: '#EEE7DF',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 14,
+    backgroundColor: 'rgba(255,255,255,0.96)',
+  },
+  footerMeta: {
+    fontSize: 12,
+    fontFamily: titleFontFamily,
+    color: '#2A2725',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
   submitButton: {
-    backgroundColor: '#0A2916',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 20,
+    ...primaryButton,
+    backgroundColor: '#2F7A5F',
+    shadowColor: '#1D4E3C',
+    minHeight: 52,
   },
   submitButtonDisabled: { opacity: 0.5 },
-  submitButtonText: { color: 'white', fontWeight: '700', fontSize: 16 },
+  submitButtonText: {
+    ...primaryButtonText,
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: titleFontFamily,
+  },
 });

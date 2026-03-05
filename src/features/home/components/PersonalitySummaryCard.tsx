@@ -2,6 +2,14 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Colors from '@/themes/colors';
+import { displayFontFamily, titleFontFamily } from '@/themes/typography';
+import {
+  cardSurface,
+  secondaryButton,
+  secondaryButtonText,
+  softBadge,
+  softBadgeText,
+} from '@/themes/ui';
 import { UserFull } from '@/types/user';
 
 type Props = {
@@ -33,7 +41,11 @@ export default function PersonalitySummaryCard({
         ))}
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={onPress}>
+      <TouchableOpacity
+        activeOpacity={0.88}
+        style={styles.button}
+        onPress={onPress}
+      >
         <Text style={styles.buttonText}>Voir mon analyse</Text>
       </TouchableOpacity>
     </View>
@@ -42,33 +54,30 @@ export default function PersonalitySummaryCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffffdd',
-    borderRadius: 20,
+    ...cardSurface,
     padding: 20,
     marginBottom: 28,
-    shadowColor: '#000',
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 3,
   },
   title: {
     fontSize: 16,
-    color: '#062314',
+    fontFamily: titleFontFamily,
+    color: '#1F1F1F',
     opacity: 0.7,
     marginBottom: 6,
   },
   type: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
     letterSpacing: 3,
-    color: Colors.greyDark.normal,
+    color: '#1F1F1F',
     opacity: 0.7,
     marginBottom: 12,
   },
   label: {
     fontSize: 30,
-    fontWeight: '800',
-    color: Colors.orange.normal,
+    fontWeight: '600',
+    fontFamily: displayFontFamily,
+    color: Colors.accent.strong,
     marginBottom: 4,
   },
   badges: {
@@ -78,25 +87,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   badge: {
-    backgroundColor: Colors.greenLight.light.normal,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 14,
+    ...softBadge,
   },
   badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.greenLight.dark.normal,
+    ...softBadgeText,
   },
   button: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
+    ...secondaryButton,
+    marginTop: 10,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '700',
+    ...secondaryButtonText,
   },
 });

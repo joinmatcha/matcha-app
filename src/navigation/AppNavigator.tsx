@@ -33,12 +33,12 @@ const linking: LinkingOptions<RootStackParamList> = {
           Home: {
             screens: {
               HomeMain: 'home',
-              PersonalityTest: 'personality-test',
+              PersonalityIntro: 'personality-test',
+              PersonalityTest: 'personality-questions',
             },
           },
           Swipe: 'swipe',
           Profil: 'profile',
-          Deconnexion: 'logout',
         },
       },
     },

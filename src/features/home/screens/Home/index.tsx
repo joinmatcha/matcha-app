@@ -23,9 +23,15 @@ import {
   getPreferences,
 } from '@/features/swipe/api/preferencesApi';
 import { useAuth } from '@/hooks/useAuth';
-import { loadDraft } from '@/services/draftStorage';
+import { clearDraft, loadDraft } from '@/services/draftStorage';
+import Colors from '@/themes/colors';
+import { displayFontFamily, titleFontFamily } from '@/themes/typography';
 import { HomeStackParamList, TabParamList } from '@/types/navigation';
 import { computeProfileCompletion } from '@/utils/computeProfileCompletion';
+
+type BilanDraftData = {
+  answers: [string, number | string][];
+};
 
 type HomeNavigation = CompositeNavigationProp<
   NativeStackNavigationProp<HomeStackParamList>,
@@ -51,6 +57,11 @@ export default function HomeScreen() {
   }, []);
 
   const [hasPersonalityDraft, setHasPersonalityDraft] = useState(false);
+  const [hasBilanDraft, setHasBilanDraft] = useState(false);
+  const [hasStartedBilanDraft, setHasStartedBilanDraft] = useState(false);
+  const [bilanDraftUpdatedAt, setBilanDraftUpdatedAt] = useState<number | null>(
+    null,
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -61,15 +72,40 @@ export default function HomeScreen() {
       const checkDraft = async () => {
         if (!userId) {
           setHasPersonalityDraft(false);
+          setHasBilanDraft(false);
+          setHasStartedBilanDraft(false);
           return;
         }
 
-        const draft = await loadDraft('personality', userId);
-        setHasPersonalityDraft(!!draft);
+        const [personalityDraft, bilanDraft] = await Promise.all([
+          loadDraft('personality', userId),
+          loadDraft<BilanDraftData>('bilan', userId),
+        ]);
+
+        const bilanCreatedAtMs = bilan?.createdAt
+          ? new Date(bilan.createdAt).getTime()
+          : null;
+        const draftIsStale =
+          !!bilanDraft &&
+          !!bilanCreatedAtMs &&
+          bilanDraft.updatedAt <= bilanCreatedAtMs;
+
+        if (draftIsStale) {
+          await clearDraft('bilan', userId);
+        }
+
+        setHasPersonalityDraft(!!personalityDraft);
+        setHasBilanDraft(!!bilanDraft && !draftIsStale);
+        setHasStartedBilanDraft(
+          !!bilanDraft && !draftIsStale && !!bilanDraft.data.answers.length,
+        );
+        setBilanDraftUpdatedAt(
+          !!bilanDraft && !draftIsStale ? bilanDraft.updatedAt : null,
+        );
       };
 
       checkDraft().catch(() => {});
-    }, [refresh, refreshBilan, userId, refreshPreferences]),
+    }, [refresh, refreshBilan, userId, refreshPreferences, bilan?.createdAt]),
   );
 
   if (loading) return null;
@@ -77,7 +113,7 @@ export default function HomeScreen() {
   if (error || !user) {
     return (
       <BackgroundRadial bubbles>
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>
               {error ?? 'Impossible de charger les données utilisateur.'}
@@ -92,18 +128,31 @@ export default function HomeScreen() {
   }
 
   const completion = computeProfileCompletion(user);
-  const hasBilan = !!bilan;
+  const bilanCreatedAtMs = bilan?.createdAt
+    ? new Date(bilan.createdAt).getTime()
+    : null;
+  const draftIsStaleComparedToBilan =
+    !!bilan &&
+    !!bilanCreatedAtMs &&
+    !!bilanDraftUpdatedAt &&
+    bilanDraftUpdatedAt <= bilanCreatedAtMs;
+  const shouldUseBilanDraft = hasBilanDraft && !draftIsStaleComparedToBilan;
+  const hasBilan = !!bilan && !shouldUseBilanDraft;
 
   return (
     <BackgroundRadial bubbles>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.container}>
             {/* HEADER */}
-            <Text style={styles.title}>Bonjour {user.firstName}</Text>
+            <View style={styles.titleRow}>
+              <Text style={styles.titleBase}>
+                Bonjour <Text style={styles.titleAccent}>{user.firstName}</Text>
+              </Text>
+            </View>
             <Text style={styles.subtitle}>
               Voici un aperçu de ton profil Matcha.
             </Text>
@@ -136,7 +185,11 @@ export default function HomeScreen() {
                     : 'Découvre ton profil Matcha.'
                 }
                 buttonLabel={hasPersonalityDraft ? 'Reprendre' : 'Commencer'}
-                onPress={() => navigation.navigate('PersonalityTest')}
+                onPress={() =>
+                  navigation.navigate('PersonalityIntro', {
+                    hasDraft: hasPersonalityDraft,
+                  })
+                }
               />
             )}
 
@@ -150,12 +203,28 @@ export default function HomeScreen() {
               <TestCard
                 title="Bilan de compétences"
                 description={
-                  bilanError
-                    ? 'Le bilan est indisponible pour le moment.'
-                    : 'Analyse complète : forces, valeurs & métiers.'
+                  shouldUseBilanDraft
+                    ? hasStartedBilanDraft
+                      ? 'Tu as un bilan en cours.'
+                      : 'Analyse complète : forces, valeurs & métiers.'
+                    : bilanError
+                      ? 'Le bilan est indisponible pour le moment.'
+                      : 'Analyse complète : forces, valeurs & métiers.'
                 }
-                buttonLabel="Commencer"
-                onPress={() => navigation.navigate('BilanIntro')}
+                buttonLabel={
+                  shouldUseBilanDraft && hasStartedBilanDraft
+                    ? 'Reprendre'
+                    : 'Commencer'
+                }
+                onPress={() =>
+                  navigation.navigate('BilanIntro', {
+                    mode: shouldUseBilanDraft
+                      ? hasStartedBilanDraft
+                        ? 'resume'
+                        : 'restart'
+                      : 'start',
+                  })
+                }
               />
             )}
 
@@ -189,23 +258,36 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     zIndex: 5,
   },
-  title: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: '#062314',
-    marginBottom: 4,
-    letterSpacing: 0.5,
+  titleRow: {
+    width: '100%',
+    marginBottom: 6,
+  },
+  titleBase: {
+    fontSize: 32,
+    fontWeight: '700',
+    fontFamily: displayFontFamily,
+    color: Colors.text.strong,
+    letterSpacing: 0.2,
+    flexShrink: 1,
+  },
+  titleAccent: {
+    fontSize: 32,
+    fontWeight: '700',
+    fontFamily: displayFontFamily,
+    color: Colors.accent.primary,
+    letterSpacing: 0.2,
   },
   subtitle: {
     fontSize: 16,
-    color: 'rgba(0,0,0,0.55)',
+    color: Colors.text.muted,
     lineHeight: 22,
     marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#062314',
+    fontSize: 19,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
     marginTop: 10,
     marginBottom: 12,
   },
@@ -218,7 +300,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     textAlign: 'center',
-    color: '#444',
+    color: '#222',
     fontSize: 16,
   },
 });

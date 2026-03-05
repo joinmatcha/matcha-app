@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+import { cardSurface } from '@/themes/ui';
 
 interface TestHeaderProps {
   title: string;
@@ -44,25 +45,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   headerCard: {
-    backgroundColor: 'rgba(255,255,255,0.97)',
+    ...cardSurface,
     padding: 18,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
   },
   title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#062314',
-    marginBottom: 6,
+    fontSize: 21,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: '#1F1F1F',
+    marginBottom: 4,
   },
   summary: {
-    fontSize: 14,
-    color: 'rgba(0,0,0,0.6)',
-    marginBottom: 16,
+    fontSize: 13,
+    fontFamily: bodyFontFamily,
+    color: '#2A2A2A',
+    marginBottom: 14,
   },
   progressRow: {
     flexDirection: 'row',
@@ -71,21 +68,26 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     flex: 1,
-    height: 8,
-    backgroundColor: '#e7ede6',
+    height: 7,
+    backgroundColor: '#D7EBE2',
     borderRadius: 999,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: Colors.greenDark.normal,
+    backgroundColor: '#2F7A5F',
     borderRadius: 999,
   },
   progressText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-    color: Colors.greyDark.normal,
-    minWidth: 52,
-    textAlign: 'right',
+    fontFamily: titleFontFamily,
+    color: '#215542',
+    minWidth: 56,
+    textAlign: 'center',
+    backgroundColor: '#E3F2EA',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
 });

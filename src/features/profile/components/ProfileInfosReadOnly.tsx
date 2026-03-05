@@ -2,6 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import EditableSection from '@/components/ui/EditableSection';
+import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+import { secondaryButton, secondaryButtonText } from '@/themes/ui';
 import { UserFull } from '@/types/user';
 
 import ProfileSections from './ProfileSections';
@@ -249,53 +252,57 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   readOnlyWrapper: {
-    gap: 10,
+    gap: 14,
   },
 
   row: {
-    marginBottom: 4,
+    backgroundColor: 'rgba(250,252,250,0.96)',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
   label: {
     fontSize: 12,
-    color: '#888',
+    fontFamily: bodyFontFamily,
+    color: Colors.text.soft,
   },
   value: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#062314',
-    marginTop: 2,
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
+    marginTop: 4,
   },
 
   dangerCard: {
-    backgroundColor: '#fff5f5',
-    padding: 20,
-    borderRadius: 14,
+    backgroundColor: 'rgba(255,246,245,0.92)',
+    padding: 22,
+    borderRadius: 24,
     marginTop: 18,
   },
   dangerTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
     color: '#b30000',
     marginBottom: 8,
   },
   dangerText: {
     fontSize: 13,
-    color: '#444',
+    fontFamily: bodyFontFamily,
+    color: Colors.text.muted,
     marginBottom: 16,
     lineHeight: 19,
   },
 
   deleteButton: {
-    borderWidth: 1,
-    borderColor: '#b30000',
-    paddingVertical: 10,
+    ...secondaryButton,
     paddingHorizontal: 18,
-    borderRadius: 12,
     alignSelf: 'flex-start',
+    backgroundColor: '#F8E4E3',
   },
   deleteButtonLabel: {
-    fontSize: 14,
-    fontWeight: '700',
+    ...secondaryButtonText,
     color: '#b30000',
   },
 });

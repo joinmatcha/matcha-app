@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.greenDark.normal,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#062314',
+    shadowColor: '#1F2937',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.28,
     shadowRadius: 10,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 26,
-    fontWeight: '700',
+    fontWeight: '600',
     color: Colors.background,
     lineHeight: 26,
   },

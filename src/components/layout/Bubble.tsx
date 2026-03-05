@@ -27,8 +27,8 @@ export function Bubble({ x, size, duration, screenHeight }: Props) {
     height: size,
     borderRadius: size / 2,
     left: x,
-    backgroundColor: 'rgba(255,255,255,0.35)',
-    opacity: 0.3,
+    backgroundColor: 'rgba(255,255,255,0.56)',
+    opacity: 0.52,
     top: screenHeight - progress.value * (screenHeight + 200),
     transform: [{ scale: 0.9 + Math.sin(progress.value * Math.PI) * 0.1 }],
   }));

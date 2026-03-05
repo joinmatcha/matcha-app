@@ -8,7 +8,7 @@ import rnpTheme from '@/themes/rnpTheme';
 export default function GoogleAuth() {
   return (
     <>
-      <Button style={styles.googleBtn} mode="outlined">
+      <Button style={styles.googleBtn} mode="contained">
         <View style={styles.content}>
           <Image source={Images.GoogleLogo} style={styles.googleLogo} />
           <Text style={styles.text}>S'inscrire via Google</Text>
@@ -23,10 +23,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: rnpTheme.colors.background,
-    borderColor: rnpTheme.colors.greyLight.dark.normal,
-    borderRadius: 4,
+    backgroundColor: '#F0EEEB',
+    borderRadius: 12,
     padding: 2,
+    elevation: 0,
   },
   content: {
     flexDirection: 'row',

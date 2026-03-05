@@ -1,6 +1,5 @@
 import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { Alert, Text, TouchableOpacity } from 'react-native';
 
 import DeleteAccountModal from '@/components/Modals/DeleteAccountModal';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,11 +15,10 @@ export default function DeleteAccount() {
       await deleteAccount();
       modal.hide();
     } catch {
-      Toast.show({
-        type: 'error',
-        text1: 'Erreur',
-        text2: 'Impossible de supprimer le compte pour le moment.',
-      });
+      Alert.alert(
+        'Erreur',
+        'Impossible de supprimer le compte pour le moment.',
+      );
     }
   };
 

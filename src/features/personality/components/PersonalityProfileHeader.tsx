@@ -3,6 +3,8 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Branding } from '@/assets';
 import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+import { cardSurface } from '@/themes/ui';
 
 interface PersonalityProfileHeaderProps {
   label: string;
@@ -40,40 +42,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   profileHeader: {
-    backgroundColor: 'rgba(255,255,255,0.97)',
+    ...cardSurface,
     paddingVertical: 24,
     paddingHorizontal: 20,
     alignItems: 'center',
     marginHorizontal: 20,
     marginBottom: 20,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
   },
   profileTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: Colors.greyDark.normal,
+    fontFamily: bodyFontFamily,
+    color: '#5F5A56',
     textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 4,
+    letterSpacing: 0.8,
+    marginBottom: 6,
   },
   profileLabel: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: Colors.orange.normal,
+    fontSize: 24,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: Colors.accent.strong,
     textAlign: 'center',
+    letterSpacing: -0.3,
   },
   profileType: {
     marginTop: 8,
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 3,
-    color: Colors.greyDark.normal,
-    opacity: 0.7,
+    fontSize: 13,
+    fontWeight: '400',
+    fontFamily: titleFontFamily,
+    letterSpacing: 1.6,
+    color: '#6A6460',
+    opacity: 0.9,
     textTransform: 'uppercase',
   },
 });

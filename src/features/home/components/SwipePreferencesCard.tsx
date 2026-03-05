@@ -3,6 +3,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Preferences } from '@/features/swipe/api/preferencesApi';
 import Colors from '@/themes/colors';
+import { displayFontFamily, titleFontFamily } from '@/themes/typography';
+import {
+  cardSurface,
+  neutralBadge,
+  neutralBadgeText,
+  secondaryButton,
+  secondaryButtonText,
+  softBadge,
+  softBadgeText,
+} from '@/themes/ui';
 
 type Props = {
   preferences: Preferences;
@@ -22,7 +32,11 @@ export default function SwipePreferencesCard({
         <Text style={styles.description}>
           Swipe des métiers pour découvrir tes préférences.
         </Text>
-        <TouchableOpacity style={styles.button} onPress={onSwipePress}>
+        <TouchableOpacity
+          activeOpacity={0.88}
+          style={styles.button}
+          onPress={onSwipePress}
+        >
           <Text style={styles.buttonLabel}>Commencer à swiper</Text>
         </TouchableOpacity>
       </View>
@@ -63,7 +77,11 @@ export default function SwipePreferencesCard({
         </View>
       )}
 
-      <TouchableOpacity style={styles.button} onPress={onSwipePress}>
+      <TouchableOpacity
+        activeOpacity={0.88}
+        style={styles.button}
+        onPress={onSwipePress}
+      >
         <Text style={styles.buttonLabel}>Continuer à swiper</Text>
       </TouchableOpacity>
     </View>
@@ -72,25 +90,22 @@ export default function SwipePreferencesCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffffdd',
-    borderRadius: 20,
+    ...cardSurface,
     padding: 20,
     marginBottom: 28,
-    shadowColor: '#000',
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 3,
   },
   title: {
     fontSize: 16,
-    color: '#062314',
+    fontFamily: titleFontFamily,
+    color: '#1F1F1F',
     opacity: 0.7,
     marginBottom: 6,
   },
   counter: {
     fontSize: 28,
-    fontWeight: '800',
-    color: Colors.success,
+    fontWeight: '600',
+    fontFamily: displayFontFamily,
+    color: Colors.accent.strong,
     marginBottom: 14,
   },
   description: {
@@ -105,7 +120,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 13,
-    color: 'rgba(0,0,0,0.6)',
+    color: 'rgba(0,0,0,0.82)',
     fontWeight: '600',
     marginBottom: 6,
   },
@@ -115,37 +130,22 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   badge: {
-    backgroundColor: Colors.greenLight.light.normal,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
+    ...softBadge,
   },
   badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.greenLight.dark.normal,
+    ...softBadgeText,
   },
   badgeLight: {
-    backgroundColor: 'rgba(0,0,0,0.04)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
+    ...neutralBadge,
   },
   badgeLightText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.greyDark.normal,
+    ...neutralBadgeText,
   },
   button: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
+    ...secondaryButton,
     marginTop: 10,
   },
   buttonLabel: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '700',
+    ...secondaryButtonText,
   },
 });

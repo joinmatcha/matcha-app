@@ -17,7 +17,7 @@ import InfoRow from '@/features/jobs/components/InfoRow';
 import SoftCard from '@/features/jobs/components/SoftCard';
 import ProfileSection from '@/features/personality/components/ProfileSection';
 import TagList from '@/features/personality/components/TagList';
-import Colors from '@/themes/colors';
+import { primaryButton, primaryButtonText } from '@/themes/ui';
 import { HomeStackParamList } from '@/types/navigation';
 
 type Route = RouteProp<HomeStackParamList, 'JobDetail'>;
@@ -80,7 +80,7 @@ export default function JobDetailScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView style={styles.safeArea} />
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea} />
 
       <ScrollView
         contentContainerStyle={styles.container}
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
 
   errorText: {
     fontSize: 14,
-    color: 'rgba(0,0,0,0.75)',
+    color: 'rgba(0,0,0,0.93)',
     marginBottom: 12,
   },
 
@@ -257,15 +257,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.12)',
     backgroundColor: 'rgba(255,255,255,0.6)',
   },
 
   retryText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: Colors.greyDark.normal,
+    fontWeight: '600',
+    color: '#1F1F1F',
   },
 
   hero: {
@@ -276,8 +274,8 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 28,
-    fontWeight: '800',
-    color: Colors.greyDark.normal,
+    fontWeight: '700',
+    color: '#1F1F1F',
   },
 
   metaRow: {
@@ -297,8 +295,8 @@ const styles = StyleSheet.create({
 
   sectorText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: Colors.orange.normal,
+    fontWeight: '600',
+    color: '#70635B',
   },
 
   outlookBadge: {
@@ -308,48 +306,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(46,125,50,0.10)',
+    backgroundColor: 'rgba(198,93,60,0.10)',
   },
 
   dot: {
     width: 8,
     height: 8,
     borderRadius: 99,
-    backgroundColor: Colors.greenDark.normal,
+    backgroundColor: '#8C5C49',
   },
 
   outlookText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: Colors.greenDark.normal,
+    fontWeight: '600',
+    color: '#70635B',
   },
 
   marketText: {
     marginTop: 10,
     fontSize: 13,
-    color: 'rgba(0,0,0,0.6)',
+    color: 'rgba(0,0,0,0.82)',
     lineHeight: 18,
   },
 
   resumeTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '600',
     marginBottom: 6,
-    color: Colors.greyDark.normal,
+    color: '#1F1F1F',
   },
 
   resumeText: {
     fontSize: 15,
     lineHeight: 22,
-    color: 'rgba(0,0,0,0.75)',
+    color: 'rgba(0,0,0,0.93)',
   },
 
   subLabel: {
     marginTop: 14,
     marginBottom: 6,
     fontSize: 13,
-    fontWeight: '700',
-    color: 'rgba(0,0,0,0.6)',
+    fontWeight: '600',
+    color: 'rgba(0,0,0,0.82)',
   },
 
   rowsGap: {
@@ -372,7 +370,7 @@ const styles = StyleSheet.create({
   activityText: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(0,0,0,0.75)',
+    color: 'rgba(0,0,0,0.93)',
   },
 
   evolutionContainer: {
@@ -383,27 +381,27 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 14,
-    backgroundColor: 'rgba(46,125,50,0.08)',
+    backgroundColor: 'rgba(198,93,60,0.08)',
   },
 
   evolutionText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: Colors.greenDark.normal,
+    fontWeight: '600',
+    color: '#70635B',
   },
 
   salaryCard: {
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 16,
-    backgroundColor: 'rgba(76,175,80,0.12)',
+    backgroundColor: 'rgba(198,93,60,0.12)',
     alignItems: 'center',
   },
 
   salaryText: {
     fontSize: 15,
-    fontWeight: '800',
-    color: Colors.greenDark.normal,
+    fontWeight: '600',
+    color: '#4B392F',
     textAlign: 'center',
   },
 
@@ -413,15 +411,11 @@ const styles = StyleSheet.create({
   },
 
   backToBilanButton: {
-    backgroundColor: Colors.greenDark.normal,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
+    ...primaryButton,
   },
 
   backToBilanText: {
-    color: Colors.background,
-    fontSize: 16,
-    fontWeight: '800',
+    ...primaryButtonText,
+    fontWeight: '600',
   },
 });

@@ -9,7 +9,9 @@ import {
 } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 
+import Colors from '@/themes/colors';
 import rnpTheme from '@/themes/rnpTheme';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 
 export type SelectOption<T> = {
   label: string;
@@ -68,6 +70,7 @@ export default function BottomSheetSelect<T>({
         </Pressable>
 
         <View style={styles.sheet}>
+          <View style={styles.handle} />
           <Text style={styles.sheetTitle}>{label}</Text>
 
           <FlatList
@@ -94,13 +97,22 @@ export default function BottomSheetSelect<T>({
           />
 
           <View style={styles.actions}>
-            <Button mode="text" onPress={closeSheet} textColor="#666">
+            <Button
+              mode="text"
+              onPress={closeSheet}
+              textColor="#5A534E"
+              labelStyle={styles.cancelLabel}
+            >
               Annuler
             </Button>
             <Button
               mode="contained"
               onPress={confirm}
               style={styles.confirmButton}
+              buttonColor={Colors.accent.primary}
+              textColor={Colors.text.inverse}
+              contentStyle={styles.confirmButtonContent}
+              labelStyle={styles.confirmButtonLabel}
             >
               Valider
             </Button>
@@ -118,50 +130,77 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: '#00000055',
+    backgroundColor: 'rgba(28, 25, 22, 0.24)',
   },
   sheet: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: '#FFFCF9',
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    paddingBottom: 22,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     maxHeight: '60%',
   },
+  handle: {
+    alignSelf: 'center',
+    width: 42,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: '#DDD4CB',
+    marginBottom: 14,
+  },
   sheetTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 16,
-    color: rnpTheme.colors.primary,
+    fontSize: 18,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    marginBottom: 10,
+    color: Colors.text.base,
   },
   optionRow: {
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#EFE7DF',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   optionLabel: {
     fontSize: 16,
+    fontFamily: bodyFontFamily,
+    color: Colors.text.base,
   },
   selectorCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: '#ccc',
+    width: 18,
+    height: 18,
+    borderRadius: 18,
+    borderWidth: 2.5,
+    borderColor: '#D1C8C0',
   },
   selectorCircleSelected: {
-    borderColor: rnpTheme.colors.greenDark.normal,
-    backgroundColor: rnpTheme.colors.greenLight.light.active,
+    borderColor: Colors.accent.primary,
+    backgroundColor: Colors.accent.soft,
   },
   actions: {
-    marginTop: 20,
+    marginTop: 18,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 16,
+    alignItems: 'center',
+    gap: 12,
+  },
+  cancelLabel: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
+  },
+  confirmButtonContent: {
+    minHeight: 46,
+    paddingHorizontal: 8,
   },
   confirmButton: {
-    borderRadius: 8,
+    borderRadius: 999,
+  },
+  confirmButtonLabel: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
+    fontWeight: '600',
   },
 });

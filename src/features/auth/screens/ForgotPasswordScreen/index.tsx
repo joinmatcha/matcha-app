@@ -10,6 +10,12 @@ import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import LoginLink from '@/features/auth/components/LoginLink';
 import SigninLink from '@/features/auth/components/SigninLink';
 import ForgotPasswordForm from '@/features/auth/forms/ForgotPasswordForm';
+import {
+  bodyFontFamily,
+  displayFontFamily,
+  titleFontFamily,
+} from '@/themes/typography';
+import { cardSurface } from '@/themes/ui';
 import { AuthStackParamList } from '@/types/navigation';
 
 export default function ForgotPasswordScreen() {
@@ -30,7 +36,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <BackgroundRadial bubbles>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.contentContainer}
@@ -42,6 +48,9 @@ export default function ForgotPasswordScreen() {
 
           <View style={styles.card}>
             <Text style={styles.title}>Mot de passe oublié</Text>
+            <Text style={styles.subtitle}>
+              Renseigne ton email pour recevoir un lien de réinitialisation.
+            </Text>
 
             {!sent ? (
               <ForgotPasswordForm setSent={setSent} />
@@ -73,6 +82,8 @@ export default function ForgotPasswordScreen() {
                   mode="contained"
                   onPress={handleTokenSubmit}
                   disabled={!token.trim()}
+                  buttonColor="#E9E6E2"
+                  textColor="#2B2A29"
                   style={styles.continueButton}
                 >
                   Continuer
@@ -114,40 +125,47 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     zIndex: 5,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    paddingHorizontal: 20,
+    ...cardSurface,
+    paddingHorizontal: 22,
     paddingVertical: 24,
     zIndex: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#062314',
-    marginBottom: 12,
+    fontSize: 28,
+    fontWeight: '700',
+    fontFamily: displayFontFamily,
+    color: '#1F1F1F',
+    marginBottom: 8,
+    letterSpacing: -0.4,
+  },
+  subtitle: {
+    fontSize: 15,
+    fontFamily: bodyFontFamily,
+    color: 'rgba(45,33,27,0.72)',
+    lineHeight: 22,
+    marginBottom: 22,
   },
   infoText: {
-    fontSize: 14,
-    color: '#444',
+    fontSize: 15,
+    fontFamily: bodyFontFamily,
+    color: '#222',
     marginBottom: 20,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   subLabel: {
     fontSize: 14,
+    fontFamily: titleFontFamily,
+    color: '#1F1F1F',
     marginBottom: 6,
   },
   helperText: {
     fontSize: 12,
-    color: '#666',
+    fontFamily: bodyFontFamily,
+    color: '#2A2A2A',
     marginBottom: 10,
   },
   input: {
@@ -155,7 +173,7 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     marginTop: 8,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   resendButton: {
     marginTop: 8,
