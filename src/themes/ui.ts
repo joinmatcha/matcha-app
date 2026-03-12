@@ -46,7 +46,7 @@ export const primaryButton: ViewStyle = {
   paddingVertical: 13,
   alignItems: 'center',
   justifyContent: 'center',
-  shadowColor: '#185C45',
+  shadowColor: '#1A5C45',
   shadowOpacity: 0.2,
   shadowRadius: 8,
   shadowOffset: { width: 0, height: 4 },

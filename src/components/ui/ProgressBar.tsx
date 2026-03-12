@@ -22,7 +22,7 @@ export default function ProgressBar({ value }: { value: number }) {
     <View style={styles.track}>
       <Animated.View style={[styles.fillContainer, animatedFill]}>
         <LinearGradient
-          colors={['#33A777', '#1F8A65']}
+          colors={['#6DB89F', '#2A7F68']}
           style={styles.gradient}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}

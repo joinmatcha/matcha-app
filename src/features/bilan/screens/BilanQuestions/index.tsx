@@ -449,8 +449,8 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     ...primaryButton,
-    backgroundColor: '#2F7A5F',
-    shadowColor: '#1D4E3C',
+    backgroundColor: Colors.accent.primary,
+    shadowColor: '#1B6F52',
     minHeight: 52,
   },
   submitButtonDisabled: { opacity: 0.5 },

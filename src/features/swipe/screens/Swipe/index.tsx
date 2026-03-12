@@ -714,6 +714,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.16)',
   },
   likeBtn: {
-    backgroundColor: '#1F8A65',
+    backgroundColor: Colors.accent.primary,
   },
 });

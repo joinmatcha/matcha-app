@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
+import Colors from '@/themes/colors';
+
 interface AnswerButtonProps {
   value: number;
   index: number;
@@ -27,11 +29,11 @@ export default function AnswerButton({
 
   if (isSelected) {
     if (index < 2) {
-      circleColor = '#BFDCCF';
+      circleColor = '#CFEBDD';
     } else if (index === 2) {
-      circleColor = '#8DBBA6';
+      circleColor = '#99D3BA';
     } else {
-      circleColor = '#2F7A5F';
+      circleColor = Colors.accent.primary;
     }
     shadowOpacity = 0.16;
   }

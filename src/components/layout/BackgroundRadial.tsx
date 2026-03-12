@@ -4,9 +4,9 @@ import { StyleSheet, View } from 'react-native';
 
 import BackgroundBubbles from './BackgroundBubbles';
 
-type BackgroundVariant = 'green' | 'beige';
+type BackgroundVariant = 'white' | 'green' | 'beige';
 
-const DEFAULT_BACKGROUND_VARIANT: BackgroundVariant = 'green';
+const DEFAULT_BACKGROUND_VARIANT: BackgroundVariant = 'white';
 
 const paletteByVariant: Record<
   BackgroundVariant,
@@ -17,6 +17,16 @@ const paletteByVariant: Record<
     container: string;
   }
 > = {
+  white: {
+    base: ['#FFFDF9', '#FCF8F2', '#F8F2E8'],
+    washOne: ['rgba(168,154,138,0.1)', 'rgba(168,154,138,0.03)', 'transparent'],
+    washTwo: [
+      'rgba(222,214,200,0.14)',
+      'rgba(222,214,200,0.04)',
+      'transparent',
+    ],
+    container: '#FFFCF8',
+  },
   green: {
     base: ['#F4F8F2', '#EBF2E6', '#E3ECDD'],
     washOne: ['rgba(92,138,95,0.18)', 'rgba(92,138,95,0.04)', 'transparent'],
@@ -24,18 +34,14 @@ const paletteByVariant: Record<
     container: '#E8F0E6',
   },
   beige: {
-    base: ['#FFFDF9', '#F6EFE6', '#EEE4D7'],
-    washOne: [
-      'rgba(198,144,109,0.16)',
-      'rgba(198,144,109,0.05)',
-      'transparent',
-    ],
+    base: ['#FFF8F1', '#F5EADF', '#EEDFD2'],
+    washOne: ['rgba(208,122,83,0.18)', 'rgba(208,122,83,0.05)', 'transparent'],
     washTwo: [
-      'rgba(228,188,154,0.18)',
-      'rgba(228,188,154,0.05)',
+      'rgba(198,157,120,0.18)',
+      'rgba(198,157,120,0.05)',
       'transparent',
     ],
-    container: '#F2E6D8',
+    container: '#F5E8DB',
   },
 };
 

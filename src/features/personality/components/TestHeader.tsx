@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { cardSurface } from '@/themes/ui';
 
@@ -69,23 +70,23 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 7,
-    backgroundColor: '#D7EBE2',
+    backgroundColor: '#DFF0E8',
     borderRadius: 999,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#2F7A5F',
+    backgroundColor: Colors.accent.primary,
     borderRadius: 999,
   },
   progressText: {
     fontSize: 12,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#215542',
+    color: Colors.accent.strong,
     minWidth: 56,
     textAlign: 'center',
-    backgroundColor: '#E3F2EA',
+    backgroundColor: '#EAF7F1',
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 3,
