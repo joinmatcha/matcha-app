@@ -1,0 +1,6 @@
+node_modules
+.expo
+coverage
+storybook-static
+dist
+web-build

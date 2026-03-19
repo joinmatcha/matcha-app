@@ -1,152 +1,76 @@
-# Matcha App
+# matcha-app
 
-**Matcha App** est une application mobile construite avec **React Native** (via **Expo**) et **TypeScript**, intégrée à **Firebase** pour l'authentification et connectée à une API REST Node.js. L'objectif est de fournir une base solide et modulaire pour développer une application mobile moderne.
+Application mobile React Native/Expo pour Matcha, basée sur TypeScript et connectée à l'API Matcha.
 
----
+## Prerequisites
 
-## Fonctionnalités principales
-
-- Initialisation avec **Expo** (sans sous-dossier inutile)
-- Typage strict avec **TypeScript**
-- Architecture modulaire (services, hooks, composants, etc.)
-- Authentification via **Firebase Authentication**
-- **Axios** pour les appels API
-- Support des **variables d'environnement** (via `app.config.js`)
-- **Linting** avec ESLint + Prettier + tri des imports
-- **Tests unitaires** avec Jest + Testing Library
-- Hooks de commit : lint, format & test via **Husky** + **lint-staged**
-
----
-
-## Structure du projet
-
-```
-matcha-app/
-├── src/
-│   ├── auth/            # Firebase Auth + services associés
-│   ├── components/      # Composants UI réutilisables
-│   ├── constants/       # Constantes globales, config
-│   ├── contexts/        # Context API (auth, theme, etc.)
-│   ├── hooks/           # Hooks personnalisés (ex: useAuth)
-│   ├── lib/             # api.ts, helpers globaux
-│   ├── navigation/      # Stack, Tab, Router, guards
-│   ├── screens/         # Pages de l'app (Home, Login...)
-│   ├── services/        # Services pour appels backend
-│   ├── types/           # Types partagés
-│   └── utils/           # Fonctions utilitaires génériques
-├── .husky/              # Hooks git
-├── .expo/, assets/      # Expo, images et icônes
-├── app.config.js        # Config Expo avec dotenv
-├── .env.example/.local  # Variables d’environnement
-├── .eslintrc.cjs        # ESLint config
-├── .prettierrc.cjs      # Prettier config
-├── tsconfig.json        # TypeScript config
-└── README.md
-```
-
----
+- Node.js 22.16.0
+- Yarn Classic 1.22.x
 
 ## Installation
 
 ```bash
-# Cloner le repo
-git clone https://github.com/ton-utilisateur/matcha-app.git
-cd matcha-app
-
-# Installer les dépendances
 yarn install
+cp .env.example .env.local
 ```
 
----
+## Development
 
-## Configuration des variables d'environnement
+Lancer l'application avec Expo :
 
-Fichier `.env.local` (copie de `.env.example`) :
-
-```
-API_URL=https://api.matcha.com
-FIREBASE_API_KEY=xxx
-FIREBASE_AUTH_DOMAIN=xxx
-FIREBASE_PROJECT_ID=xxx
+```bash
+yarn dev
 ```
 
-Fichier `app.config.js` :
+Raccourcis utiles :
 
-```ts
-export default ({ config }) => ({
-  ...config,
-  extra: {
-    API_URL: process.env.API_URL,
-    FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
-    // etc.
-  },
-});
+```bash
+yarn android
+yarn ios
+yarn web
 ```
 
----
+## Scripts
 
-## Scripts disponibles
+| Script                 | Description                              |
+| ---------------------- | ---------------------------------------- |
+| `yarn dev`             | Démarre Expo                             |
+| `yarn android`         | Lance Expo sur Android                   |
+| `yarn ios`             | Lance Expo sur iOS                       |
+| `yarn web`             | Lance Expo sur le web                    |
+| `yarn lint`            | Vérifie ESLint                           |
+| `yarn lint:fix`        | Corrige automatiquement ESLint           |
+| `yarn format`          | Formate le projet avec Prettier          |
+| `yarn test`            | Exécute les tests Jest                   |
+| `yarn test:coverage`   | Exécute les tests avec couverture        |
+| `yarn typecheck`       | Vérifie TypeScript sans émettre de build |
+| `yarn storybook`       | Lance Storybook                          |
+| `yarn build-storybook` | Génère le build statique Storybook       |
 
-| Script         | Description                          |
-| -------------- | ------------------------------------ |
-| `yarn start`   | Démarre le serveur Expo              |
-| `yarn android` | Lance l'app sur un émulateur Android |
-| `yarn ios`     | Lance l'app sur un simulateur iOS    |
-| `yarn web`     | Lance la version web (Expo)          |
-| `yarn test`    | Lance les tests unitaires avec Jest  |
-| `yarn prepare` | Installe les hooks git Husky         |
+## Environment variables
 
----
+Créer un fichier `.env.local` à partir de [`.env.example`](/Users/etienne-rch/Documents/ETNA/MASTER/GPE/matcha-app/.env.example).
 
-## Conventions & bonnes pratiques
+Exemple minimal :
 
-### Structure et logique
+```env
+EXPO_PUBLIC_API_URL=http://localhost:3000
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_web_client_id_here
+EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=your_google_android_client_id_here
+EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=your_google_ios_client_id_here
+```
 
-- **Separation of concerns** : composants visuels, logique métier (services), logique de données (API)
-- **Pas de logique dans les composants** : utiliser des hooks et services
-- Utiliser des **hooks custom** pour l'état global (ex: `useAuth`, `useTheme`)
-- Auth avec Firebase isolée dans `src/auth`
-- Toutes les fonctions d'API dans `services/`, utilisant `lib/api.ts`
+Les variables publiques sont injectées par Expo via [app.config.js](/Users/etienne-rch/Documents/ETNA/MASTER/GPE/matcha-app/app.config.js).
 
-### Style de code
+## Quality
 
-- ESLint + Prettier strictement appliqués
-- Tri automatique des imports avec `@trivago/prettier-plugin-sort-imports`
-- Pas de `any` ou `ts-ignore` non justifié
-- Hooks, types, components = **typés explicitement**
-- Convention de nommage :
-  - kebab-case pour les fichiers
-  - camelCase pour les variables/fonctions
-  - PascalCase pour les composants et types
+Le repo est autonome et inclut :
 
-### Qualité / CI
+- Husky + `lint-staged` pour les hooks Git
+- une CI GitHub Actions pour `lint`, `test:coverage` et `typecheck`
+- un résumé de couverture publié dans les PR
 
-- `lint-staged` empêche les commits si erreurs ESLint ou tests KO
-- `yarn format` obligatoire avant tout commit (via Husky)
-- Tests avec `@testing-library/react-native`
-- Nom des fichiers de test : `*.test.tsx`
+## Notes
 
-### Authentification Firebase
-
-- Auth isolée dans `auth/firebase.ts`
-- Utilisation de `getIdToken()` pour chaque requête
-- Token ajouté aux headers Axios dynamiquement (via interceptor)
-- Aucun accès direct aux infos sensibles Firebase dans les composants
-
-### Sécurité
-
-- Ne jamais commit `.env`
-- Pas de secret sensible hardcodé dans le code source
-- Aucune info perso en console (`console.log(user.email)` = ❌)
-
-### Collaboration & Git
-
-- Hooks Husky : linter + test auto avant commit
-- Convention de commit : `feat:`, `fix:`, `refactor:`, `test:`...
-- CI GitHub Actions recommandée si besoin
-
----
-
-## Licence
-
-MIT — libre d'utilisation, de modification et de distribution.
+- L'alias `@/` pointe sur `src/`.
+- Le client utilise l'API définie par `EXPO_PUBLIC_API_URL`.
