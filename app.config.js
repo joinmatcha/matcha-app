@@ -19,6 +19,7 @@ export default {
       supportsTablet: true,
     },
     android: {
+      package: 'com.matchagpe.app',
       adaptiveIcon: {
         foregroundImage: './src/assets/icons/adaptive-icon.png',
         backgroundColor: '#ffffff',
@@ -30,6 +31,9 @@ export default {
       bundler: 'metro',
     },
     extra: {
+      eas: {
+        projectId: '8b62f242-c858-4afa-b38b-208fa92060e8',
+      },
       FIREBASE_API_KEY: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
       FIREBASE_AUTH_DOMAIN: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
       FIREBASE_PROJECT_ID: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
