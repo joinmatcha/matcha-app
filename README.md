@@ -1,28 +1,47 @@
 # matcha-app
 
-Application mobile React Native/Expo pour Matcha, basée sur TypeScript et connectée à l'API Matcha.
+Application mobile React Native pour Matcha, application d'aide à la reconversion professionnelle.
 
-## Prerequisites
+## Stack technique
 
-- Node.js 22.16.0
-- Yarn Classic 1.22.x
+- **Framework** : React Native 0.81.5 (Expo 54)
+- **Langage** : TypeScript
+- **Navigation** : React Navigation (bottom-tabs, native-stack)
+- **UI** : React Native Paper, Reanimated, Expo Linear Gradient
+- **HTTP** : Axios
+- **Validation** : Zod
+- **Authentification** : JWT (jwt-decode)
+- **Stockage local** : AsyncStorage, Expo Secure Store
+- **Design system** : Storybook
+- **Polices** : Google Fonts (Manrope, Outfit)
+
+## Prérequis
+
+- [Node.js](https://nodejs.org/) 22.16.0
+- [Yarn](https://classic.yarnpkg.com/) 1.22.x
+- [EAS CLI](https://docs.expo.dev/eas/) >= 18.0.5 (pour les builds)
+- Un émulateur Android/iOS ou l'application [Expo Go](https://expo.dev/go)
 
 ## Installation
 
 ```bash
+git clone git@github.com:joinmatcha/matcha-app.git
+cd matcha-app
 yarn install
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-## Development
+Remplacer les valeurs placeholder par les vraies valeurs disponibles sur le **Bitwarden de l'organisation Matcha** (compte `matcha.api.gpe@gmail.com`).
 
-Lancer l'application avec Expo :
+## Lancement en local
+
+Démarrer l'application avec Expo :
 
 ```bash
 yarn dev
 ```
 
-Raccourcis utiles :
+Lancer sur une plateforme spécifique :
 
 ```bash
 yarn android
@@ -30,47 +49,114 @@ yarn ios
 yarn web
 ```
 
-## Scripts
+L'API doit être accessible à l'URL définie dans `EXPO_PUBLIC_API_URL` (par défaut `http://localhost:3000`).
 
-| Script                 | Description                              |
-| ---------------------- | ---------------------------------------- |
-| `yarn dev`             | Démarre Expo                             |
-| `yarn android`         | Lance Expo sur Android                   |
-| `yarn ios`             | Lance Expo sur iOS                       |
-| `yarn web`             | Lance Expo sur le web                    |
-| `yarn lint`            | Vérifie ESLint                           |
-| `yarn lint:fix`        | Corrige automatiquement ESLint           |
-| `yarn format`          | Formate le projet avec Prettier          |
-| `yarn test`            | Exécute les tests Jest                   |
-| `yarn test:coverage`   | Exécute les tests avec couverture        |
-| `yarn typecheck`       | Vérifie TypeScript sans émettre de build |
-| `yarn storybook`       | Lance Storybook                          |
-| `yarn build-storybook` | Génère le build statique Storybook       |
+## Variables d'environnement
 
-## Environment variables
+| Variable              | Description         | Valeur par défaut       |
+| --------------------- | ------------------- | ----------------------- |
+| `EXPO_PUBLIC_API_URL` | URL de l'API Matcha | `http://localhost:3000` |
 
-Créer un fichier `.env.local` à partir de [`.env.example`](/Users/etienne-rch/Documents/ETNA/MASTER/GPE/matcha-app/.env.example).
+Les variables sont injectées dans l'application via `app.config.js` (objet `extra`).
 
-Exemple minimal :
+## Build APK (EAS)
 
-```env
-EXPO_PUBLIC_API_URL=http://localhost:3000
-EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_web_client_id_here
-EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=your_google_android_client_id_here
-EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=your_google_ios_client_id_here
+L'application est buildée via [EAS Build](https://docs.expo.dev/build/introduction/) (Expo Application Services).
+
+### Profils de build
+
+| Profil        | Format     | Distribution | Usage                            |
+| ------------- | ---------- | ------------ | -------------------------------- |
+| `development` | Dev client | Interne      | Développement avec hot reload    |
+| `preview`     | APK        | Interne      | Test interne, partage à l'équipe |
+| `production`  | APK        | Store-ready  | Version finale                   |
+
+### Générer un APK (profil preview)
+
+```bash
+eas build --platform android --profile preview
 ```
 
-Les variables publiques sont injectées par Expo via [app.config.js](/Users/etienne-rch/Documents/ETNA/MASTER/GPE/matcha-app/app.config.js).
+Le build est lancé sur les serveurs Expo. Une fois terminé, l'APK est téléchargeable depuis le dashboard Expo ou via le lien fourni dans le terminal.
 
-## Quality
+### Keystore Android
 
-Le repo est autonome et inclut :
+Le keystore est généré et stocké automatiquement sur Expo (compte `matcha-gpe`). Ne pas le supprimer — il est nécessaire pour signer les futures mises à jour.
 
-- Husky + `lint-staged` pour les hooks Git
-- une CI GitHub Actions pour `lint`, `test:coverage` et `typecheck`
-- un résumé de couverture publié dans les PR
+### Release GitHub
 
-## Notes
+L'APK est publié en tant que GitHub Release :
 
-- L'alias `@/` pointe sur `src/`.
-- Le client utilise l'API définie par `EXPO_PUBLIC_API_URL`.
+- Tag : `v1.0.0-preview`
+- Repo : `joinmatcha/matcha-app`
+
+## Scripts
+
+| Script                 | Description                                  |
+| ---------------------- | -------------------------------------------- |
+| `yarn dev`             | Démarre Expo                                 |
+| `yarn android`         | Lance Expo sur Android                       |
+| `yarn ios`             | Lance Expo sur iOS                           |
+| `yarn web`             | Lance Expo sur le web                        |
+| `yarn lint`            | Vérifie le code avec ESLint                  |
+| `yarn lint:fix`        | Corrige automatiquement les erreurs ESLint   |
+| `yarn format`          | Formate le code avec Prettier                |
+| `yarn test`            | Exécute les tests Jest                       |
+| `yarn test:coverage`   | Exécute les tests avec rapport de couverture |
+| `yarn typecheck`       | Vérifie les types TypeScript (sans build)    |
+| `yarn storybook`       | Lance Storybook (composants UI)              |
+| `yarn build-storybook` | Génère le build statique Storybook           |
+
+## Qualité de code
+
+- **Husky + lint-staged** : lint et format automatiques sur chaque commit
+- **ESLint** : règles TypeScript + React + React Native
+- **Prettier** : formatage uniforme (avec plugin Tailwind pour l'ordre des classes)
+- **TypeScript** : mode strict activé
+
+## Architecture du projet
+
+```
+src/
+├── App.tsx           # Point d'entrée de l'application
+├── api/              # Client HTTP (Axios), intercepteurs
+├── assets/           # Images, icônes, polices
+├── components/       # Composants réutilisables
+├── config/           # Configuration
+├── constants/        # Constantes de l'application
+├── contexts/         # React Contexts (auth, theme, etc.)
+├── features/         # Modules métier (écrans + logique par feature)
+├── hooks/            # Hooks React personnalisés
+├── navigation/       # Configuration React Navigation
+├── schemas/          # Schémas de validation Zod
+├── services/         # Services métier
+├── themes/           # Thème UI (couleurs, typographie)
+├── types/            # Types TypeScript partagés
+└── utils/            # Fonctions utilitaires
+```
+
+## Configuration technique
+
+### Alias de chemins
+
+L'alias `@/` pointe sur `src/`. Exemple :
+
+```typescript
+import { Button } from '@/components/Button';
+```
+
+### SVG
+
+Les fichiers SVG sont importés comme des composants React Native grâce à `react-native-svg-transformer` (configuré dans `metro.config.js`).
+
+```typescript
+import Logo from '@/assets/icons/logo.svg';
+```
+
+## Accès aux services
+
+| Service                  | URL                                      | Connexion                                    |
+| ------------------------ | ---------------------------------------- | -------------------------------------------- |
+| **Expo** (builds)        | https://expo.dev                         | Identifiants sur Bitwarden                   |
+| **GitHub** (code source) | https://github.com/joinmatcha/matcha-app | Compte personnel (organisation `joinmatcha`) |
+| **Bitwarden** (secrets)  | https://vault.bitwarden.eu               | Google (`matcha.api.gpe@gmail.com`)          |
