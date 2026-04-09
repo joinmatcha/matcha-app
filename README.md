@@ -116,6 +116,71 @@ Le keystore est généré et stocké automatiquement sur Expo (compte `matcha-gp
 | `yarn storybook`       | Lance Storybook (composants UI)              |
 | `yarn build-storybook` | Génère le build statique Storybook           |
 
+## Tests
+
+Le projet utilise **Jest** avec **@testing-library/react-native** pour les tests unitaires et d'intégration.
+
+### Lancer les tests
+
+```bash
+yarn test                # exécute tous les tests
+yarn test:coverage       # exécute les tests avec rapport de couverture
+```
+
+Pour un fichier ou dossier spécifique :
+
+```bash
+npx jest --config jest.config.cjs src/__tests__/hooks/useAuth.test.tsx
+```
+
+### Couverture
+
+| Metric     | Objectif | Actuel |
+| ---------- | -------- | ------ |
+| Statements | 80%      | ~87%   |
+| Branches   | —        | ~71%   |
+| Functions  | 80%      | ~84%   |
+| Lines      | 80%      | ~87%   |
+
+Le rapport HTML est généré dans `coverage/` après un `yarn test:coverage`.
+
+### Organisation des tests
+
+Les tests suivent la structure source dans `src/__tests__/` :
+
+```
+src/__tests__/
+├── api/                # Tests des appels API (axios mocks)
+├── components/         # Tests des composants UI (modals, layout, ui)
+├── config/             # Tests de la configuration (toastConfig)
+├── contexts/           # Tests des React Contexts (AuthContext)
+├── features/           # Tests des composants et forms par feature
+│   ├── auth/
+│   ├── home/
+│   ├── jobs/
+│   ├── personality/
+│   └── profile/
+├── hooks/              # Tests des hooks (useAuth, useBilan, etc.)
+├── navigation/         # Tests de navigation (AppNavigator)
+├── schemas/            # Tests des schémas Zod
+├── screens/            # Tests de rendu des écrans
+│   ├── auth/
+│   ├── bilan/
+│   ├── home/
+│   ├── jobs/
+│   ├── personality/
+│   ├── profile/
+│   └── swipe/
+├── services/           # Tests des services (draftStorage)
+└── utils/              # Tests des utilitaires
+```
+
+### Conventions
+
+- Descriptions de tests en **français** (`it('se rend sans erreur', ...)`)
+- Mocks manuels par fichier (pas de setup global)
+- Les dépendances natives (`AsyncStorage`, `SecureStore`, `react-native-paper`) sont mockées dans chaque fichier de test
+
 ## Qualité de code
 
 - **Husky + lint-staged** : lint et format automatiques sur chaque commit
