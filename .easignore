@@ -1,0 +1,12 @@
+node_modules/
+.git/
+.github/
+.husky/
+.storybook/
+__tests__/
+*.test.ts
+*.test.tsx
+*.stories.ts
+*.stories.tsx
+.env.example
+README.md

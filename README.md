@@ -83,12 +83,21 @@ Le build est lancé sur les serveurs Expo. Une fois terminé, l'APK est téléch
 
 Le keystore est généré et stocké automatiquement sur Expo (compte `matcha-gpe`). Ne pas le supprimer — il est nécessaire pour signer les futures mises à jour.
 
-### Release GitHub
+### Publier l'APK sur GitHub Release
 
-L'APK est publié en tant que GitHub Release :
-
-- Tag : `v1.0.0-preview`
-- Repo : `joinmatcha/matcha-app`
+1. **Builder l'APK** via EAS :
+   ```bash
+   eas build --platform android --profile preview
+   ```
+2. **Télécharger l'APK** depuis le dashboard [Expo](https://expo.dev) ou via le lien fourni dans le terminal
+3. **Créer une release** sur GitHub :
+   - Aller sur https://github.com/joinmatcha/matcha-app/releases/new
+   - Créer un nouveau tag (ex : `v1.0.0-preview`, `v1.1.0-preview`, etc.)
+   - Target : `develop1` (ou la branche concernée)
+   - Ajouter un titre et une description des changements
+   - Glisser-déposer le fichier APK dans la zone "Attach binaries"
+   - Cocher "Set as a pre-release" si ce n'est pas une version finale
+   - Publier
 
 ## Scripts
 
