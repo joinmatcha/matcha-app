@@ -3,10 +3,16 @@ node_modules/
 .github/
 .husky/
 .storybook/
+.idea/
+coverage/
 __tests__/
 *.test.ts
 *.test.tsx
 *.stories.ts
 *.stories.tsx
+.env
 .env.example
 README.md
+eslint.config.js
+prettier.config.cjs
+.prettierignore
