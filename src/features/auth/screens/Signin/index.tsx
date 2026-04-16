@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Portal, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,6 +7,7 @@ import { Branding } from '@/assets';
 import CGUModal from '@/components/Modals/CGUModal';
 import PrivacyModal from '@/components/Modals/PrivacyModal';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import KeyboardAwareScrollView from '@/components/layout/KeyboardAwareScrollView';
 import TermsAndPrivacyText from '@/components/ui/TermsAndPrivacyText';
 import LoginLink from '@/features/auth/components/LoginLink';
 import RegistrationForm from '@/features/auth/forms/RegistrationForm';
@@ -21,10 +22,9 @@ export default function SigninScreen() {
   return (
     <BackgroundRadial bubbles>
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
-        <ScrollView
+        <KeyboardAwareScrollView
           style={styles.scroll}
           contentContainerStyle={styles.contentContainer}
-          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.logoContainer}>
             <Branding.Logo />
@@ -58,7 +58,7 @@ export default function SigninScreen() {
               <LoginLink />
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </BackgroundRadial>
   );

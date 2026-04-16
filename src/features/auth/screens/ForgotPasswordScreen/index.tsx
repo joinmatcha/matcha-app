@@ -1,12 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import KeyboardAwareScrollView from '@/components/layout/KeyboardAwareScrollView';
 import LoginLink from '@/features/auth/components/LoginLink';
 import SigninLink from '@/features/auth/components/SigninLink';
 import ForgotPasswordForm from '@/features/auth/forms/ForgotPasswordForm';
@@ -37,10 +38,9 @@ export default function ForgotPasswordScreen() {
   return (
     <BackgroundRadial bubbles>
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
-        <ScrollView
+        <KeyboardAwareScrollView
           style={styles.scroll}
           contentContainerStyle={styles.contentContainer}
-          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.logoContainer}>
             <Branding.Logo />
@@ -104,7 +104,7 @@ export default function ForgotPasswordScreen() {
               <LoginLink />
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </BackgroundRadial>
   );

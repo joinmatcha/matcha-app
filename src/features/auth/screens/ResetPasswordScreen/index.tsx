@@ -1,12 +1,13 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import KeyboardAwareScrollView from '@/components/layout/KeyboardAwareScrollView';
 import LoginLink from '@/features/auth/components/LoginLink';
 import NewPasswordForm from '@/features/auth/forms/NewPasswordForm';
 import { bodyFontFamily, displayFontFamily } from '@/themes/typography';
@@ -37,10 +38,9 @@ export default function ResetPasswordScreen() {
   return (
     <BackgroundRadial bubbles>
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
-        <ScrollView
+        <KeyboardAwareScrollView
           style={styles.scroll}
           contentContainerStyle={styles.contentContainer}
-          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.logoContainer}>
             <Branding.Logo />
@@ -78,7 +78,7 @@ export default function ResetPasswordScreen() {
               <LoginLink />
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </BackgroundRadial>
   );
