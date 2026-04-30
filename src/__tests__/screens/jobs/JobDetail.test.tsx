@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native';
+import { render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 import JobDetailScreen from '@/features/jobs/screens/JobDetail';
@@ -41,25 +41,34 @@ jest.mock('@/features/jobs/api/jobsApi', () => ({
   getJobById: jest.fn().mockResolvedValue({
     job: {
       id: 'j1',
+      code: 'M1805',
       title: 'Dev',
       sector: 'Tech',
       description: 'desc',
-      growthOutlook: 'growing',
+      growthOutlook: 'unknown',
       tags: [],
       riasec: [],
-      competences: [],
-      softSkills: [],
-      values: [],
-      workConditions: [],
-      missions: [],
-      dailyTasks: [],
-      evolutionPaths: [],
+      appellations: [],
+      skills: [],
+      skillGroups: [],
+      knowledge: [],
+      knowledgeGroups: [],
+      workContexts: [],
+      themes: [],
+      interests: [],
+      trainingCodes: [],
+      sectors: [],
+      relatedJobs: [],
     },
   }),
 }));
 
 describe('JobDetailScreen', () => {
-  it('se rend sans erreur', () => {
-    expect(() => render(<JobDetailScreen />)).not.toThrow();
+  it('se rend sans erreur', async () => {
+    const screen = render(<JobDetailScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Dev')).toBeTruthy();
+    });
   });
 });

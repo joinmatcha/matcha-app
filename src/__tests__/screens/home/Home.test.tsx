@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native';
+import { render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 import HomeScreen from '@/features/home/screens/Home';
@@ -66,18 +66,28 @@ jest.mock('@/features/bilan/hooks/useBilan', () => ({
 jest.mock('@/features/swipe/api/preferencesApi', () => ({
   getPreferences: jest.fn().mockRejectedValue(new Error('no prefs')),
 }));
+jest.mock('@/features/jobs', () => ({
+  getTopLikedJobs: jest.fn().mockResolvedValue({ jobs: [] }),
+}));
 jest.mock('@/services/draftStorage', () => ({
   loadDraft: jest.fn().mockResolvedValue(null),
   clearDraft: jest.fn(),
 }));
 
 describe('HomeScreen', () => {
-  it('se rend sans erreur', () => {
-    expect(() => render(<HomeScreen />)).not.toThrow();
+  it('se rend sans erreur', async () => {
+    const screen = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByText('John')).toBeTruthy();
+    });
   });
 
-  it("affiche le prénom de l'utilisateur", () => {
+  it("affiche le prénom de l'utilisateur", async () => {
     const { getByText } = render(<HomeScreen />);
-    expect(getByText('John')).toBeTruthy();
+
+    await waitFor(() => {
+      expect(getByText('John')).toBeTruthy();
+    });
   });
 });

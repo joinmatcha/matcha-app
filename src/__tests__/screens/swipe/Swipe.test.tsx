@@ -20,6 +20,7 @@ jest.mock('react-native-safe-area-context', () => {
 });
 jest.mock('@react-navigation/native', () => ({
   useFocusEffect: (cb: () => void) => cb(),
+  useNavigation: () => ({ navigate: jest.fn() }),
 }));
 jest.mock('@expo/vector-icons', () => ({
   MaterialIcons: () => null,

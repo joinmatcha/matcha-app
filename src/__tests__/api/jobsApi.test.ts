@@ -1,5 +1,9 @@
 import api from '@/api/api';
-import { getJobById, getJobs } from '@/features/jobs/api/jobsApi';
+import {
+  getJobById,
+  getJobs,
+  getTopLikedJobs,
+} from '@/features/jobs/api/jobsApi';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -30,7 +34,7 @@ describe('jobsApi', () => {
   });
 
   it('getJobs passe les params de recherche', async () => {
-    const params = { q: 'dev', sector: 'tech', limit: 10 };
+    const params = { q: 'dev', sector: 'tech', riasec: 'RIASEC_I', limit: 10 };
     mockedApi.get.mockResolvedValue({ data: { jobs: [{ id: '1' }] } });
 
     const result = await getJobs(params);
@@ -48,5 +52,16 @@ describe('jobsApi', () => {
 
     expect(mockedApi.get).toHaveBeenCalledWith('/api/jobs/j1');
     expect(result.job.title).toBe('Dev');
+  });
+
+  it('getTopLikedJobs appelle GET /api/jobs/top-liked avec limit', async () => {
+    mockedApi.get.mockResolvedValue({ data: { jobs: [] } });
+
+    const result = await getTopLikedJobs(3);
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/jobs/top-liked', {
+      params: { limit: 3 },
+    });
+    expect(result).toEqual({ jobs: [] });
   });
 });

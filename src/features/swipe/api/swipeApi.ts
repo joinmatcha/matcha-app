@@ -2,10 +2,13 @@ import api from '@/api/api';
 
 export interface DeckJob {
   id: string;
+  code: string;
   title: string;
-  description?: string;
   sector?: string;
+  description?: string;
+  growthOutlook: 'unknown';
   tags: string[];
+  riasec: string[];
 }
 
 export interface DeckResponse {
@@ -25,8 +28,8 @@ export interface SwipeResponse {
   limit: number;
 }
 
-export const getDeck = async (): Promise<DeckResponse> => {
-  const res = await api.get('/api/jobs/deck');
+export const getDeck = async (limit?: number): Promise<DeckResponse> => {
+  const res = await api.get('/api/jobs/deck', { params: { limit } });
   return res.data as DeckResponse;
 };
 

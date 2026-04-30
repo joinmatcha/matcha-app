@@ -1,10 +1,9 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -12,16 +11,94 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
-import { JobDetail, getJobById } from '@/features/jobs/api/jobsApi';
-import InfoRow from '@/features/jobs/components/InfoRow';
-import SoftCard from '@/features/jobs/components/SoftCard';
-import ProfileSection from '@/features/personality/components/ProfileSection';
-import TagList from '@/features/personality/components/TagList';
-import { primaryButton, primaryButtonText } from '@/themes/ui';
+import {
+  JobDetail,
+  MarketIndicatorValue,
+  RomeLabelCode,
+  getJobById,
+} from '@/features/jobs/api/jobsApi';
 import { HomeStackParamList } from '@/types/navigation';
+
+import {
+  ActivityStat,
+  BulletList,
+  ChipList,
+  CompactList,
+  InfoRows,
+  ProfileInsight,
+  SalaryDashboard,
+  SectionCard,
+  TensionTrend,
+} from './components';
+import { styles } from './styles';
 
 type Route = RouteProp<HomeStackParamList, 'JobDetail'>;
 type Nav = NativeStackNavigationProp<HomeStackParamList>;
+
+const relationLabels: Record<string, string> = {
+  close: 'Métier proche',
+  possible: 'Transition possible',
+};
+
+const formatLabelCode = (item?: RomeLabelCode) =>
+  [item?.code, item?.label].filter(Boolean).join(' - ');
+
+const hasItems = <T,>(items?: T[]) => Boolean(items?.length);
+
+const getRiasecLabel = (item: JobDetail['riasec'][number]) =>
+  typeof item === 'string'
+    ? item
+    : item.label
+      ? `${item.label}${item.code ? ` (${item.code})` : ''}`
+      : item.code;
+
+const getLabels = (items?: RomeLabelCode[]) =>
+  (items ?? [])
+    .map((item) => item.label || item.code)
+    .filter((label): label is string => Boolean(label));
+
+const isDisplayableTransitionDetail = (detail?: string) =>
+  Boolean(detail && !/^EMPLOI_[A-Z_]+$/.test(detail));
+
+const normalizeRomeText = (text?: string) =>
+  (text ?? '').replace(/\\n/g, '\n').replace(/\s+\n/g, '\n').trim();
+
+const splitRomeText = (text?: string) =>
+  normalizeRomeText(text)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+const findMarketValue = (
+  values: MarketIndicatorValue[] | undefined,
+  codes: string[],
+) => values?.find((value) => value.code && codes.includes(value.code));
+
+const formatNumber = (value?: number) =>
+  typeof value === 'number' ? value.toLocaleString('fr-FR') : undefined;
+
+const formatCurrency = (value?: number) =>
+  typeof value === 'number'
+    ? `${Math.round(value).toLocaleString('fr-FR')} €`
+    : undefined;
+
+const getTensionLabel = (value?: number) => {
+  if (typeof value !== 'number') return undefined;
+  if (value <= 1) return 'Faible';
+  if (value === 2) return 'Modérée';
+  if (value === 3) return 'Moyenne';
+  if (value === 4) return 'Forte';
+  return 'Très forte';
+};
+
+const getTensionHelper = (value?: number) => {
+  if (typeof value !== 'number') return undefined;
+  if (value <= 1) return 'Peu de tension signalée sur ce métier';
+  if (value === 2) return 'Tension limitée, quelques difficultés possibles';
+  if (value === 3) return 'Tension intermédiaire sur le recrutement';
+  if (value === 4) return 'Tension forte, profils plus rares';
+  return 'Très forte tension, recrutement difficile';
+};
 
 export default function JobDetailScreen() {
   const { params } = useRoute<Route>();
@@ -38,7 +115,9 @@ export default function JobDetailScreen() {
       try {
         setLoading(true);
         const res = await getJobById(jobId);
-        if (mounted) setJob(res.job);
+        if (mounted) {
+          setJob(res.job);
+        }
       } catch {
         if (mounted) setJob(null);
       } finally {
@@ -50,6 +129,16 @@ export default function JobDetailScreen() {
       mounted = false;
     };
   }, [jobId]);
+
+  const transitionTags = useMemo(() => {
+    if (!job?.transitions) return [];
+
+    return [
+      job.transitions.ecological ? 'Transition écologique' : null,
+      job.transitions.digital ? 'Transition numérique' : null,
+      job.transitions.demographic ? 'Transition démographique' : null,
+    ].filter((tag): tag is string => Boolean(tag));
+  }, [job?.transitions]);
 
   if (loading) {
     return (
@@ -78,6 +167,120 @@ export default function JobDetailScreen() {
     );
   }
 
+  const definition = normalizeRomeText(job.definition || job.description);
+  const definitionLines = splitRomeText(definition);
+  const definitionPreview =
+    definitionLines.length > 1 ? definitionLines.slice(0, 4) : [];
+  const definitionParagraph =
+    definitionLines.length === 1 ? definitionLines[0] : undefined;
+  const accessLines = splitRomeText(job.accessToJob);
+  const skillGroups = hasItems(job.skillGroups)
+    ? job.skillGroups
+    : hasItems(job.skills)
+      ? [{ group: undefined, skills: job.skills }]
+      : [];
+  const knowledgeGroups = hasItems(job.knowledgeGroups)
+    ? job.knowledgeGroups
+    : hasItems(job.knowledge)
+      ? [{ category: undefined, knowledge: job.knowledge }]
+      : [];
+  const domainItems = [
+    formatLabelCode(job.domain),
+    job.domain?.grandDomain
+      ? `Grand domaine : ${formatLabelCode(job.domain.grandDomain)}`
+      : null,
+  ].filter((item): item is string => Boolean(item));
+  const riasecLabels = job.riasec.map(getRiasecLabel).filter(Boolean);
+  const sectorLabels = getLabels(job.sectors);
+  const interestLabels = getLabels(job.interests);
+  const trainingLabels = getLabels(job.trainingCodes);
+  const mainAppellations = job.appellations
+    .filter((appellation) => appellation.isMain)
+    .slice(0, 4);
+  const displayedAppellations = (
+    mainAppellations.length ? mainAppellations : job.appellations.slice(0, 4)
+  ).map((appellation) => appellation.shortLabel || appellation.label);
+  const displayedSkillGroups = skillGroups.slice(0, 2);
+  const displayedKnowledgeGroups = knowledgeGroups.slice(0, 2);
+  const displayedRelatedJobs = job.relatedJobs.slice(0, 4);
+  const displayableTransitionDetail = isDisplayableTransitionDetail(
+    job.transitions?.ecologicalDetail,
+  )
+    ? job.transitions?.ecologicalDetail
+    : undefined;
+  const mainHeroTags = [
+    job.sector,
+    job.isRegulated ? 'Métier réglementé' : null,
+    job.isExecutive ? 'Emploi cadre' : null,
+  ].filter((tag): tag is string => Boolean(tag));
+  const statItems = [
+    job.domain?.label ? { label: 'Domaine', value: job.domain.label } : null,
+    job.isRegulated !== undefined
+      ? {
+          label: 'Réglementation',
+          value: job.isRegulated ? 'Réglementé' : 'Non réglementé',
+        }
+      : null,
+    job.isExecutive !== undefined
+      ? {
+          label: 'Statut',
+          value: job.isExecutive ? 'Cadre' : 'Non cadre',
+        }
+      : null,
+  ].filter((item): item is { label: string; value: string } => Boolean(item));
+  const salaryAverage = findMarketValue(job.market?.salary?.values, [
+    'SAL3',
+    'SAL_3',
+  ]);
+  const salaryBeginner = findMarketValue(job.market?.salary?.values, [
+    'SAL1',
+    'SAL_1',
+  ]);
+  const salaryExperienced = findMarketValue(job.market?.salary?.values, [
+    'SAL2',
+    'SAL_2',
+  ]);
+  const totalOffersQuarter = findMarketValue(job.market?.offers?.values, [
+    'TOFF',
+  ]);
+  const totalOffers12Months = findMarketValue(job.market?.offers?.values, [
+    'TOFF-CUMUL12MOIS',
+  ]);
+  const hires12MonthsOrQuarter = findMarketValue(job.market?.hires?.values, [
+    'TOUT-TOUTE',
+  ]);
+  const demandersAll = findMarketValue(job.market?.demanders?.values, [
+    'ABCDEFG',
+  ]);
+  const mainTension = findMarketValue(job.market?.tension?.values, [
+    'PERSPECTIVE',
+  ]);
+  const salaryAverageValue = formatCurrency(salaryAverage?.amount);
+  const salaryBeginnerValue = formatCurrency(salaryBeginner?.amount);
+  const salaryExperiencedValue = formatCurrency(salaryExperienced?.amount);
+  const offerQuarterValue = formatNumber(totalOffersQuarter?.count);
+  const offer12MonthsValue = formatNumber(totalOffers12Months?.count);
+  const hiresValue = formatNumber(hires12MonthsOrQuarter?.count);
+  const demandersValue = formatNumber(demandersAll?.count);
+  const tensionValue =
+    typeof mainTension?.count === 'number' ? `${mainTension.count}/5` : null;
+  const tensionLabel = getTensionLabel(mainTension?.count);
+  const tensionHelper = getTensionHelper(mainTension?.count);
+  const hasMarketData = Boolean(
+    salaryAverageValue ||
+    salaryBeginnerValue ||
+    salaryExperiencedValue ||
+    offerQuarterValue ||
+    offer12MonthsValue ||
+    hiresValue ||
+    demandersValue ||
+    tensionValue,
+  );
+  const marketPeriod =
+    job.market?.offers?.periodLabel ||
+    job.market?.hires?.periodLabel ||
+    job.market?.salary?.periodLabel;
+
   return (
     <BackgroundRadial>
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea} />
@@ -86,138 +289,300 @@ export default function JobDetailScreen() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* HERO */}
         <View style={styles.hero}>
+          {job.code ? (
+            <Text style={styles.romeCode}>ROME {job.code}</Text>
+          ) : null}
           <Text style={styles.title}>{job.title}</Text>
 
-          <View style={styles.metaRow}>
-            {job.sector ? (
-              <View style={styles.sectorBadge}>
-                <Text style={styles.sectorText}>{job.sector}</Text>
-              </View>
-            ) : null}
-
-            {job.growthOutlook ? (
-              <View style={styles.outlookBadge}>
-                <View style={styles.dot} />
-                <Text style={styles.outlookText}>
-                  {job.growthOutlook === 'growing' &&
-                    'Bon niveau d’opportunités'}
-                  {job.growthOutlook === 'stable' && 'Marché plutôt stable'}
-                  {job.growthOutlook === 'declining' &&
-                    'Opportunités plus ciblées'}
-                  {job.growthOutlook === 'unknown' && 'Marché variable'}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-
-          {job.growthOutlook ? (
-            <Text style={styles.marketText}>
-              {job.growthOutlook === 'growing' &&
-                'Le marché recrute régulièrement : de nouvelles offres apparaissent souvent.'}
-              {job.growthOutlook === 'stable' &&
-                'Les besoins sont constants : les postes existent mais évoluent moins vite.'}
-              {job.growthOutlook === 'declining' &&
-                'Le métier reste présent mais sur des périmètres plus spécialisés.'}
-              {job.growthOutlook === 'unknown' &&
-                'Les opportunités dépendent beaucoup du secteur et de la région.'}
-            </Text>
-          ) : null}
+          <ChipList items={mainHeroTags} limit={3} />
         </View>
 
-        {/* RÉSUMÉ */}
-        {job.description ? (
-          <SoftCard>
-            <Text style={styles.resumeTitle}>En résumé</Text>
-            <Text style={styles.resumeText}>{job.description}</Text>
-          </SoftCard>
+        {definition ? (
+          <SectionCard title="À retenir">
+            {definitionPreview.length ? (
+              <BulletList items={definitionPreview} />
+            ) : (
+              <Text style={styles.bodyText}>{definitionParagraph}</Text>
+            )}
+          </SectionCard>
         ) : null}
 
-        {/* MISSIONS */}
-        {job.missions?.length ? (
-          <ProfileSection title="Missions principales">
-            <View style={styles.rowsGap}>
-              {job.missions.map((m: string, i: number) => (
-                <InfoRow key={i} label={m} />
-              ))}
+        {statItems.length ? (
+          <View style={styles.statGrid}>
+            {statItems.map((item) => (
+              <View key={item.label} style={styles.statCard}>
+                <Text style={styles.statLabel}>{item.label}</Text>
+                <Text style={styles.statValue}>{item.value}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+
+        {hasMarketData ? (
+          <SectionCard title="Marché de l’emploi">
+            <View style={styles.dashboardStack}>
+              {salaryAverageValue ? (
+                <SalaryDashboard
+                  average={salaryAverageValue}
+                  beginner={salaryBeginnerValue}
+                  experienced={salaryExperiencedValue}
+                  period={job.market?.salary?.periodLabel}
+                />
+              ) : null}
+
+              {typeof mainTension?.count === 'number' ? (
+                <TensionTrend
+                  value={mainTension.count}
+                  label={tensionLabel}
+                  helper={tensionHelper}
+                />
+              ) : null}
+
+              {offerQuarterValue ||
+              offer12MonthsValue ||
+              hiresValue ||
+              demandersValue ? (
+                <View style={styles.activityPanel}>
+                  <Text style={styles.activityPanelTitle}>
+                    Activité du marché
+                  </Text>
+                  <View style={styles.activityList}>
+                    {offerQuarterValue ? (
+                      <ActivityStat
+                        label="Offres publiées"
+                        value={offerQuarterValue}
+                        helper={
+                          totalOffersQuarter?.periodLabel ?? 'Sur le trimestre'
+                        }
+                      />
+                    ) : null}
+                    {offer12MonthsValue ? (
+                      <ActivityStat
+                        label="Offres sur 12 mois"
+                        value={offer12MonthsValue}
+                        helper="Total cumulé"
+                      />
+                    ) : null}
+                    {hiresValue ? (
+                      <ActivityStat
+                        label="Embauches"
+                        value={hiresValue}
+                        helper="Recrutements enregistrés"
+                      />
+                    ) : null}
+                    {demandersValue ? (
+                      <ActivityStat
+                        label="Candidats disponibles"
+                        value={demandersValue}
+                        helper="Demandeurs d’emploi sur ce métier"
+                      />
+                    ) : null}
+                  </View>
+                </View>
+              ) : null}
             </View>
-          </ProfileSection>
+
+            <View style={styles.marketSourceRow}>
+              {job.market?.territory?.label || job.market?.territory?.code ? (
+                <View style={styles.marketSourcePill}>
+                  <Text style={styles.marketSourceLabel}>Territoire</Text>
+                  <Text style={styles.marketSourceValue}>
+                    {job.market.territory.label ??
+                      (job.market.territory.code === 'FR'
+                        ? 'France'
+                        : job.market.territory.code)}
+                  </Text>
+                </View>
+              ) : null}
+              {marketPeriod ? (
+                <View style={styles.marketSourcePill}>
+                  <Text style={styles.marketSourceLabel}>Période</Text>
+                  <Text style={styles.marketSourceValue}>{marketPeriod}</Text>
+                </View>
+              ) : null}
+            </View>
+          </SectionCard>
         ) : null}
 
-        {/* QUOTIDIEN */}
-        {job.dailyTasks?.length ? (
-          <ProfileSection title="Au quotidien">
-            <View style={styles.rowWrap}>
-              {job.dailyTasks.map((t: string, i: number) => (
-                <View key={i} style={styles.activityTag}>
-                  <Text style={styles.activityText}>{t}</Text>
+        {accessLines.length ? (
+          <SectionCard title="Accès au métier">
+            {accessLines.length > 1 ? (
+              <BulletList items={accessLines.slice(0, 4)} />
+            ) : (
+              <Text style={styles.bodyText}>{accessLines[0]}</Text>
+            )}
+          </SectionCard>
+        ) : null}
+
+        {domainItems.length ? (
+          <SectionCard title="Domaine" compact>
+            <InfoRows
+              rows={[
+                {
+                  label: 'Domaine',
+                  value: job.domain
+                    ? [job.domain.code, job.domain.label]
+                        .filter(Boolean)
+                        .join(' - ')
+                    : undefined,
+                },
+                {
+                  label: 'Grand domaine',
+                  value: job.domain?.grandDomain
+                    ? formatLabelCode(job.domain.grandDomain)
+                    : undefined,
+                },
+              ]}
+            />
+          </SectionCard>
+        ) : null}
+
+        {hasItems(riasecLabels) || hasItems(interestLabels) ? (
+          <SectionCard title="Profil d’intérêt">
+            <ProfileInsight riasec={riasecLabels} interests={interestLabels} />
+          </SectionCard>
+        ) : null}
+
+        {hasItems(displayedAppellations) ? (
+          <SectionCard title="Appellations fréquentes" compact>
+            <CompactList
+              items={displayedAppellations.map((appellation) => ({
+                title: appellation,
+              }))}
+              limit={4}
+            />
+          </SectionCard>
+        ) : null}
+
+        {hasItems(displayedSkillGroups) ? (
+          <SectionCard title="Compétences clés">
+            <View style={styles.groupList}>
+              {displayedSkillGroups.map((group, groupIndex) => (
+                <View
+                  key={`${group.group?.code ?? group.group?.label ?? 'skills'}-${groupIndex}`}
+                  style={styles.groupCard}
+                >
+                  {group.group?.label || group.group?.code ? (
+                    <Text style={styles.groupTitle}>
+                      {formatLabelCode(group.group)}
+                    </Text>
+                  ) : null}
+
+                  <View style={styles.skillList}>
+                    {group.skills.slice(0, 2).map((skill, index) => (
+                      <View
+                        key={`${skill.code ?? skill.label}-${index}`}
+                        style={styles.skillRow}
+                      >
+                        <View style={styles.skillMarker} />
+                        <Text style={styles.skillText}>{skill.label}</Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
               ))}
             </View>
-          </ProfileSection>
+          </SectionCard>
         ) : null}
 
-        {/* PROFIL RECHERCHÉ */}
-        <ProfileSection title="Profil recherché">
-          {job.competences?.length ? (
-            <>
-              <Text style={styles.subLabel}>Compétences clés</Text>
-              <TagList items={job.competences} />
-            </>
-          ) : null}
+        {hasItems(displayedKnowledgeGroups) ? (
+          <SectionCard title="Savoirs utiles">
+            <View style={styles.groupList}>
+              {displayedKnowledgeGroups.map((group, groupIndex) => (
+                <View
+                  key={`${group.category?.code ?? group.category?.label ?? 'knowledge'}-${groupIndex}`}
+                  style={styles.groupCard}
+                >
+                  {group.category?.label || group.category?.code ? (
+                    <Text style={styles.groupTitle}>
+                      {formatLabelCode(group.category)}
+                    </Text>
+                  ) : null}
 
-          {job.softSkills?.length ? (
-            <>
-              <Text style={styles.subLabel}>Soft skills</Text>
-              <TagList items={job.softSkills} />
-            </>
-          ) : null}
-
-          {job.values?.length ? (
-            <>
-              <Text style={styles.subLabel}>Valeurs associées</Text>
-              <TagList items={job.values} />
-            </>
-          ) : null}
-
-          {job.workConditions?.length ? (
-            <>
-              <Text style={styles.subLabel}>Conditions de travail</Text>
-              <TagList items={job.workConditions} />
-            </>
-          ) : null}
-        </ProfileSection>
-
-        {/* ÉVOLUTIONS */}
-        {job.evolutionPaths?.length ? (
-          <ProfileSection title="Évolutions possibles">
-            <View style={styles.evolutionContainer}>
-              {job.evolutionPaths.map((e: string, i: number) => (
-                <View key={i} style={styles.evolutionStep}>
-                  <Text style={styles.evolutionText}>{e}</Text>
+                  <CompactList
+                    items={group.knowledge.map((knowledge) => ({
+                      title: knowledge.label,
+                    }))}
+                    limit={4}
+                  />
                 </View>
               ))}
             </View>
-          </ProfileSection>
+          </SectionCard>
         ) : null}
 
-        {/* SALAIRE */}
-        {job.salaryMin || job.salaryMax ? (
-          <ProfileSection title="Rémunération (indicatif)">
-            <View style={styles.salaryCard}>
-              <Text style={styles.salaryText}>
-                {job.salaryMin && job.salaryMax
-                  ? `Entre ${job.salaryMin}€ et ${job.salaryMax}€ brut / an`
-                  : job.salaryMin
-                    ? `À partir de ${job.salaryMin}€ brut / an`
-                    : `Jusqu’à ${job.salaryMax}€ brut / an`}
-              </Text>
+        {hasItems(job.workContexts) ? (
+          <SectionCard title="Contextes de travail" compact>
+            <CompactList
+              items={job.workContexts.map((context) => ({
+                title: context.label,
+              }))}
+              limit={6}
+            />
+          </SectionCard>
+        ) : null}
+
+        {hasItems(sectorLabels) ? (
+          <SectionCard title="Secteurs" compact>
+            <CompactList
+              items={sectorLabels.map((sector) => ({ title: sector }))}
+              limit={5}
+            />
+          </SectionCard>
+        ) : null}
+
+        {hasItems(trainingLabels) ? (
+          <SectionCard title="Formations associées" compact>
+            <CompactList
+              items={trainingLabels.map((training) => ({ title: training }))}
+              limit={5}
+            />
+          </SectionCard>
+        ) : null}
+
+        {hasItems(displayedRelatedJobs) ? (
+          <SectionCard title="Métiers proches">
+            <View style={styles.groupList}>
+              {displayedRelatedJobs.map((related, index) => (
+                <View
+                  key={`${related.code ?? related.label}-${index}`}
+                  style={styles.relatedCard}
+                >
+                  <Text style={styles.relatedTitle}>
+                    {[related.code, related.label].filter(Boolean).join(' - ')}
+                  </Text>
+                  <Text style={styles.relatedMeta}>
+                    {relationLabels[related.relation] ?? related.relation}
+                  </Text>
+                </View>
+              ))}
             </View>
-          </ProfileSection>
+          </SectionCard>
         ) : null}
 
-        {/* ACTIONS */}
+        {transitionTags.length || displayableTransitionDetail ? (
+          <SectionCard title="Transitions" compact>
+            {transitionTags.length ? (
+              <CompactList
+                items={transitionTags.map((transition) => ({
+                  title: transition,
+                }))}
+              />
+            ) : null}
+            {displayableTransitionDetail ? (
+              <Text style={styles.bodyText}>{displayableTransitionDetail}</Text>
+            ) : null}
+          </SectionCard>
+        ) : null}
+
+        {job.lastSyncedAt ? (
+          <Text style={styles.syncedAt}>
+            Données synchronisées le{' '}
+            {new Date(job.lastSyncedAt).toLocaleDateString('fr-FR')}
+          </Text>
+        ) : null}
+
         <View style={styles.bottomActions}>
           <TouchableOpacity
             style={styles.backToBilanButton}
@@ -225,7 +590,7 @@ export default function JobDetailScreen() {
               navigation.goBack();
             }}
           >
-            <Text style={styles.backToBilanText}>Retour au bilan</Text>
+            <Text style={styles.backToBilanText}>Retour</Text>
           </TouchableOpacity>
         </View>
 
@@ -234,188 +599,3 @@ export default function JobDetailScreen() {
     </BackgroundRadial>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { backgroundColor: 'transparent' },
-  container: { paddingBottom: 24 },
-  bottomSpacer: { height: 34 },
-
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-
-  errorText: {
-    fontSize: 14,
-    color: 'rgba(0,0,0,0.93)',
-    marginBottom: 12,
-  },
-
-  retryButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.6)',
-  },
-
-  retryText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1F1F1F',
-  },
-
-  hero: {
-    marginHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 10,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1F1F1F',
-  },
-
-  metaRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 10,
-  },
-
-  sectorBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,167,38,0.16)',
-  },
-
-  sectorText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#70635B',
-  },
-
-  outlookBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: 'rgba(198,93,60,0.10)',
-  },
-
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 99,
-    backgroundColor: '#8C5C49',
-  },
-
-  outlookText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#70635B',
-  },
-
-  marketText: {
-    marginTop: 10,
-    fontSize: 13,
-    color: 'rgba(0,0,0,0.82)',
-    lineHeight: 18,
-  },
-
-  resumeTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 6,
-    color: '#1F1F1F',
-  },
-
-  resumeText: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(0,0,0,0.93)',
-  },
-
-  subLabel: {
-    marginTop: 14,
-    marginBottom: 6,
-    fontSize: 13,
-    fontWeight: '600',
-    color: 'rgba(0,0,0,0.82)',
-  },
-
-  rowsGap: {
-    gap: 10,
-  },
-
-  rowWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-
-  activityTag: {
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    backgroundColor: 'rgba(0,0,0,0.05)',
-  },
-
-  activityText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: 'rgba(0,0,0,0.93)',
-  },
-
-  evolutionContainer: {
-    gap: 10,
-  },
-
-  evolutionStep: {
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 14,
-    backgroundColor: 'rgba(198,93,60,0.08)',
-  },
-
-  evolutionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#70635B',
-  },
-
-  salaryCard: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    backgroundColor: 'rgba(198,93,60,0.12)',
-    alignItems: 'center',
-  },
-
-  salaryText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#4B392F',
-    textAlign: 'center',
-  },
-
-  bottomActions: {
-    marginTop: 18,
-    marginHorizontal: 16,
-  },
-
-  backToBilanButton: {
-    ...primaryButton,
-  },
-
-  backToBilanText: {
-    ...primaryButtonText,
-    fontWeight: '600',
-  },
-});

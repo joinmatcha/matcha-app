@@ -24,8 +24,21 @@ describe('swipeApi', () => {
 
     const result = await getDeck();
 
-    expect(mockedApi.get).toHaveBeenCalledWith('/api/jobs/deck');
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/jobs/deck', {
+      params: { limit: undefined },
+    });
     expect(result).toEqual(data);
+  });
+
+  it('getDeck passe le param limit', async () => {
+    const data = { jobs: [], remaining: 5, limit: 10 };
+    mockedApi.get.mockResolvedValue({ data });
+
+    await getDeck(10);
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/jobs/deck', {
+      params: { limit: 10 },
+    });
   });
 
   it('postSwipe envoie un POST /api/jobs/swipe avec jobId et action', async () => {

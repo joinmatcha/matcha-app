@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { DeckJob, getDeck, postSwipe } from '@/features/swipe/api/swipeApi';
+import { getApiErrorMessage } from '@/utils/apiError';
 
 export function useSwipe() {
   const [deck, setDeck] = useState<DeckJob[]>([]);
   const [remaining, setRemaining] = useState<number | null>(null);
+  const [limit, setLimit] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,6 +21,7 @@ export function useSwipe() {
       const data = await getDeck();
       setDeck(data.jobs);
       setRemaining(data.remaining);
+      setLimit(data.limit);
     } catch {
       setError('Impossible de charger les métiers.');
     } finally {
@@ -33,9 +36,12 @@ export function useSwipe() {
         setError(null);
         const data = await postSwipe(jobId, action);
         setRemaining(data.remaining);
+        setLimit(data.limit);
         setDeck((prev) => prev.filter((j) => j.id !== jobId));
-      } catch {
-        setError('Impossible d’enregistrer ton swipe.');
+      } catch (err) {
+        setError(
+          getApiErrorMessage(err, 'Impossible d’enregistrer ton swipe.'),
+        );
       }
     },
     [],
@@ -55,6 +61,7 @@ export function useSwipe() {
   return {
     deck,
     remaining,
+    limit,
     loading,
     error,
     loadDeck,

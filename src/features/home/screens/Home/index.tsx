@@ -17,6 +17,8 @@ import PersonalitySummaryCard from '@/features/home/components/PersonalitySummar
 import ProfileCompletionCard from '@/features/home/components/ProfileCompletionCard';
 import SwipePreferencesCard from '@/features/home/components/SwipePreferencesCard';
 import TestCard from '@/features/home/components/TestCard';
+import TopLikedJobsCard from '@/features/home/components/TopLikedJobsCard';
+import { TopLikedJob, getTopLikedJobs } from '@/features/jobs';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import {
   Preferences,
@@ -46,6 +48,7 @@ export default function HomeScreen() {
   const { user, loading, error, refresh } = useProfile();
   const { bilan, error: bilanError, refreshBilan } = useBilan();
   const [preferences, setPreferences] = useState<Preferences | null>(null);
+  const [topLikedJobs, setTopLikedJobs] = useState<TopLikedJob[]>([]);
 
   const refreshPreferences = useCallback(async () => {
     try {
@@ -53,6 +56,15 @@ export default function HomeScreen() {
       setPreferences(data);
     } catch {
       // silencieux : la carte ne s'affiche pas si l'appel échoue
+    }
+  }, []);
+
+  const refreshTopLikedJobs = useCallback(async () => {
+    try {
+      const data = await getTopLikedJobs(3);
+      setTopLikedJobs(data.jobs);
+    } catch {
+      setTopLikedJobs([]);
     }
   }, []);
 
@@ -68,6 +80,7 @@ export default function HomeScreen() {
       refresh();
       refreshBilan();
       refreshPreferences();
+      refreshTopLikedJobs();
 
       const checkDraft = async () => {
         if (!userId) {
@@ -105,7 +118,14 @@ export default function HomeScreen() {
       };
 
       checkDraft().catch(() => {});
-    }, [refresh, refreshBilan, userId, refreshPreferences, bilan?.createdAt]),
+    }, [
+      refresh,
+      refreshBilan,
+      userId,
+      refreshPreferences,
+      refreshTopLikedJobs,
+      bilan?.createdAt,
+    ]),
   );
 
   if (loading) return null;
@@ -229,9 +249,17 @@ export default function HomeScreen() {
             )}
 
             {/* SECTION: Préférences métiers */}
+            <Text style={styles.sectionTitle}>Préférences métiers</Text>
+            <TopLikedJobsCard
+              jobs={topLikedJobs}
+              onJobPress={(jobId) =>
+                navigation.navigate('JobDetail', { jobId })
+              }
+              onSwipePress={() => navigation.navigate('Swipe')}
+            />
+
             {preferences !== null && (
               <>
-                <Text style={styles.sectionTitle}>Préférences métiers</Text>
                 <SwipePreferencesCard
                   preferences={preferences}
                   onSwipePress={() => navigation.navigate('Swipe')}

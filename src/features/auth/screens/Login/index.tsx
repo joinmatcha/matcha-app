@@ -10,7 +10,6 @@ import ForgotPasswordLink from '@/features/auth/components/ForgotPasswordLink';
 import SigninLink from '@/features/auth/components/SigninLink';
 import LoginForm from '@/features/auth/forms/LoginForm';
 import { bodyFontFamily, displayFontFamily } from '@/themes/typography';
-import { cardSurface } from '@/themes/ui';
 
 export default function LoginScreen() {
   return (
@@ -21,14 +20,16 @@ export default function LoginScreen() {
           contentContainerStyle={styles.contentContainer}
         >
           <View style={styles.logoContainer}>
-            <Branding.Logo />
+            <Branding.Logo width={286} height={121} />
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.title}>Connexion</Text>
-            <Text style={styles.subtitle}>
-              Connecte-toi pour retrouver ton profil Matcha.
-            </Text>
+            <View style={styles.cardHeader}>
+              <Text style={styles.heroTitle}>Connexion</Text>
+              <Text style={styles.heroSubtitle}>
+                Retrouve tes tests, tes métiers favoris et tes recommandations.
+              </Text>
+            </View>
 
             <LoginForm />
 
@@ -54,35 +55,46 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 32,
+    paddingTop: 24,
+    paddingBottom: 24,
     justifyContent: 'center',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 18,
     zIndex: 5,
   },
-  card: {
-    ...cardSurface,
-    paddingHorizontal: 22,
-    paddingVertical: 24,
-    zIndex: 5,
+  cardHeader: {
+    marginBottom: 16,
   },
-  title: {
-    fontSize: 28,
+  heroTitle: {
+    fontSize: 30,
+    lineHeight: 35,
     fontWeight: '700',
     fontFamily: displayFontFamily,
-    color: '#1F1F1F',
-    marginBottom: 8,
-    letterSpacing: -0.4,
+    color: '#111820',
+    letterSpacing: 0,
   },
-  subtitle: {
-    fontSize: 15,
+  heroSubtitle: {
+    marginTop: 7,
+    fontSize: 14,
     fontFamily: bodyFontFamily,
-    color: 'rgba(45,33,27,0.72)',
-    lineHeight: 22,
-    marginBottom: 22,
+    color: 'rgba(31,31,31,0.64)',
+    lineHeight: 20,
+  },
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.88)',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(31,31,31,0.08)',
+    paddingHorizontal: 18,
+    paddingVertical: 20,
+    zIndex: 5,
+    shadowColor: '#5C5148',
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 4,
   },
   linksContainer: {
     marginTop: 10,
