@@ -4,9 +4,19 @@ import { Button, HelperText, TextInput } from 'react-native-paper';
 
 import { requestPasswordReset } from '@/api/auth';
 import { forgotPasswordSchema } from '@/schemas/forgot-password';
-import { titleFontFamily } from '@/themes/typography';
+import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
+
+const inputTheme = {
+  colors: {
+    primary: Colors.accent.primary,
+    error: Colors.error,
+    outline: 'rgba(31,31,31,0.10)',
+    onSurfaceVariant: 'rgba(31,31,31,0.58)',
+  },
+};
 
 interface ForgotPasswordFormProps {
   setSent: (value: boolean) => void;
@@ -51,8 +61,14 @@ export default function ForgotPasswordForm({
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
+        contentStyle={styles.inputContent}
+        outlineStyle={styles.inputOutline}
+        activeOutlineColor={Colors.accent.primary}
+        outlineColor="rgba(31,31,31,0.10)"
+        theme={inputTheme}
         disabled={loading}
         error={!!error}
+        left={<TextInput.Icon icon="email-outline" />}
       />
 
       {error && <HelperText type="error">{error}</HelperText>}
@@ -62,8 +78,9 @@ export default function ForgotPasswordForm({
         onPress={handleSubmit}
         loading={loading}
         disabled={loading}
-        buttonColor="#E9E6E2"
-        textColor="#2B2A29"
+        buttonColor={Colors.accent.primary}
+        textColor="#FFFFFF"
+        contentStyle={styles.continueButtonContent}
         style={styles.continueButton}
         labelStyle={styles.continueButtonLabel}
       >
@@ -76,17 +93,40 @@ export default function ForgotPasswordForm({
 const styles = StyleSheet.create({
   inputContainer: {
     width: '100%',
-    marginBottom: 24,
+    marginBottom: 18,
   },
   input: {
-    marginBottom: 8,
+    marginBottom: 6,
+    backgroundColor: '#F8FAF8',
+    fontFamily: bodyFontFamily,
+    height: 54,
+  },
+  inputContent: {
+    height: 54,
+    fontFamily: bodyFontFamily,
+    color: '#111820',
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  inputOutline: {
+    borderRadius: 16,
+    borderWidth: 1,
   },
   continueButton: {
-    marginTop: 12,
+    marginTop: 14,
     borderRadius: 16,
+    shadowColor: '#1A5C45',
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
+  },
+  continueButtonContent: {
+    minHeight: 52,
   },
   continueButtonLabel: {
     fontFamily: titleFontFamily,
-    fontSize: 15,
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

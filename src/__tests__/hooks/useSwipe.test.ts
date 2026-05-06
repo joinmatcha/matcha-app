@@ -23,8 +23,22 @@ describe('useSwipe', () => {
     jest.clearAllMocks();
     mockedGetDeck.mockResolvedValue({
       jobs: [
-        { id: 'j1', title: 'Dev', tags: [] },
-        { id: 'j2', title: 'Designer', tags: [] },
+        {
+          id: 'j1',
+          code: 'M1805',
+          title: 'Dev',
+          growthOutlook: 'unknown',
+          tags: [],
+          riasec: [],
+        },
+        {
+          id: 'j2',
+          code: 'B1805',
+          title: 'Designer',
+          growthOutlook: 'unknown',
+          tags: [],
+          riasec: [],
+        },
       ],
       remaining: 5,
       limit: 10,

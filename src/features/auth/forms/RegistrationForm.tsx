@@ -6,12 +6,22 @@ import { Button, HelperText, TextInput } from 'react-native-paper';
 
 import { useAuth } from '@/hooks/useAuth';
 import { registrationSchema } from '@/schemas/registration';
-import { titleFontFamily } from '@/themes/typography';
+import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import type { AuthStackParamList } from '@/types/navigation';
 import { getApiErrorMessage, getApiErrorStatus } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
 
 type NavProps = NativeStackNavigationProp<AuthStackParamList>;
+
+const inputTheme = {
+  colors: {
+    primary: Colors.accent.primary,
+    error: Colors.error,
+    outline: 'rgba(31,31,31,0.10)',
+    onSurfaceVariant: 'rgba(31,31,31,0.58)',
+  },
+};
 
 export default function RegistrationForm() {
   const navigation = useNavigation<NavProps>();
@@ -92,8 +102,14 @@ export default function RegistrationForm() {
         }}
         mode="outlined"
         style={styles.input}
+        contentStyle={styles.inputContent}
+        outlineStyle={styles.inputOutline}
+        activeOutlineColor={Colors.accent.primary}
+        outlineColor="rgba(31,31,31,0.10)"
+        theme={inputTheme}
         disabled={loading}
         error={!!errors.firstName}
+        left={<TextInput.Icon icon="account-outline" />}
       />
       {errors.firstName ? (
         <HelperText type="error">{errors.firstName}</HelperText>
@@ -108,8 +124,14 @@ export default function RegistrationForm() {
         }}
         mode="outlined"
         style={styles.input}
+        contentStyle={styles.inputContent}
+        outlineStyle={styles.inputOutline}
+        activeOutlineColor={Colors.accent.primary}
+        outlineColor="rgba(31,31,31,0.10)"
+        theme={inputTheme}
         disabled={loading}
         error={!!errors.lastName}
+        left={<TextInput.Icon icon="account-outline" />}
       />
       {errors.lastName ? (
         <HelperText type="error">{errors.lastName}</HelperText>
@@ -128,8 +150,14 @@ export default function RegistrationForm() {
         textContentType="emailAddress"
         mode="outlined"
         style={styles.input}
+        contentStyle={styles.inputContent}
+        outlineStyle={styles.inputOutline}
+        activeOutlineColor={Colors.accent.primary}
+        outlineColor="rgba(31,31,31,0.10)"
+        theme={inputTheme}
         disabled={loading}
         error={!!errors.email}
+        left={<TextInput.Icon icon="email-outline" />}
       />
       {errors.email ? (
         <HelperText type="error">{errors.email}</HelperText>
@@ -146,8 +174,14 @@ export default function RegistrationForm() {
         textContentType="password"
         mode="outlined"
         style={styles.input}
+        contentStyle={styles.inputContent}
+        outlineStyle={styles.inputOutline}
+        activeOutlineColor={Colors.accent.primary}
+        outlineColor="rgba(31,31,31,0.10)"
+        theme={inputTheme}
         disabled={loading}
         error={!!errors.password}
+        left={<TextInput.Icon icon="lock-outline" />}
         right={
           <TextInput.Icon
             icon={showPassword ? 'eye-off' : 'eye'}
@@ -169,8 +203,9 @@ export default function RegistrationForm() {
         mode="contained"
         loading={loading}
         disabled={loading}
-        buttonColor="#E9E6E2"
-        textColor="#2B2A29"
+        buttonColor={Colors.accent.primary}
+        textColor="#FFFFFF"
+        contentStyle={styles.continueButtonContent}
         style={styles.continueButton}
         labelStyle={styles.continueButtonLabel}
         onPress={handleRegister}
@@ -184,21 +219,44 @@ export default function RegistrationForm() {
 const styles = StyleSheet.create({
   inputContainer: {
     width: '100%',
-    marginBottom: 24,
+    marginBottom: 18,
   },
   input: {
-    marginBottom: 8,
+    marginBottom: 6,
+    backgroundColor: '#F8FAF8',
+    fontFamily: bodyFontFamily,
+    height: 54,
+  },
+  inputContent: {
+    height: 54,
+    fontFamily: bodyFontFamily,
+    color: '#111820',
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  inputOutline: {
+    borderRadius: 16,
+    borderWidth: 1,
   },
   authError: {
     marginTop: 8,
     marginBottom: 4,
   },
   continueButton: {
-    marginTop: 12,
+    marginTop: 14,
     borderRadius: 16,
+    shadowColor: '#1A5C45',
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
+  },
+  continueButtonContent: {
+    minHeight: 52,
   },
   continueButtonLabel: {
     fontFamily: titleFontFamily,
-    fontSize: 15,
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
