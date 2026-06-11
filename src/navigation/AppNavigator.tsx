@@ -1,12 +1,30 @@
 import { LinkingOptions, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {
+  NativeStackHeaderLeftProps,
+  NativeStackNavigationOptions,
+} from '@react-navigation/native-stack';
 import * as Linking from 'expo-linking';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import {
+  BilanIntroScreen,
+  BilanQuestionsScreen,
+  BilanResultScreen,
+} from '@/features/bilan';
+import { JobCompareScreen, JobDetailScreen } from '@/features/jobs';
+import {
+  PersonalityIntroScreen,
+  PersonalityResultScreen,
+  PersonalityTestScreen,
+} from '@/features/personality';
+import { HelpSupportScreen } from '@/features/profile';
 import { useAuth } from '@/hooks/useAuth';
 import AuthStack from '@/navigation/AuthStack';
+import StackBackButton from '@/navigation/StackBackButton';
 import TabNavigator from '@/navigation/TabNavigator';
+import Colors from '@/themes/colors';
 import { RootStackParamList } from '@/types/navigation';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -30,19 +48,33 @@ const linking: LinkingOptions<RootStackParamList> = {
       },
       Main: {
         screens: {
-          Home: {
-            screens: {
-              HomeMain: 'home',
-              PersonalityIntro: 'personality-test',
-              PersonalityTest: 'personality-questions',
-            },
-          },
+          Home: 'home',
           Swipe: 'swipe',
           Profil: 'profile',
         },
       },
+      PersonalityIntro: 'personality-test',
+      PersonalityTest: 'personality-questions',
+      BilanIntro: 'professional-self-assessment',
+      BilanQuestions: 'professional-self-assessment/questions',
+      JobDetail: 'jobs/:jobId',
+      HelpSupport: 'help',
     },
   },
+};
+
+const secondaryScreenOptions: NativeStackNavigationOptions = {
+  headerShown: true,
+  headerTransparent: false,
+  headerTitle: '',
+  headerShadowVisible: true,
+  headerStyle: {
+    backgroundColor: '#FFFDF9',
+  },
+  headerTintColor: Colors.text.strong,
+  headerLeft: (props: NativeStackHeaderLeftProps) => (
+    <StackBackButton {...props} />
+  ),
 };
 
 export default function AppNavigator() {
@@ -60,7 +92,54 @@ export default function AppNavigator() {
     <NavigationContainer<RootStackParamList> linking={linking}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <RootStack.Screen name="Main" component={TabNavigator} />
+          <>
+            <RootStack.Screen name="Main" component={TabNavigator} />
+            <RootStack.Screen
+              name="PersonalityIntro"
+              component={PersonalityIntroScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="PersonalityTest"
+              component={PersonalityTestScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="PersonalityResult"
+              component={PersonalityResultScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="BilanIntro"
+              component={BilanIntroScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="BilanQuestions"
+              component={BilanQuestionsScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="BilanResult"
+              component={BilanResultScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="JobCompare"
+              component={JobCompareScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="JobDetail"
+              component={JobDetailScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="HelpSupport"
+              component={HelpSupportScreen}
+              options={secondaryScreenOptions}
+            />
+          </>
         ) : (
           <RootStack.Screen name="Auth" component={AuthStack} />
         )}

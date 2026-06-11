@@ -54,7 +54,9 @@ describe('useBilan', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe('Impossible de charger le bilan.');
+    expect(result.current.error).toBe(
+      "Impossible de charger l'auto-évaluation.",
+    );
     expect(result.current.questions).toEqual([]);
     expect(result.current.version).toBeNull();
   });

@@ -66,7 +66,7 @@ describe('BilanSummaryCard', () => {
     const { getByText } = render(
       <BilanSummaryCard bilan={bilan as any} onPress={onPress} />,
     );
-    fireEvent.press(getByText('Voir mon bilan'));
+    fireEvent.press(getByText('Voir ma synthèse'));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

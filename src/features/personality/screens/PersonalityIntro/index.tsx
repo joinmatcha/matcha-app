@@ -18,10 +18,10 @@ import {
   titleFontFamily,
 } from '@/themes/typography';
 import { cardSurface, primaryButton, primaryButtonText } from '@/themes/ui';
-import { HomeStackParamList } from '@/types/navigation';
+import { RootStackParamList } from '@/types/navigation';
 
-type Nav = NativeStackNavigationProp<HomeStackParamList, 'PersonalityIntro'>;
-type IntroRoute = RouteProp<HomeStackParamList, 'PersonalityIntro'>;
+type Nav = NativeStackNavigationProp<RootStackParamList, 'PersonalityIntro'>;
+type IntroRoute = RouteProp<RootStackParamList, 'PersonalityIntro'>;
 
 const mbtiAxes = ['E / I', 'S / N', 'T / F', 'J / P'];
 
@@ -57,7 +57,7 @@ export default function PersonalityIntroScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
+      <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}

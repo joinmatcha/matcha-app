@@ -26,7 +26,9 @@ export function useBilan() {
       setQuestions(res.questions);
       setVersion(res.version);
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Impossible de charger le bilan.'));
+      setError(
+        getApiErrorMessage(err, "Impossible de charger l'auto-évaluation."),
+      );
       setQuestions([]);
       setVersion(null);
     } finally {

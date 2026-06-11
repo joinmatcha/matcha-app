@@ -29,6 +29,9 @@ jest.mock('react-native-safe-area-context', () => {
   const { View } = require('react-native');
   return { SafeAreaView: (props: any) => <View {...props} /> };
 });
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ navigate: jest.fn() }),
+}));
 jest.mock('react-native-paper', () => {
   const { Text, Pressable } = require('react-native');
   return {

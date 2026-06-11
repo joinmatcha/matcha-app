@@ -9,16 +9,21 @@ interface ProfileSectionProps {
   title: string;
   children: React.ReactNode;
   isLast?: boolean;
+  headerRight?: React.ReactNode;
 }
 
 export default function ProfileSection({
   title,
   children,
   isLast = false,
+  headerRight,
 }: ProfileSectionProps) {
   return (
     <View style={[styles.section, isLast && styles.lastSection]}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        {headerRight}
+      </View>
       {children}
     </View>
   );
@@ -35,11 +40,18 @@ const styles = StyleSheet.create({
   lastSection: {
     marginBottom: 32,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 14,
+  },
   sectionTitle: {
+    flex: 1,
     fontSize: 16,
     fontWeight: '600',
     fontFamily: titleFontFamily,
     color: Colors.text.base,
-    marginBottom: 14,
   },
 });

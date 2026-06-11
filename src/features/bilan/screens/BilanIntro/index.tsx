@@ -18,10 +18,10 @@ import {
   titleFontFamily,
 } from '@/themes/typography';
 import { cardSurface, primaryButton, primaryButtonText } from '@/themes/ui';
-import { BilanIntroMode, HomeStackParamList } from '@/types/navigation';
+import { BilanIntroMode, RootStackParamList } from '@/types/navigation';
 
-type Nav = NativeStackNavigationProp<HomeStackParamList, 'BilanIntro'>;
-type IntroRoute = RouteProp<HomeStackParamList, 'BilanIntro'>;
+type Nav = NativeStackNavigationProp<RootStackParamList, 'BilanIntro'>;
+type IntroRoute = RouteProp<RootStackParamList, 'BilanIntro'>;
 
 const benefitCards = [
   {
@@ -56,18 +56,18 @@ export default function BilanIntroScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
+      <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.hero}>
             <Text style={styles.eyebrow}>
-              {isResume ? 'POUR RAPPEL' : 'BILAN DE COMPÉTENCES'}
+              {isResume ? 'POUR RAPPEL' : 'AUTO-ÉVALUATION PROFESSIONNELLE'}
             </Text>
             <Text style={styles.title}>
               {isResume
-                ? 'Reprends ton bilan là où tu en étais'
+                ? 'Reprends ton auto-évaluation là où tu en étais'
                 : 'Prendre du recul, concrètement'}
             </Text>
             <Text style={styles.subtitle}>
@@ -121,9 +121,9 @@ export default function BilanIntroScreen() {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>À garder en tête</Text>
             <Text style={styles.note}>
-              Ce bilan sert à clarifier une direction, pas à t&apos;enfermer
-              dans une case. Le plus utile est de répondre simplement, en
-              pensant à ta réalité actuelle.
+              Cette auto-évaluation sert à clarifier une direction, pas à
+              t&apos;enfermer dans une case. Le plus utile est de répondre
+              simplement, en pensant à ta réalité actuelle.
             </Text>
           </View>
 
@@ -132,7 +132,9 @@ export default function BilanIntroScreen() {
             onPress={() => navigation.navigate('BilanQuestions')}
           >
             <Text style={styles.startButtonText}>
-              {isResume ? 'Reprendre le bilan' : 'Commencer le bilan'}
+              {isResume
+                ? "Reprendre l'auto-évaluation"
+                : "Commencer l'auto-évaluation"}
             </Text>
           </TouchableOpacity>
         </ScrollView>

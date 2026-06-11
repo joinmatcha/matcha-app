@@ -21,7 +21,7 @@ export default function LogoutScreen() {
               text: 'Annuler',
               style: 'cancel',
               onPress: () => {
-                navigation.navigate('Home', { screen: 'HomeMain' });
+                navigation.navigate('Home');
               },
             },
             {

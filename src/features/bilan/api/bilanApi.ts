@@ -46,6 +46,7 @@ export interface BilanInvestigation {
   topValues: string[];
   topWorkConditions: string[];
   interestsProfile: string[];
+  feasibilityProfile?: string[];
 }
 
 export interface BilanResult {

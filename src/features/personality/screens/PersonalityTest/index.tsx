@@ -26,10 +26,10 @@ import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { primaryButton, primaryButtonText } from '@/themes/ui';
-import { HomeStackParamList } from '@/types/navigation';
+import { RootStackParamList } from '@/types/navigation';
 import { getApiErrorMessage } from '@/utils/apiError';
 
-type Nav = NativeStackNavigationProp<HomeStackParamList>;
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 type PersonalityDraftData = {
   answers: [string, number][];
@@ -214,7 +214,7 @@ export default function PersonalityTestScreen() {
   if (!test) {
     return (
       <BackgroundRadial>
-        <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
+        <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
           <View style={styles.centerContainer}>
             <Text style={styles.errorTitle}>Aucun test disponible</Text>
             <Text style={styles.errorMessage}>
@@ -239,7 +239,7 @@ export default function PersonalityTestScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
+      <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <View style={styles.container}>
           <TestHeader
             title="Test de personnalité"

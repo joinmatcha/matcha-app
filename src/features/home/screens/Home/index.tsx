@@ -28,7 +28,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { clearDraft, loadDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
 import { displayFontFamily, titleFontFamily } from '@/themes/typography';
-import { HomeStackParamList, TabParamList } from '@/types/navigation';
+import { RootStackParamList, TabParamList } from '@/types/navigation';
 import { computeProfileCompletion } from '@/utils/computeProfileCompletion';
 
 type BilanDraftData = {
@@ -36,8 +36,8 @@ type BilanDraftData = {
 };
 
 type HomeNavigation = CompositeNavigationProp<
-  NativeStackNavigationProp<HomeStackParamList>,
-  BottomTabNavigationProp<TabParamList>
+  BottomTabNavigationProp<TabParamList, 'Home'>,
+  NativeStackNavigationProp<RootStackParamList>
 >;
 
 export default function HomeScreen() {
@@ -213,7 +213,7 @@ export default function HomeScreen() {
               />
             )}
 
-            {/* BILAN DE COMPÉTENCES */}
+            {/* Auto-évaluation professionnelle */}
             {hasBilan ? (
               <BilanSummaryCard
                 bilan={bilan}
@@ -221,14 +221,14 @@ export default function HomeScreen() {
               />
             ) : (
               <TestCard
-                title="Bilan de compétences"
+                title="Auto-évaluation professionnelle"
                 description={
                   shouldUseBilanDraft
                     ? hasStartedBilanDraft
-                      ? 'Tu as un bilan en cours.'
+                      ? 'Tu as une auto-évaluation en cours.'
                       : 'Analyse complète : forces, valeurs & métiers.'
                     : bilanError
-                      ? 'Le bilan est indisponible pour le moment.'
+                      ? "L'auto-évaluation est indisponible pour le moment."
                       : 'Analyse complète : forces, valeurs & métiers.'
                 }
                 buttonLabel={

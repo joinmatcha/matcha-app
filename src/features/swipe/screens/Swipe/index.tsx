@@ -1,6 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import {
+  CompositeNavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
@@ -15,11 +20,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useSwipe } from '@/features/swipe/hooks/useSwipe';
 import Colors from '@/themes/colors';
-import { TabParamList } from '@/types/navigation';
+import { RootStackParamList, TabParamList } from '@/types/navigation';
 
 import { styles } from './styles';
 
 const SWIPE_THRESHOLD = 120;
+
+type SwipeNavigation = CompositeNavigationProp<
+  BottomTabNavigationProp<TabParamList, 'Swipe'>,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
 function SwipeBackground({ children }: { children: React.ReactNode }) {
   return (
@@ -63,7 +73,7 @@ function SwipeBackground({ children }: { children: React.ReactNode }) {
 }
 
 export default function SwipeScreen() {
-  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
+  const navigation = useNavigation<SwipeNavigation>();
   const { deck, remaining, limit, loading, error, loadDeck, swipe } =
     useSwipe();
 
@@ -174,10 +184,7 @@ export default function SwipeScreen() {
 
   const openCurrentJob = useCallback(() => {
     if (!currentJob) return;
-    navigation.navigate('Home', {
-      screen: 'JobDetail',
-      params: { jobId: currentJob.id },
-    });
+    navigation.navigate('JobDetail', { jobId: currentJob.id });
   }, [currentJob, navigation]);
 
   if (loading || (deck.length === 0 && remaining !== null && remaining > 0)) {

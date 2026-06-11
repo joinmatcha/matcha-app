@@ -44,3 +44,14 @@ export async function requestEmailChange(newEmail: string) {
   });
   return response.data;
 }
+
+export type SupportContactPayload = {
+  category: 'account' | 'privacy' | 'billing' | 'bug' | 'other';
+  subject: string;
+  message: string;
+};
+
+export async function sendSupportContact(data: SupportContactPayload) {
+  const response = await api.post('/api/profile/support-contact', data);
+  return response.data;
+}
