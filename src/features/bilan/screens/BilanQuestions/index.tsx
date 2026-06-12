@@ -28,10 +28,10 @@ import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { cardSurface, primaryButton, primaryButtonText } from '@/themes/ui';
-import { HomeStackParamList } from '@/types/navigation';
+import { RootStackParamList } from '@/types/navigation';
 import { getApiErrorMessage } from '@/utils/apiError';
 
-type Nav = NativeStackNavigationProp<HomeStackParamList>;
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 type BilanDraftData = {
   answers: [string, number | string][];
 };
@@ -78,7 +78,7 @@ export default function BilanQuestionsScreen() {
         setErrorMessage(
           getApiErrorMessage(
             error,
-            'Impossible de charger les questions du bilan.',
+            "Impossible de charger les questions de l'auto-évaluation.",
           ),
         );
       } finally {
@@ -108,7 +108,7 @@ export default function BilanQuestionsScreen() {
 
     Alert.alert(
       'Repartir de zéro ?',
-      'Tu vas supprimer ton brouillon et recommencer le bilan.',
+      "Tu vas supprimer ton brouillon et recommencer l'auto-évaluation.",
       [
         { text: 'Annuler', style: 'cancel' },
         {
@@ -176,7 +176,10 @@ export default function BilanQuestionsScreen() {
       navigation.navigate('BilanResult', { bilan: generated.bilan });
     } catch (error) {
       setErrorMessage(
-        getApiErrorMessage(error, 'Erreur lors de la soumission du bilan.'),
+        getApiErrorMessage(
+          error,
+          "Erreur lors de la soumission de l'auto-évaluation.",
+        ),
       );
     } finally {
       setSubmitting(false);
@@ -197,10 +200,10 @@ export default function BilanQuestionsScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
+      <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <View style={styles.container}>
           <TestHeader
-            title="Bilan de compétences"
+            title="Auto-évaluation professionnelle"
             summary="Réponds simplement. L'objectif est de faire ressortir ce qui te correspond aujourd'hui."
             currentQuestion={answeredCount}
             totalQuestions={totalQuestions}
@@ -323,7 +326,7 @@ export default function BilanQuestionsScreen() {
               ) : (
                 <Text style={styles.submitButtonText}>
                   {isComplete
-                    ? 'Terminer le bilan'
+                    ? "Terminer l'auto-évaluation"
                     : 'Complète toutes les questions'}
                 </Text>
               )}

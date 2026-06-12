@@ -25,7 +25,7 @@ export default function BilanSummaryCard({ bilan, onPress }: Props) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Bilan de compétences</Text>
+      <Text style={styles.title}>Auto-évaluation professionnelle</Text>
 
       <Text style={styles.label}>{bilan.conclusion.archetype.title}</Text>
 
@@ -35,7 +35,7 @@ export default function BilanSummaryCard({ bilan, onPress }: Props) {
 
         <View style={styles.badges}>
           {strengths.length === 0 && (
-            <Text style={styles.placeholder}>À explorer dans ton bilan</Text>
+            <Text style={styles.placeholder}>À explorer dans ton profil</Text>
           )}
 
           {strengths.map((s) => (
@@ -52,7 +52,7 @@ export default function BilanSummaryCard({ bilan, onPress }: Props) {
 
         <View style={styles.badges}>
           {jobs.length === 0 && (
-            <Text style={styles.placeholder}>Suggestions dans ton bilan</Text>
+            <Text style={styles.placeholder}>Suggestions dans ton profil</Text>
           )}
 
           {jobs.map((job) => (
@@ -69,7 +69,7 @@ export default function BilanSummaryCard({ bilan, onPress }: Props) {
         style={styles.button}
         onPress={onPress}
       >
-        <Text style={styles.buttonText}>Voir mon bilan</Text>
+        <Text style={styles.buttonText}>Voir ma synthèse</Text>
       </TouchableOpacity>
     </View>
   );

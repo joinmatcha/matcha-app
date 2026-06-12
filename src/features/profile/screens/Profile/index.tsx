@@ -1,5 +1,15 @@
+import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,8 +22,12 @@ import { useAuth } from '@/hooks/useAuth';
 import Colors from '@/themes/colors';
 import { bodyFontFamily } from '@/themes/typography';
 import { secondaryButton, secondaryButtonText } from '@/themes/ui';
+import { RootStackParamList } from '@/types/navigation';
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function ProfileScreen() {
+  const navigation = useNavigation<Nav>();
   const { user, loading, error, refresh } = useProfile();
   const { deleteAccount, logout } = useAuth();
 
@@ -63,6 +77,22 @@ export default function ProfileScreen() {
     <BackgroundRadial>
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.topActions}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Aide et support"
+              activeOpacity={0.82}
+              style={styles.helpButton}
+              onPress={() => navigation.navigate('HelpSupport')}
+            >
+              <MaterialIcons
+                name="help-outline"
+                size={22}
+                color={Colors.text.strong}
+              />
+            </TouchableOpacity>
+          </View>
+
           <ProfileHeader user={user} />
 
           <ProfileInfosReadOnly
@@ -110,6 +140,20 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 40,
     zIndex: 5,
+  },
+  topActions: {
+    alignItems: 'flex-end',
+    marginBottom: 8,
+  },
+  helpButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.ui.borderSoft,
   },
   errorContainer: {
     flex: 1,

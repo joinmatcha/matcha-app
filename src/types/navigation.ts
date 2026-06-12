@@ -28,10 +28,11 @@ export type HomeStackParamList = {
     bilan: BilanResult;
   };
   JobDetail: { jobId: string };
+  JobCompare: { jobIds: string[] };
 };
 
 export type TabParamList = {
-  Home: NavigatorScreenParams<HomeStackParamList>;
+  Home: undefined;
   Swipe: undefined;
   Profil: undefined;
 };
@@ -39,4 +40,5 @@ export type TabParamList = {
 export type RootStackParamList = {
   Auth: NavigatorScreenParams<AuthStackParamList>;
   Main: NavigatorScreenParams<TabParamList>;
-};
+  HelpSupport: undefined;
+} & Omit<HomeStackParamList, 'HomeMain'>;

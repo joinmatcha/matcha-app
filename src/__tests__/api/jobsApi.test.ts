@@ -1,5 +1,6 @@
 import api from '@/api/api';
 import {
+  compareJobs,
   getJobById,
   getJobs,
   getTopLikedJobs,
@@ -14,7 +15,7 @@ jest.mock('expo-secure-store', () => ({
 }));
 jest.mock('@/api/api', () => ({
   __esModule: true,
-  default: { get: jest.fn() },
+  default: { get: jest.fn(), post: jest.fn() },
 }));
 
 const mockedApi = api as jest.Mocked<typeof api>;
@@ -63,5 +64,18 @@ describe('jobsApi', () => {
       params: { limit: 3 },
     });
     expect(result).toEqual({ jobs: [] });
+  });
+
+  it('compareJobs appelle POST /api/jobs/compare avec les ids', async () => {
+    mockedApi.post.mockResolvedValue({
+      data: { jobs: [], context: { bilanId: 'b1' } },
+    });
+
+    const result = await compareJobs(['j1', 'j2']);
+
+    expect(mockedApi.post).toHaveBeenCalledWith('/api/jobs/compare', {
+      jobIds: ['j1', 'j2'],
+    });
+    expect(result.jobs).toEqual([]);
   });
 });

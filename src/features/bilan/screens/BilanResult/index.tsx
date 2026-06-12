@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -30,10 +30,10 @@ import {
   softBadge,
   softBadgeText,
 } from '@/themes/ui';
-import { HomeStackParamList } from '@/types/navigation';
+import { RootStackParamList } from '@/types/navigation';
 
-type ResultRoute = RouteProp<HomeStackParamList, 'BilanResult'>;
-type ResultNav = NativeStackNavigationProp<HomeStackParamList, 'BilanResult'>;
+type ResultRoute = RouteProp<RootStackParamList, 'BilanResult'>;
+type ResultNav = NativeStackNavigationProp<RootStackParamList, 'BilanResult'>;
 type BilanDraftData = {
   answers: [string, number | string][];
 };
@@ -45,6 +45,30 @@ export default function BilanResultScreen() {
 
   const { bilan } = route.params;
   const { conclusion, investigation } = bilan;
+  const [isCompareMode, setIsCompareMode] = useState(false);
+  const [selectedJobIds, setSelectedJobIds] = useState<string[]>([]);
+  const canCompare = selectedJobIds.length >= 2;
+
+  const toggleCompareMode = () => {
+    setIsCompareMode((current) => {
+      if (current) {
+        setSelectedJobIds([]);
+      }
+      return !current;
+    });
+  };
+
+  const toggleJobSelection = (jobId: string) => {
+    setSelectedJobIds((current) => {
+      if (current.includes(jobId)) {
+        return current.filter((id) => id !== jobId);
+      }
+      if (current.length >= 3) {
+        return current;
+      }
+      return [...current, jobId];
+    });
+  };
 
   const handleRedo = async () => {
     if (user?.id) {
@@ -64,15 +88,16 @@ export default function BilanResultScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea} />
+      <SafeAreaView edges={['left', 'right']} style={styles.safeArea} />
 
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.hero}>
-          <Text style={styles.eyebrow}>BILAN TERMINÉ</Text>
+          <Text style={styles.eyebrow}>AUTO-ÉVALUATION TERMINÉE</Text>
           <Text style={styles.heroTitle}>Ton profil professionnel</Text>
           <Text style={styles.heroSubtitle}>
-            Ce bilan met en lumière ce qui te motive, ce que tu sais bien faire
-            et les environnements dans lesquels tu peux vraiment t’épanouir.
+            Cette synthèse met en lumière ce qui te motive, ce que tu sais bien
+            faire et les environnements dans lesquels tu peux vraiment
+            t’épanouir.
           </Text>
         </View>
 
@@ -181,7 +206,21 @@ export default function BilanResultScreen() {
           ))}
         </ProfileSection>
 
-        <ProfileSection title="Pistes métiers à explorer">
+        <ProfileSection
+          title="Pistes métiers à explorer"
+          headerRight={
+            conclusion.recommendedJobs.length >= 2 ? (
+              <TouchableOpacity
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                onPress={toggleCompareMode}
+              >
+                <Text style={styles.compareModeButtonText}>
+                  {isCompareMode ? 'Annuler' : 'Comparer'}
+                </Text>
+              </TouchableOpacity>
+            ) : null
+          }
+        >
           {conclusion.recommendedJobs.map((job) => (
             <View key={job.id} style={styles.jobCard}>
               <View style={styles.jobHeader}>
@@ -190,10 +229,6 @@ export default function BilanResultScreen() {
                   <Text style={styles.jobSector}>{job.sector}</Text>
                 )}
               </View>
-
-              {job.description && (
-                <Text style={styles.jobDescription}>{job.description}</Text>
-              )}
 
               {/* Raisons */}
               {job.reasons?.length ? (
@@ -207,6 +242,30 @@ export default function BilanResultScreen() {
                 </View>
               ) : null}
 
+              {isCompareMode ? (
+                <TouchableOpacity
+                  style={styles.selectionRow}
+                  onPress={() => toggleJobSelection(job.id)}
+                >
+                  <View
+                    style={[
+                      styles.selectionCircle,
+                      selectedJobIds.includes(job.id) &&
+                        styles.selectionCircleActive,
+                    ]}
+                  >
+                    {selectedJobIds.includes(job.id) ? (
+                      <View style={styles.selectionCircleDot} />
+                    ) : null}
+                  </View>
+                  <Text style={styles.selectionText}>
+                    {selectedJobIds.includes(job.id)
+                      ? 'Sélectionné pour comparaison'
+                      : 'Ajouter à la comparaison'}
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+
               <TouchableOpacity
                 style={styles.jobLinkButton}
                 onPress={() =>
@@ -217,6 +276,30 @@ export default function BilanResultScreen() {
               </TouchableOpacity>
             </View>
           ))}
+
+          {isCompareMode ? (
+            <TouchableOpacity
+              disabled={!canCompare}
+              style={[
+                styles.compareButton,
+                !canCompare && styles.compareButtonDisabled,
+              ]}
+              onPress={() =>
+                navigation.navigate('JobCompare', { jobIds: selectedJobIds })
+              }
+            >
+              <Text
+                style={[
+                  styles.compareButtonText,
+                  !canCompare && styles.compareButtonTextDisabled,
+                ]}
+              >
+                {canCompare
+                  ? `Comparer ${selectedJobIds.length} métiers`
+                  : `${selectedJobIds.length}/3 sélectionné(s)`}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
         </ProfileSection>
 
         <ProfileSection title="Prochaines étapes" isLast>
@@ -231,12 +314,12 @@ export default function BilanResultScreen() {
         </ProfileSection>
 
         <TouchableOpacity style={styles.redoButton} onPress={handleRedo}>
-          <Text style={styles.redoButtonText}>Refaire le bilan</Text>
+          <Text style={styles.redoButtonText}>Refaire l'auto-évaluation</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate('HomeMain')}
+          onPress={() => navigation.navigate('Main', { screen: 'Home' })}
         >
           <Text style={styles.backButtonText}>Retour à l’accueil</Text>
         </TouchableOpacity>
@@ -499,9 +582,6 @@ const styles = StyleSheet.create({
   },
 
   jobHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 6,
   },
 
@@ -513,19 +593,16 @@ const styles = StyleSheet.create({
   },
 
   jobSector: {
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
+    marginTop: 6,
     fontSize: 12,
     fontFamily: titleFontFamily,
     color: Colors.greenDark.normal,
     fontWeight: '600',
+    textAlign: 'left',
   },
 
-  jobDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: bodyFontFamily,
-    color: 'rgba(0,0,0,0.9)',
-    marginBottom: 10,
-  },
   reasonRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -549,6 +626,66 @@ const styles = StyleSheet.create({
     ...secondaryButton,
     minHeight: 44,
     marginTop: 2,
+  },
+  compareModeButtonText: {
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: Colors.text.muted,
+  },
+  selectionRow: {
+    minHeight: 42,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    borderRadius: 14,
+    backgroundColor: '#F8FBF9',
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    marginBottom: 10,
+  },
+  selectionCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: Colors.greenDark.normal,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectionCircleActive: {
+    backgroundColor: Colors.greenDark.normal,
+  },
+  selectionCircleDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+  },
+  selectionText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '600',
+    fontFamily: titleFontFamily,
+    color: Colors.greenDark.normal,
+  },
+  compareButton: {
+    ...primaryButton,
+    minHeight: 46,
+    marginTop: 2,
+  },
+  compareButtonDisabled: {
+    backgroundColor: Colors.ui.surfaceMuted,
+    shadowOpacity: 0,
+  },
+  compareButtonText: {
+    ...primaryButtonText,
+    fontSize: 15,
+  },
+  compareButtonTextDisabled: {
+    color: Colors.text.muted,
   },
 
   jobReason: {

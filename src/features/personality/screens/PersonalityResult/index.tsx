@@ -25,11 +25,11 @@ import {
   secondaryButton,
   secondaryButtonText,
 } from '@/themes/ui';
-import { HomeStackParamList } from '@/types/navigation';
+import { RootStackParamList } from '@/types/navigation';
 
-type ResultRoute = RouteProp<HomeStackParamList, 'PersonalityResult'>;
+type ResultRoute = RouteProp<RootStackParamList, 'PersonalityResult'>;
 type ResultNav = NativeStackNavigationProp<
-  HomeStackParamList,
+  RootStackParamList,
   'PersonalityResult'
 >;
 
@@ -56,7 +56,7 @@ export default function PersonalityResultScreen() {
 
   const handleContinue = async () => {
     await refreshUser();
-    navigation.navigate('HomeMain');
+    navigation.navigate('Main', { screen: 'Home' });
   };
 
   const handleRedoTest = async () => {
@@ -73,7 +73,7 @@ export default function PersonalityResultScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea} />
+      <SafeAreaView edges={['left', 'right']} style={styles.safeArea} />
 
       <View style={styles.container}>
         <ScrollView

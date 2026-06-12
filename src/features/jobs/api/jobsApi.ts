@@ -170,6 +170,38 @@ export type TopLikedJob = JobSummary & {
   lastLikedAt: string;
 };
 
+export interface ComparedJob {
+  id: string;
+  code: string;
+  title: string;
+  sector?: string;
+  description?: string;
+  matchScore: number;
+  matchReasons: string[];
+  riasec: string[];
+  matchedInterests: string[];
+  matchedSkills: string[];
+  skillsToDevelop: string[];
+  matchedWorkConditions: string[];
+  workContexts: string[];
+  accessToJob?: string;
+  isRegulated?: boolean;
+  isExecutive?: boolean;
+  market: JobMarket | null;
+  recommendedNextStep: string;
+}
+
+export interface JobComparison {
+  jobs: ComparedJob[];
+  context: {
+    bilanId: string;
+    bilanVersion: number;
+    interestsProfile: string[];
+    strengths: string[];
+    workConditions: string[];
+  };
+}
+
 /**
  * GET /api/jobs
  * (liste simple)
@@ -207,4 +239,12 @@ export const getRecommendedJobs = async () => {
 export const getTopLikedJobs = async (limit = 3) => {
   const res = await api.get('/api/jobs/top-liked', { params: { limit } });
   return res.data as { jobs: TopLikedJob[] };
+};
+
+/**
+ * POST /api/jobs/compare
+ */
+export const compareJobs = async (jobIds: string[]) => {
+  const res = await api.post('/api/jobs/compare', { jobIds });
+  return res.data as JobComparison;
 };

@@ -1,4 +1,5 @@
 export { default as ProfileScreen } from './screens/Profile';
+export { default as HelpSupportScreen } from './screens/HelpSupport';
 
 export { default as ProfileHeader } from './components/ProfileHeader';
 export { default as ProfileInfosReadOnly } from './components/ProfileInfosReadOnly';
@@ -11,5 +12,9 @@ export {
   updateProfile,
   deleteAccount,
   requestEmailChange,
+  sendSupportContact,
 } from './api/profileApi';
-export type { UpdateProfilePayload } from './api/profileApi';
+export type {
+  SupportContactPayload,
+  UpdateProfilePayload,
+} from './api/profileApi';

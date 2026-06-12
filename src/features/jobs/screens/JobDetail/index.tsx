@@ -17,7 +17,7 @@ import {
   RomeLabelCode,
   getJobById,
 } from '@/features/jobs/api/jobsApi';
-import { HomeStackParamList } from '@/types/navigation';
+import { RootStackParamList } from '@/types/navigation';
 
 import {
   ActivityStat,
@@ -32,8 +32,8 @@ import {
 } from './components';
 import { styles } from './styles';
 
-type Route = RouteProp<HomeStackParamList, 'JobDetail'>;
-type Nav = NativeStackNavigationProp<HomeStackParamList>;
+type Route = RouteProp<RootStackParamList, 'JobDetail'>;
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 const relationLabels: Record<string, string> = {
   close: 'Métier proche',
@@ -283,7 +283,7 @@ export default function JobDetailScreen() {
 
   return (
     <BackgroundRadial>
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea} />
+      <SafeAreaView edges={['left', 'right']} style={styles.safeArea} />
 
       <ScrollView
         contentContainerStyle={styles.container}

@@ -4,6 +4,7 @@ import {
   deleteAccount,
   getProfile,
   requestEmailChange,
+  sendSupportContact,
   updateProfile,
 } from '@/features/profile/api/profileApi';
 
@@ -82,6 +83,24 @@ describe('profileApi', () => {
     expect(mockedApi.post).toHaveBeenCalledWith(
       '/api/profile/request-email-change',
       { newEmail: 'new@test.com' },
+    );
+    expect(result).toEqual({ message: 'sent' });
+  });
+
+  it('sendSupportContact envoie un POST /api/profile/support-contact', async () => {
+    const payload = {
+      category: 'privacy' as const,
+      subject: 'Question RGPD',
+      message:
+        'Bonjour, je souhaite obtenir des informations sur mes données personnelles.',
+    };
+    mockedApi.post.mockResolvedValue({ data: { message: 'sent' } });
+
+    const result = await sendSupportContact(payload);
+
+    expect(mockedApi.post).toHaveBeenCalledWith(
+      '/api/profile/support-contact',
+      payload,
     );
     expect(result).toEqual({ message: 'sent' });
   });
