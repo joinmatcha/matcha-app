@@ -20,6 +20,11 @@ import {
   PersonalityTestScreen,
 } from '@/features/personality';
 import { HelpSupportScreen } from '@/features/profile';
+import {
+  WorkStyleIntroScreen,
+  WorkStyleQuestionsScreen,
+  WorkStyleResultScreen,
+} from '@/features/workStyle';
 import { useAuth } from '@/hooks/useAuth';
 import AuthStack from '@/navigation/AuthStack';
 import StackBackButton from '@/navigation/StackBackButton';
@@ -57,6 +62,8 @@ const linking: LinkingOptions<RootStackParamList> = {
       PersonalityTest: 'personality-questions',
       BilanIntro: 'professional-self-assessment',
       BilanQuestions: 'professional-self-assessment/questions',
+      WorkStyleIntro: 'work-style',
+      WorkStyleQuestions: 'work-style/questions',
       JobDetail: 'jobs/:jobId',
       HelpSupport: 'help',
     },
@@ -122,6 +129,21 @@ export default function AppNavigator() {
             <RootStack.Screen
               name="BilanResult"
               component={BilanResultScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="WorkStyleIntro"
+              component={WorkStyleIntroScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="WorkStyleQuestions"
+              component={WorkStyleQuestionsScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="WorkStyleResult"
+              component={WorkStyleResultScreen}
               options={secondaryScreenOptions}
             />
             <RootStack.Screen

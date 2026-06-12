@@ -111,6 +111,12 @@ export type JobMarket = {
   lastSyncedAt?: string;
 };
 
+export type WorkStyleCompatibility = {
+  level: 'high' | 'medium' | 'low';
+  label: string;
+  reasons: string[];
+};
+
 export interface JobSummary {
   id: string;
   code: string;
@@ -153,6 +159,7 @@ export type JobDetail = Omit<JobSummary, 'riasec'> & {
   isExecutive?: boolean;
   isRegulated?: boolean;
   market: JobMarket | null;
+  workStyleCompatibility?: WorkStyleCompatibility | null;
   lastSyncedAt?: string;
 };
 
@@ -188,6 +195,7 @@ export interface ComparedJob {
   isRegulated?: boolean;
   isExecutive?: boolean;
   market: JobMarket | null;
+  workStyleCompatibility?: WorkStyleCompatibility | null;
   recommendedNextStep: string;
 }
 
