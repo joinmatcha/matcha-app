@@ -308,6 +308,15 @@ export default function JobDetailScreen() {
           </SectionCard>
         ) : null}
 
+        {job.workStyleCompatibility ? (
+          <SectionCard title="Style professionnel">
+            <Text style={styles.bodyText}>
+              {job.workStyleCompatibility.label}
+            </Text>
+            <BulletList items={job.workStyleCompatibility.reasons} />
+          </SectionCard>
+        ) : null}
+
         {statItems.length ? (
           <View style={styles.statGrid}>
             {statItems.map((item) => (

@@ -63,6 +63,12 @@ jest.mock('@/features/bilan/hooks/useBilan', () => ({
     refreshBilan: jest.fn(),
   }),
 }));
+jest.mock('@/features/workStyle', () => ({
+  useWorkStyle: () => ({
+    latestResult: null,
+    refreshWorkStyle: jest.fn(),
+  }),
+}));
 jest.mock('@/features/swipe/api/preferencesApi', () => ({
   getPreferences: jest.fn().mockRejectedValue(new Error('no prefs')),
 }));

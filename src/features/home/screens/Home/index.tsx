@@ -18,12 +18,14 @@ import ProfileCompletionCard from '@/features/home/components/ProfileCompletionC
 import SwipePreferencesCard from '@/features/home/components/SwipePreferencesCard';
 import TestCard from '@/features/home/components/TestCard';
 import TopLikedJobsCard from '@/features/home/components/TopLikedJobsCard';
+import WorkStyleSummaryCard from '@/features/home/components/WorkStyleSummaryCard';
 import { TopLikedJob, getTopLikedJobs } from '@/features/jobs';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import {
   Preferences,
   getPreferences,
 } from '@/features/swipe/api/preferencesApi';
+import { useWorkStyle } from '@/features/workStyle';
 import { useAuth } from '@/hooks/useAuth';
 import { clearDraft, loadDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
@@ -47,6 +49,7 @@ export default function HomeScreen() {
 
   const { user, loading, error, refresh } = useProfile();
   const { bilan, error: bilanError, refreshBilan } = useBilan();
+  const { latestResult: workStyle, refreshWorkStyle } = useWorkStyle();
   const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [topLikedJobs, setTopLikedJobs] = useState<TopLikedJob[]>([]);
 
@@ -81,6 +84,7 @@ export default function HomeScreen() {
       refreshBilan();
       refreshPreferences();
       refreshTopLikedJobs();
+      refreshWorkStyle();
 
       const checkDraft = async () => {
         if (!userId) {
@@ -124,6 +128,7 @@ export default function HomeScreen() {
       userId,
       refreshPreferences,
       refreshTopLikedJobs,
+      refreshWorkStyle,
       bilan?.createdAt,
     ]),
   );
@@ -245,6 +250,24 @@ export default function HomeScreen() {
                       : 'start',
                   })
                 }
+              />
+            )}
+
+            {workStyle ? (
+              <WorkStyleSummaryCard
+                result={workStyle}
+                onPress={() =>
+                  navigation.navigate('WorkStyleResult', {
+                    result: workStyle,
+                  })
+                }
+              />
+            ) : (
+              <TestCard
+                title="Style professionnel"
+                description="Découvre les environnements de travail qui te correspondent et complète tes recommandations métier."
+                buttonLabel="Découvrir"
+                onPress={() => navigation.navigate('WorkStyleIntro')}
               />
             )}
 

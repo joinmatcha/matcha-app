@@ -263,6 +263,19 @@ export default function JobCompareScreen() {
             empty="Pas assez d'indices."
           />
           <ComparisonCriterion
+            title="Style professionnel"
+            jobs={comparison.jobs}
+            getItems={(job) =>
+              job.workStyleCompatibility
+                ? [
+                    job.workStyleCompatibility.label,
+                    ...job.workStyleCompatibility.reasons,
+                  ]
+                : []
+            }
+            empty="Passe le test Style professionnel pour obtenir ce signal."
+          />
+          <ComparisonCriterion
             title="Ce que tu as déjà"
             jobs={comparison.jobs}
             getItems={(job) => [
