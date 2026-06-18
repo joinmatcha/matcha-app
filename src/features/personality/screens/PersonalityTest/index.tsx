@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import { trackAnalyticsEvent } from '@/features/analytics';
 import {
   PersonalityAnswer,
   PersonalityTemplate,
@@ -48,6 +49,10 @@ export default function PersonalityTestScreen() {
 
   const scrollViewRef = useRef<ScrollView>(null);
   const questionPositions = useRef<Map<string, number>>(new Map());
+  const startedAtRef = useRef<number | null>(null);
+  const completedRef = useRef(false);
+  const answersRef = useRef(answers);
+  const testRef = useRef<PersonalityTemplate | null>(null);
 
   // évite de restaurer plusieurs fois
   const restoredOnceRef = useRef(false);
@@ -57,6 +62,41 @@ export default function PersonalityTestScreen() {
 
   useEffect(() => {
     loadTest();
+  }, []);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    testRef.current = test;
+  }, [test]);
+
+  useEffect(() => {
+    return () => {
+      const currentTest = testRef.current;
+      if (
+        !currentTest ||
+        completedRef.current ||
+        answersRef.current.size === 0
+      ) {
+        return;
+      }
+
+      trackAnalyticsEvent({
+        eventType: 'test_abandoned',
+        entityType: 'personality',
+        entityId: `personality-${currentTest.version}`,
+        stepId: `question-${answersRef.current.size}`,
+        metadata: {
+          answeredCount: answersRef.current.size,
+          totalQuestions: currentTest.questions.length,
+          durationMs: startedAtRef.current
+            ? Date.now() - startedAtRef.current
+            : undefined,
+        },
+      });
+    };
   }, []);
 
   // Restore draft quand userId + test sont dispos
@@ -97,6 +137,17 @@ export default function PersonalityTestScreen() {
 
       if (response.test) {
         setTest(response.test);
+        startedAtRef.current = Date.now();
+        trackAnalyticsEvent({
+          eventType: 'test_started',
+          entityType: 'personality',
+          entityId: `personality-${response.test.version}`,
+          metadata: {
+            testName: response.test.title,
+            version: response.test.version,
+            totalQuestions: response.test.questions.length,
+          },
+        });
       }
     } catch (error) {
       Alert.alert(
@@ -158,6 +209,17 @@ export default function PersonalityTestScreen() {
     if (!test) return;
 
     const index = test.questions.findIndex((q) => q.id === questionId);
+    trackAnalyticsEvent({
+      eventType: 'test_step_completed',
+      entityType: 'personality',
+      entityId: `personality-${test.version}`,
+      stepId: questionId,
+      metadata: {
+        stepIndex: index + 1,
+        totalSteps: test.questions.length,
+      },
+    });
+
     if (index < test.questions.length - 1) {
       const next = test.questions[index + 1];
       setTimeout(() => {
@@ -188,6 +250,19 @@ export default function PersonalityTestScreen() {
       ).map(([id, value]) => ({ questionId: id, value }));
 
       const testResult = await submitPersonalityTest(formattedAnswers);
+      completedRef.current = true;
+      trackAnalyticsEvent({
+        eventType: 'test_completed',
+        entityType: 'personality',
+        entityId: `personality-${test.version}`,
+        metadata: {
+          durationMs: startedAtRef.current
+            ? Date.now() - startedAtRef.current
+            : undefined,
+          profileKey: testResult.type,
+          profileLabel: testResult.label,
+        },
+      });
 
       // clear draft si submit OK
       if (userId) await clearDraft('personality', userId);

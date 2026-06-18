@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import { trackAnalyticsEvent } from '@/features/analytics';
 import {
   BilanAnswersPayload,
   BilanQuestion,
@@ -44,6 +45,8 @@ export default function BilanQuestionsScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const questionPositions = useRef<Map<string, number>>(new Map());
   const restoredOnceRef = useRef(false);
+  const startedAtRef = useRef<number | null>(null);
+  const completedRef = useRef(false);
 
   const [questions, setQuestions] = useState<BilanQuestion[]>([]);
   const [version, setVersion] = useState(1);
@@ -54,6 +57,21 @@ export default function BilanQuestionsScreen() {
 
   // réponses stockées comme pour le test perso
   const [answers, setAnswers] = useState<Record<string, number | string>>({});
+  const answersRef = useRef<Record<string, number | string>>({});
+  const questionsRef = useRef<BilanQuestion[]>([]);
+  const versionRef = useRef(1);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    questionsRef.current = questions;
+  }, [questions]);
+
+  useEffect(() => {
+    versionRef.current = version;
+  }, [version]);
 
   useEffect(() => {
     const load = async () => {
@@ -61,6 +79,17 @@ export default function BilanQuestionsScreen() {
         const res = await getBilanQuestions();
         setQuestions(res.questions);
         setVersion(res.version);
+        startedAtRef.current = Date.now();
+        trackAnalyticsEvent({
+          eventType: 'test_started',
+          entityType: 'bilan',
+          entityId: `bilan-v${res.version}`,
+          metadata: {
+            testName: 'Auto-évaluation professionnelle',
+            version: res.version,
+            totalQuestions: res.questions.length,
+          },
+        });
 
         if (userId && !restoredOnceRef.current) {
           restoredOnceRef.current = true;
@@ -87,6 +116,33 @@ export default function BilanQuestionsScreen() {
     };
     load();
   }, [userId]);
+
+  useEffect(() => {
+    return () => {
+      const answeredCount = Object.keys(answersRef.current).length;
+      if (
+        !questionsRef.current.length ||
+        completedRef.current ||
+        answeredCount === 0
+      ) {
+        return;
+      }
+
+      trackAnalyticsEvent({
+        eventType: 'test_abandoned',
+        entityType: 'bilan',
+        entityId: `bilan-v${versionRef.current}`,
+        stepId: `question-${answeredCount}`,
+        metadata: {
+          answeredCount,
+          totalQuestions: questionsRef.current.length,
+          durationMs: startedAtRef.current
+            ? Date.now() - startedAtRef.current
+            : undefined,
+        },
+      });
+    };
+  }, []);
 
   const persistDraft = (nextAnswers: Record<string, number | string>) => {
     if (!userId || !version) return;
@@ -131,6 +187,16 @@ export default function BilanQuestionsScreen() {
       persistDraft(nextAnswers);
       return nextAnswers;
     });
+    trackAnalyticsEvent({
+      eventType: 'test_step_completed',
+      entityType: 'bilan',
+      entityId: `bilan-v${version}`,
+      stepId: code,
+      metadata: {
+        stepIndex: index + 1,
+        totalSteps: questions.length,
+      },
+    });
     scrollToNext(index);
   };
 
@@ -171,6 +237,33 @@ export default function BilanQuestionsScreen() {
     try {
       await postBilanAnswers(version, payload);
       const generated = await generateBilan(version);
+      completedRef.current = true;
+      trackAnalyticsEvent({
+        eventType: 'test_completed',
+        entityType: 'bilan',
+        entityId: `bilan-v${version}`,
+        metadata: {
+          durationMs: startedAtRef.current
+            ? Date.now() - startedAtRef.current
+            : undefined,
+          archetypeId: generated.bilan.conclusion.archetype.id,
+          archetypeTitle: generated.bilan.conclusion.archetype.title,
+        },
+      });
+      generated.bilan.conclusion.recommendedJobs.forEach((job, index) => {
+        trackAnalyticsEvent({
+          eventType: 'job_matched',
+          entityType: 'job',
+          entityId: job.id,
+          metadata: {
+            jobTitle: job.title,
+            domain: job.sector,
+            rank: index + 1,
+            score: job.score,
+            sourceTest: 'bilan',
+          },
+        });
+      });
       if (userId) await clearDraft('bilan', userId);
       setErrorMessage(null);
       navigation.navigate('BilanResult', { bilan: generated.bilan });

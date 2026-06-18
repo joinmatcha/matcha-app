@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import { trackAnalyticsEvent } from '@/features/analytics';
 import {
   JobDetail,
   MarketIndicatorValue,
@@ -117,6 +118,16 @@ export default function JobDetailScreen() {
         const res = await getJobById(jobId);
         if (mounted) {
           setJob(res.job);
+          trackAnalyticsEvent({
+            eventType: 'job_viewed',
+            entityType: 'job',
+            entityId: res.job.code || res.job.id,
+            metadata: {
+              jobTitle: res.job.title,
+              domain: res.job.domain?.label || res.job.sector,
+              entryPoint: 'job_detail',
+            },
+          });
         }
       } catch {
         if (mounted) setJob(null);

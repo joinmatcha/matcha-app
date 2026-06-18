@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { trackAnalyticsEvent } from '@/features/analytics';
 import { DeckJob, getDeck, postSwipe } from '@/features/swipe/api/swipeApi';
 import { getApiErrorMessage } from '@/utils/apiError';
 
@@ -34,7 +35,18 @@ export function useSwipe() {
     async (jobId: string, action: 'like' | 'dislike') => {
       try {
         setError(null);
+        const swipedJob = deck.find((job) => job.id === jobId);
         const data = await postSwipe(jobId, action);
+        trackAnalyticsEvent({
+          eventType: 'job_swiped',
+          entityType: 'job',
+          entityId: swipedJob?.code || jobId,
+          metadata: {
+            action,
+            jobTitle: swipedJob?.title,
+            domain: swipedJob?.sector,
+          },
+        });
         setRemaining(data.remaining);
         setLimit(data.limit);
         setDeck((prev) => prev.filter((j) => j.id !== jobId));
@@ -44,7 +56,7 @@ export function useSwipe() {
         );
       }
     },
-    [],
+    [deck],
   );
 
   useEffect(() => {
