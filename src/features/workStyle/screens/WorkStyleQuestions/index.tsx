@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import { trackAnalyticsEvent } from '@/features/analytics';
 import QuestionCard from '@/features/personality/components/QuestionCard';
 import TestHeader from '@/features/personality/components/TestHeader';
 import {
@@ -45,6 +46,18 @@ export default function WorkStyleQuestionsScreen() {
   const [submitting, setSubmitting] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const questionPositions = useRef<Map<string, number>>(new Map());
+  const startedAtRef = useRef<number | null>(null);
+  const completedRef = useRef(false);
+  const answersRef = useRef(answers);
+  const testRef = useRef<WorkStyleTemplate | null>(null);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    testRef.current = test;
+  }, [test]);
 
   useEffect(() => {
     let mounted = true;
@@ -52,7 +65,20 @@ export default function WorkStyleQuestionsScreen() {
     (async () => {
       try {
         const response = await getActiveWorkStyleTest();
-        if (mounted) setTest(response.test);
+        if (mounted) {
+          setTest(response.test);
+          startedAtRef.current = Date.now();
+          trackAnalyticsEvent({
+            eventType: 'test_started',
+            entityType: 'work_style',
+            entityId: `work-style-v${response.test.version}`,
+            metadata: {
+              testName: response.test.title,
+              version: response.test.version,
+              totalQuestions: response.test.questions.length,
+            },
+          });
+        }
       } catch (error) {
         Alert.alert(
           'Erreur',
@@ -68,6 +94,33 @@ export default function WorkStyleQuestionsScreen() {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      const currentTest = testRef.current;
+      if (
+        !currentTest ||
+        completedRef.current ||
+        answersRef.current.size === 0
+      ) {
+        return;
+      }
+
+      trackAnalyticsEvent({
+        eventType: 'test_abandoned',
+        entityType: 'work_style',
+        entityId: `work-style-v${currentTest.version}`,
+        stepId: `question-${answersRef.current.size}`,
+        metadata: {
+          answeredCount: answersRef.current.size,
+          totalQuestions: currentTest.questions.length,
+          durationMs: startedAtRef.current
+            ? Date.now() - startedAtRef.current
+            : undefined,
+        },
+      });
+    };
+  }, []);
+
   const handleAnswer = (questionId: string, value: number) => {
     const nextAnswers = new Map(answers);
     nextAnswers.set(questionId, value);
@@ -77,6 +130,17 @@ export default function WorkStyleQuestionsScreen() {
     const index = test.questions.findIndex(
       (question) => question.id === questionId,
     );
+    trackAnalyticsEvent({
+      eventType: 'test_step_completed',
+      entityType: 'work_style',
+      entityId: `work-style-v${test.version}`,
+      stepId: questionId,
+      metadata: {
+        stepIndex: index + 1,
+        totalSteps: test.questions.length,
+      },
+    });
+
     const nextQuestion = test.questions[index + 1];
     if (nextQuestion) {
       setTimeout(() => {
@@ -105,6 +169,20 @@ export default function WorkStyleQuestionsScreen() {
         ([questionId, value]) => ({ questionId, value }),
       );
       const result = await submitWorkStyleTest(payload);
+      completedRef.current = true;
+      trackAnalyticsEvent({
+        eventType: 'test_completed',
+        entityType: 'work_style',
+        entityId: `work-style-v${result.version}`,
+        metadata: {
+          durationMs: startedAtRef.current
+            ? Date.now() - startedAtRef.current
+            : undefined,
+          profileKey: result.profile.key,
+          profileTitle: result.profile.title,
+          topAxes: result.topAxes,
+        },
+      });
       navigation.replace('WorkStyleResult', { result });
     } catch (error) {
       Alert.alert(
