@@ -266,7 +266,7 @@ export default function BilanQuestionsScreen() {
       });
       if (userId) await clearDraft('bilan', userId);
       setErrorMessage(null);
-      navigation.navigate('BilanResult', { bilan: generated.bilan });
+      navigation.replace('BilanResult', { bilan: generated.bilan });
     } catch (error) {
       setErrorMessage(
         getApiErrorMessage(

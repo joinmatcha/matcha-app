@@ -267,7 +267,7 @@ export default function PersonalityTestScreen() {
       // clear draft si submit OK
       if (userId) await clearDraft('personality', userId);
 
-      navigation.navigate('PersonalityResult', { result: testResult });
+      navigation.replace('PersonalityResult', { result: testResult });
     } catch (error) {
       Alert.alert(
         'Erreur',
