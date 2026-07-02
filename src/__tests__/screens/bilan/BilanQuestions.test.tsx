@@ -1,7 +1,16 @@
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
+import {
+  generateBilan,
+  getBilanQuestions,
+  postBilanAnswers,
+} from '@/features/bilan/api/bilanApi';
 import BilanQuestionsScreen from '@/features/bilan/screens/BilanQuestions';
+
+const mockNavigate = jest.fn();
+const mockReplace = jest.fn();
+const mockGoBack = jest.fn();
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -30,7 +39,11 @@ jest.mock('react-native-safe-area-context', () => {
   return { SafeAreaView: (props: any) => <View {...props} /> };
 });
 jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    replace: mockReplace,
+    goBack: mockGoBack,
+  }),
   useRoute: () => ({ params: {} }),
 }));
 jest.mock('react-native-paper', () => {
@@ -59,33 +72,87 @@ jest.mock('react-native-paper', () => {
 jest.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 'u1' } }),
 }));
-jest.mock('@/features/bilan/hooks/useBilan', () => ({
-  useBilan: () => ({
-    loading: false,
-    error: null,
-    version: 1,
-    questions: [
-      {
-        code: 'Q1',
-        question: 'Question 1',
-        type: 'likert_1_5',
-        domain: 'd',
-        subdomain: 's',
-      },
-    ],
-    bilan: null,
-    saveAnswers: jest.fn(),
-    generate: jest.fn(),
-  }),
+jest.mock('@/features/bilan/api/bilanApi', () => ({
+  getBilanQuestions: jest.fn(),
+  postBilanAnswers: jest.fn(),
+  generateBilan: jest.fn(),
+}));
+jest.mock('@/features/analytics', () => ({
+  trackAnalyticsEvent: jest.fn(),
 }));
 jest.mock('@/services/draftStorage', () => ({
   loadDraft: jest.fn().mockResolvedValue(null),
-  saveDraft: jest.fn(),
+  saveDraft: jest.fn().mockResolvedValue(undefined),
   clearDraft: jest.fn(),
 }));
 
 describe('BilanQuestionsScreen', () => {
-  it('se rend sans erreur', () => {
-    expect(() => render(<BilanQuestionsScreen />)).not.toThrow();
+  const generatedBilan = {
+    _id: 'bilan1',
+    user: 'u1',
+    version: 1,
+    answers: [],
+    scores: [],
+    conclusion: {
+      archetype: { id: 'balanced', title: 'Profil équilibré' },
+      recommendedJobs: [
+        {
+          id: 'job1',
+          title: 'Développeur web',
+          sector: 'Informatique',
+          score: 82,
+        },
+      ],
+    },
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getBilanQuestions as jest.Mock).mockResolvedValue({
+      version: 1,
+      questions: [
+        {
+          code: 'Q1',
+          question: 'Question 1',
+          type: 'likert_1_5',
+          domain: 'd',
+          subdomain: 's',
+        },
+      ],
+    });
+    (postBilanAnswers as jest.Mock).mockResolvedValue({});
+    (generateBilan as jest.Mock).mockResolvedValue({ bilan: generatedBilan });
+  });
+
+  it('se rend sans erreur', async () => {
+    const screen = render(<BilanQuestionsScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Réponse 5')).toBeTruthy();
+    });
+  });
+
+  it("remplace l'écran de questions par le résultat après soumission", async () => {
+    const screen = render(<BilanQuestionsScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Réponse 5')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByLabelText('Réponse 5'));
+    await waitFor(() => {
+      expect(screen.getByText('Parfait, tu peux finaliser.')).toBeTruthy();
+    });
+    fireEvent.press(screen.getByText("Terminer l'auto-évaluation"));
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('BilanResult', {
+        bilan: generatedBilan,
+      });
+    });
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      'BilanResult',
+      expect.anything(),
+    );
   });
 });
