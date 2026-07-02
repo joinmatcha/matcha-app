@@ -73,7 +73,7 @@ export default function BilanIntroScreen() {
             <Text style={styles.subtitle}>
               {isResume
                 ? "Ton brouillon est enregistré. Relis l'essentiel, puis reprends quand tu veux."
-                : 'Une lecture structurée de ton profil professionnel pour mieux comprendre ce qui te porte aujourd&apos;hui et ce que tu peux explorer ensuite.'}
+                : "Une lecture structurée de ton profil professionnel pour mieux comprendre ce qui te porte aujourd'hui et ce que tu peux explorer ensuite."}
             </Text>
           </View>
 
@@ -122,7 +122,7 @@ export default function BilanIntroScreen() {
             <Text style={styles.cardTitle}>À garder en tête</Text>
             <Text style={styles.note}>
               Cette auto-évaluation sert à clarifier une direction, pas à
-              t&apos;enfermer dans une case. Le plus utile est de répondre
+              t'enfermer dans une case. Le plus utile est de répondre
               simplement, en pensant à ta réalité actuelle.
             </Text>
           </View>

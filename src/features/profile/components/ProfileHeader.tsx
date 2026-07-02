@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontFamily: displayFontFamily,
     color: Colors.text.strong,
-    letterSpacing: -0.2,
+    letterSpacing: 0,
     textAlign: 'center',
   },
   email: {

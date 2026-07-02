@@ -239,7 +239,7 @@ export default function SwipeScreen() {
               />
             </View>
             <Text style={styles.stateTitle}>
-              Tu as tout vu pour aujourd&apos;hui
+              Tu as tout vu pour aujourd'hui
             </Text>
             <Text style={styles.stateSubtitle}>
               Tu as utilisé tous tes swipes du jour. Reviens demain pour

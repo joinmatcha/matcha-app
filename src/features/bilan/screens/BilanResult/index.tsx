@@ -130,7 +130,7 @@ export default function BilanResultScreen() {
 
         <ProfileSection title="Tes forces dominantes">
           <Text style={styles.sectionIntro}>
-            Les points sur lesquels tu peux t&apos;appuyer en priorité.
+            Les points sur lesquels tu peux t'appuyer en priorité.
           </Text>
           <View style={styles.gridList}>
             {conclusion.keyStrengths.map((item) => (

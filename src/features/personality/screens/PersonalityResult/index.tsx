@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     fontFamily: titleFontFamily,
     fontWeight: '600',
     color: '#232220',
-    letterSpacing: -0.2,
+    letterSpacing: 0,
   },
   blockSubtitle: {
     marginTop: 3,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#232220',
     marginBottom: 12,
-    letterSpacing: -0.1,
+    letterSpacing: 0,
   },
 
   description: {

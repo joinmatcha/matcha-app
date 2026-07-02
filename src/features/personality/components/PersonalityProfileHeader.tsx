@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     fontFamily: titleFontFamily,
     color: Colors.accent.strong,
     textAlign: 'center',
-    letterSpacing: -0.3,
+    letterSpacing: 0,
   },
   profileType: {
     marginTop: 8,
