@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -37,7 +38,17 @@ export default function ProfileScreen() {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <BackgroundRadial>
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.accent.primary} />
+          </View>
+        </SafeAreaView>
+      </BackgroundRadial>
+    );
+  }
 
   if (error || !user) {
     return (
@@ -161,6 +172,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24,
     gap: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
     textAlign: 'center',

@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     fontFamily: displayFontFamily,
     color: '#1F1F1F',
     marginBottom: 8,
-    letterSpacing: -0.4,
+    letterSpacing: 0,
   },
   subtitle: {
     fontSize: 15,
