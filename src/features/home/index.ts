@@ -1,4 +1,5 @@
 export { default as HomeScreen } from './screens/Home';
+export { default as CareerPreferencesScreen } from './screens/CareerPreferences';
 
 export { default as BilanSummaryCard } from './components/BilanSummaryCard';
 export { default as PersonalitySummaryCard } from './components/PersonalitySummaryCard';

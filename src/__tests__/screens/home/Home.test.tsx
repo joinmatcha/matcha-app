@@ -29,6 +29,9 @@ jest.mock('react-native-safe-area-context', () => {
   const { View } = require('react-native');
   return { SafeAreaView: (props: any) => <View {...props} /> };
 });
+jest.mock('@/assets', () => ({
+  Branding: { Logo: () => null },
+}));
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: jest.fn() }),
   useFocusEffect: (cb: () => void) => cb(),
@@ -46,7 +49,7 @@ jest.mock('react-native-paper', () => {
   };
 });
 jest.mock('@/hooks/useAuth', () => ({
-  useAuth: () => ({ user: { id: 'u1' } }),
+  useAuth: () => ({ user: { id: 'u1' }, logout: jest.fn() }),
 }));
 jest.mock('@/features/profile/hooks/useProfile', () => ({
   useProfile: () => ({
@@ -59,6 +62,7 @@ jest.mock('@/features/profile/hooks/useProfile', () => ({
 jest.mock('@/features/bilan/hooks/useBilan', () => ({
   useBilan: () => ({
     bilan: null,
+    loading: false,
     error: null,
     refreshBilan: jest.fn(),
   }),
@@ -66,6 +70,7 @@ jest.mock('@/features/bilan/hooks/useBilan', () => ({
 jest.mock('@/features/workStyle', () => ({
   useWorkStyle: () => ({
     latestResult: null,
+    loading: false,
     refreshWorkStyle: jest.fn(),
   }),
 }));
@@ -85,7 +90,7 @@ describe('HomeScreen', () => {
     const screen = render(<HomeScreen />);
 
     await waitFor(() => {
-      expect(screen.getByText('John')).toBeTruthy();
+      expect(screen.getByText(/Hello John !/)).toBeTruthy();
     });
   });
 
@@ -93,7 +98,7 @@ describe('HomeScreen', () => {
     const { getByText } = render(<HomeScreen />);
 
     await waitFor(() => {
-      expect(getByText('John')).toBeTruthy();
+      expect(getByText(/Hello John !/)).toBeTruthy();
     });
   });
 });

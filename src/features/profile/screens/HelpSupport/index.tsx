@@ -1,9 +1,7 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -15,17 +13,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import MatchaButton from '@/components/ui/MatchaButton';
 import {
   SupportContactPayload,
   sendSupportContact,
 } from '@/features/profile/api/profileApi';
 import Colors from '@/themes/colors';
-import {
-  bodyFontFamily,
-  displayFontFamily,
-  titleFontFamily,
-} from '@/themes/typography';
-import { primaryButton, primaryButtonText } from '@/themes/ui';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { RootStackParamList } from '@/types/navigation';
 import { getApiErrorMessage } from '@/utils/apiError';
 
@@ -130,7 +124,6 @@ export default function HelpSupportScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.hero}>
-            <Text style={styles.eyebrow}>AIDE & SUPPORT</Text>
             <Text style={styles.title}>Comment peut-on t’aider ?</Text>
             <Text style={styles.subtitle}>
               Retrouve les réponses principales, nos conditions, la politique de
@@ -212,32 +205,25 @@ export default function HelpSupportScreen() {
               maxLength={2000}
             />
 
-            <TouchableOpacity
-              activeOpacity={0.88}
-              style={[
-                styles.submitButton,
-                (!canSubmit || submitting) && styles.submitButtonDisabled,
-              ]}
-              disabled={!canSubmit || submitting}
+            <MatchaButton
+              label="Envoyer"
+              icon="send"
+              variant="primary"
+              disabled={!canSubmit}
+              loading={submitting}
+              fullWidth
               onPress={handleSubmit}
-            >
-              {submitting ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <>
-                  <MaterialIcons name="send" size={18} color="#FFFFFF" />
-                  <Text style={styles.submitButtonText}>Envoyer</Text>
-                </>
-              )}
-            </TouchableOpacity>
+              style={styles.submitButton}
+            />
           </View>
 
-          <TouchableOpacity
-            style={styles.backHome}
+          <MatchaButton
+            label="Retour au profil"
+            icon="person"
             onPress={() => navigation.navigate('Main', { screen: 'Profil' })}
-          >
-            <Text style={styles.backHomeText}>Retour au profil</Text>
-          </TouchableOpacity>
+            fullWidth
+            style={styles.backButton}
+          />
         </ScrollView>
       </SafeAreaView>
     </BackgroundRadial>
@@ -249,30 +235,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 36,
+    paddingHorizontal: 24,
+    paddingTop: 18,
+    paddingBottom: 118,
     gap: 14,
   },
   hero: {
     backgroundColor: 'rgba(255,255,255,0.92)',
-    borderRadius: 24,
+    borderRadius: 8,
     paddingHorizontal: 18,
     paddingVertical: 18,
-  },
-  eyebrow: {
-    fontSize: 11,
-    fontWeight: '700',
-    fontFamily: titleFontFamily,
-    letterSpacing: 1.2,
-    color: Colors.accent.strong,
+    shadowColor: '#22332C',
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 2,
   },
   title: {
-    marginTop: 6,
     fontSize: 30,
     lineHeight: 36,
-    fontWeight: '800',
-    fontFamily: displayFontFamily,
+    fontFamily: titleFontFamily,
     color: Colors.text.strong,
   },
   subtitle: {
@@ -283,19 +265,18 @@ const styles = StyleSheet.create({
     color: Colors.text.muted,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderRadius: 8,
     padding: 18,
-    shadowColor: '#0D1520',
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
+    shadowColor: '#22332C',
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
     elevation: 2,
   },
   sectionTitle: {
     fontSize: 20,
     lineHeight: 25,
-    fontWeight: '800',
     fontFamily: titleFontFamily,
     color: Colors.text.strong,
     marginBottom: 12,
@@ -308,7 +289,6 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 15,
     lineHeight: 21,
-    fontWeight: '700',
     fontFamily: titleFontFamily,
     color: Colors.text.strong,
   },
@@ -335,7 +315,7 @@ const styles = StyleSheet.create({
   },
   categoryButton: {
     minHeight: 34,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
@@ -346,7 +326,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: titleFontFamily,
     color: Colors.text.muted,
   },
   categoryTextActive: {
@@ -354,11 +334,11 @@ const styles = StyleSheet.create({
   },
   input: {
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 10,
-    backgroundColor: Colors.ui.surfaceSoft,
+    backgroundColor: '#F7FAF8',
     color: Colors.text.strong,
     fontFamily: bodyFontFamily,
     fontSize: 15,
@@ -367,24 +347,9 @@ const styles = StyleSheet.create({
     minHeight: 132,
   },
   submitButton: {
-    ...primaryButton,
-    flexDirection: 'row',
-    gap: 8,
     marginTop: 4,
   },
-  submitButtonDisabled: {
-    opacity: 0.48,
-  },
-  submitButtonText: {
-    ...primaryButtonText,
-  },
-  backHome: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  backHomeText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text.soft,
+  backButton: {
+    backgroundColor: '#DDE5EA',
   },
 });
