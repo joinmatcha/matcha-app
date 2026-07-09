@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import { trackAnalyticsEvent } from '@/features/analytics';
 import {
   BilanAnswersPayload,
@@ -28,7 +28,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
-import { cardSurface, primaryButton, primaryButtonText } from '@/themes/ui';
+import { primaryButton, primaryButtonText } from '@/themes/ui';
 import { RootStackParamList } from '@/types/navigation';
 import { getApiErrorMessage } from '@/utils/apiError';
 
@@ -292,7 +292,7 @@ export default function BilanQuestionsScreen() {
   const isComplete = answeredCount === totalQuestions;
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <View style={styles.container}>
           <TestHeader
@@ -427,7 +427,7 @@ export default function BilanQuestionsScreen() {
           </View>
         </View>
       </SafeAreaView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
@@ -437,12 +437,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, zIndex: 2 },
 
   scroll: { flex: 1 },
-  scrollContent: { padding: 20, paddingBottom: 24 },
+  scrollContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 24 },
   scrollSpacer: { height: 8 },
 
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   actionsRow: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 10,
     paddingBottom: 4,
     alignItems: 'flex-end',
@@ -450,19 +450,21 @@ const styles = StyleSheet.create({
   restartButton: {
     paddingVertical: 6,
     paddingHorizontal: 10,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.72)',
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: Colors.accent.border,
+    shadowColor: '#5C5148',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
     elevation: 1,
   },
   restartButtonText: {
     fontSize: 13,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#232323',
+    color: Colors.text.strong,
   },
   errorText: {
     marginHorizontal: 20,
@@ -473,15 +475,23 @@ const styles = StyleSheet.create({
   },
 
   textCard: {
-    ...cardSurface,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.accent.border,
     padding: 18,
     marginBottom: 20,
+    shadowColor: '#5C5148',
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 2,
   },
   badge: {
     fontSize: 12,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#6A615C',
+    color: Colors.accent.strong,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
@@ -490,7 +500,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#232220',
+    color: Colors.text.strong,
     marginBottom: 8,
     lineHeight: 24,
   },
@@ -498,18 +508,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     fontFamily: bodyFontFamily,
-    color: '#5A534E',
+    color: Colors.text.muted,
     marginBottom: 12,
   },
   input: {
     minHeight: 120,
-    backgroundColor: '#FAF5EF',
-    borderRadius: 12,
+    backgroundColor: Colors.accent.soft,
+    borderRadius: 8,
     padding: 12,
     marginBottom: 12,
     fontSize: 15,
     fontFamily: bodyFontFamily,
-    color: '#232220',
+    color: Colors.text.strong,
     lineHeight: 21,
     textAlignVertical: 'top',
   },
@@ -529,16 +539,16 @@ const styles = StyleSheet.create({
 
   footer: {
     borderTopWidth: 1,
-    borderTopColor: '#EEE7DF',
-    paddingHorizontal: 20,
+    borderTopColor: Colors.accent.border,
+    paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 14,
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: '#FFFFFF',
   },
   footerMeta: {
     fontSize: 12,
     fontFamily: titleFontFamily,
-    color: '#2A2725',
+    color: Colors.text.strong,
     marginBottom: 8,
     textAlign: 'center',
     fontWeight: '600',

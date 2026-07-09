@@ -1,7 +1,9 @@
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 import HomeScreen from '@/features/home/screens/Home';
+
+const mockNavigate = jest.fn();
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -33,7 +35,7 @@ jest.mock('@/assets', () => ({
   Branding: { Logo: () => null },
 }));
 jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({ navigate: jest.fn() }),
+  useNavigation: () => ({ navigate: mockNavigate }),
   useFocusEffect: (cb: () => void) => cb(),
 }));
 jest.mock('react-native-paper', () => {
@@ -67,6 +69,16 @@ jest.mock('@/features/bilan/hooks/useBilan', () => ({
     refreshBilan: jest.fn(),
   }),
 }));
+jest.mock('@/features/home/hooks/useMatchaProfile', () => ({
+  useMatchaProfile: () => ({
+    profile: {
+      completion: 0,
+    },
+    loading: false,
+    error: null,
+    refresh: jest.fn(),
+  }),
+}));
 jest.mock('@/features/workStyle', () => ({
   useWorkStyle: () => ({
     latestResult: null,
@@ -86,6 +98,10 @@ jest.mock('@/services/draftStorage', () => ({
 }));
 
 describe('HomeScreen', () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+  });
+
   it('se rend sans erreur', async () => {
     const screen = render(<HomeScreen />);
 
@@ -100,5 +116,17 @@ describe('HomeScreen', () => {
     await waitFor(() => {
       expect(getByText(/Hello John !/)).toBeTruthy();
     });
+  });
+
+  it('ouvre la synthèse Profil Matcha depuis la card profil', async () => {
+    const screen = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Construire mon profil')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Construire mon profil'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('MatchaProfile');
   });
 });

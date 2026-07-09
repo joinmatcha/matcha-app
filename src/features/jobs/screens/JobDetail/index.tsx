@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import { trackAnalyticsEvent } from '@/features/analytics';
 import {
   JobDetail,
@@ -153,17 +153,17 @@ export default function JobDetailScreen() {
 
   if (loading) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <View style={styles.centered}>
           <ActivityIndicator />
         </View>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
   if (!job) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <View style={styles.centered}>
           <Text style={styles.errorText}>Impossible de charger le métier.</Text>
 
@@ -174,7 +174,7 @@ export default function JobDetailScreen() {
             <Text style={styles.retryText}>Retour</Text>
           </TouchableOpacity>
         </View>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
@@ -293,7 +293,7 @@ export default function JobDetailScreen() {
     job.market?.salary?.periodLabel;
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea} />
 
       <ScrollView
@@ -616,6 +616,6 @@ export default function JobDetailScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }

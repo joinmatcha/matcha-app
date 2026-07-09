@@ -207,7 +207,7 @@ export const styles = StyleSheet.create({
   cardShadowBackMost: {
     position: 'absolute',
     width: '82%',
-    height: 374,
+    height: 388,
     backgroundColor: 'rgba(0,81,58,0.07)',
     borderRadius: 8,
     transform: [{ translateX: -8 }, { translateY: 18 }, { rotate: '-2deg' }],
@@ -215,7 +215,7 @@ export const styles = StyleSheet.create({
   cardShadowBack: {
     position: 'absolute',
     width: '85%',
-    height: 376,
+    height: 390,
     ...cardSurface,
     backgroundColor: 'rgba(255,255,255,0.72)',
     borderRadius: 8,
@@ -226,7 +226,7 @@ export const styles = StyleSheet.create({
   },
   card: {
     width: '90%',
-    height: 386,
+    height: 400,
     ...cardSurface,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
@@ -243,6 +243,7 @@ export const styles = StyleSheet.create({
   },
   cardPressArea: {
     flex: 1,
+    overflow: 'hidden',
   },
   overlay: {
     position: 'absolute',
@@ -310,7 +311,7 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   heroPanel: {
-    height: 182,
+    height: 168,
     backgroundColor: '#F7FAF8',
     borderRadius: 8,
     paddingHorizontal: 20,
@@ -338,16 +339,18 @@ export const styles = StyleSheet.create({
     color: 'rgba(31,31,31,0.48)',
   },
   cardTitle: {
-    fontSize: 27,
-    lineHeight: 33,
+    fontSize: 25,
+    lineHeight: 31,
     fontFamily: titleFontFamily,
     fontWeight: '600',
     color: '#1F1F1F',
     letterSpacing: 0,
   },
   tagsSection: {
-    minHeight: 58,
+    minHeight: 74,
+    maxHeight: 74,
     paddingTop: 10,
+    overflow: 'hidden',
   },
   tagsTitle: {
     marginBottom: 7,
@@ -361,9 +364,11 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    maxHeight: 34,
+    overflow: 'hidden',
   },
   tag: {
-    maxWidth: '100%',
+    maxWidth: '82%',
     backgroundColor: 'rgba(31,31,31,0.06)',
     borderRadius: 999,
     paddingHorizontal: 11,
@@ -376,11 +381,27 @@ export const styles = StyleSheet.create({
     color: 'rgba(31,31,31,0.72)',
     fontWeight: '600',
   },
+  tagCount: {
+    minWidth: 34,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(0,81,58,0.10)',
+    alignItems: 'center',
+  },
+  tagCountText: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: titleFontFamily,
+    color: Colors.accent.primary,
+    fontWeight: '700',
+  },
   cardFooter: {
-    marginTop: 10,
+    marginTop: 'auto',
     minHeight: 42,
     paddingHorizontal: 18,
     borderRadius: 21,
+    alignSelf: 'flex-start',
   },
   buttons: {
     flexDirection: 'row',

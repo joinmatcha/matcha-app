@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import { TopLikedJob, getTopLikedJobs } from '@/features/jobs';
 import {
   Preferences,
@@ -134,7 +134,7 @@ export default function CareerPreferencesScreen() {
   const competences = preferences?.topCompetences.slice(0, 6) ?? [];
 
   return (
-    <BackgroundRadial bubbles>
+    <AppScreen>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -222,7 +222,7 @@ export default function CareerPreferencesScreen() {
           <MaterialIcons name="arrow-forward" size={20} color="#FFFFFF" />
         </TouchableOpacity>
       </ScrollView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 

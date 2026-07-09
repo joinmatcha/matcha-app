@@ -376,7 +376,7 @@ export default function SwipeScreen() {
                   <View style={styles.titleAccent} />
                   <Text style={styles.cardKicker}>Piste proposée</Text>
                 </View>
-                <Text style={styles.cardTitle} numberOfLines={5}>
+                <Text style={styles.cardTitle} numberOfLines={3}>
                   {currentJob?.title}
                 </Text>
               </View>
@@ -385,13 +385,24 @@ export default function SwipeScreen() {
                 <View style={styles.tagsSection}>
                   <Text style={styles.tagsTitle}>Repère métier</Text>
                   <View style={styles.tagsRow}>
-                    {currentJob.tags.slice(0, 2).map((tag) => (
+                    {currentJob.tags.slice(0, 1).map((tag) => (
                       <View key={tag} style={styles.tag}>
-                        <Text style={styles.tagText} numberOfLines={1}>
+                        <Text
+                          style={styles.tagText}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
                           {tag}
                         </Text>
                       </View>
                     ))}
+                    {currentJob.tags.length > 1 ? (
+                      <View style={styles.tagCount}>
+                        <Text style={styles.tagCountText}>
+                          +{currentJob.tags.length - 1}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                 </View>
               )}

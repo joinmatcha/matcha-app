@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ConfirmDeleteAccountModal from '@/components/Modals/ConfirmDeleteAccountModal';
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import MatchaButton from '@/components/ui/MatchaButton';
 import ProfileHeader from '@/features/profile/components/ProfileHeader';
 import ProfileInfosReadOnly from '@/features/profile/components/ProfileInfosReadOnly';
@@ -39,19 +39,19 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={Colors.accent.primary} />
           </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
   if (error || !user) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>
@@ -64,7 +64,7 @@ export default function ProfileScreen() {
             />
           </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
@@ -86,7 +86,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.heroRow}>
@@ -141,7 +141,7 @@ export default function ProfileScreen() {
           onConfirm={handleDeleteAccount}
         />
       </SafeAreaView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 

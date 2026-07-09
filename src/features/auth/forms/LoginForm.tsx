@@ -1,22 +1,15 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, HelperText, TextInput } from 'react-native-paper';
+import { View } from 'react-native';
+import { HelperText, TextInput } from 'react-native-paper';
 
+import MatchaButton from '@/components/ui/MatchaButton';
 import { useAuth } from '@/hooks/useAuth';
 import { loginSchema } from '@/schemas/login';
 import Colors from '@/themes/colors';
-import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { getApiErrorMessage, getApiErrorStatus } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
 
-const inputTheme = {
-  colors: {
-    primary: Colors.accent.primary,
-    error: Colors.error,
-    outline: 'rgba(31,31,31,0.10)',
-    onSurfaceVariant: 'rgba(31,31,31,0.58)',
-  },
-};
+import { authFormStyles, authInputTheme } from './authFormStyles';
 
 export default function LoginForm() {
   const { login } = useAuth();
@@ -69,7 +62,7 @@ export default function LoginForm() {
   };
 
   return (
-    <View style={styles.inputContainer}>
+    <View style={authFormStyles.inputContainer}>
       <TextInput
         label="Email"
         value={email}
@@ -79,17 +72,21 @@ export default function LoginForm() {
         autoCapitalize="none"
         autoCorrect={false}
         textContentType="emailAddress"
-        style={styles.input}
-        contentStyle={styles.inputContent}
-        outlineStyle={styles.inputOutline}
+        style={authFormStyles.input}
+        contentStyle={authFormStyles.inputContent}
+        outlineStyle={authFormStyles.inputOutline}
         activeOutlineColor={Colors.accent.primary}
-        outlineColor="rgba(31,31,31,0.10)"
-        theme={inputTheme}
+        outlineColor="rgba(0,81,58,0.12)"
+        theme={authInputTheme}
         disabled={loading}
         error={!!errors.email}
         left={<TextInput.Icon icon="email-outline" />}
       />
-      {errors.email && <HelperText type="error">{errors.email}</HelperText>}
+      {errors.email && (
+        <HelperText type="error" style={authFormStyles.helper}>
+          {errors.email}
+        </HelperText>
+      )}
 
       <TextInput
         label="Mot de passe"
@@ -97,12 +94,12 @@ export default function LoginForm() {
         onChangeText={setMotDePasse}
         mode="outlined"
         secureTextEntry={!showPassword}
-        style={styles.input}
-        contentStyle={styles.inputContent}
-        outlineStyle={styles.inputOutline}
+        style={authFormStyles.input}
+        contentStyle={authFormStyles.inputContent}
+        outlineStyle={authFormStyles.inputOutline}
         activeOutlineColor={Colors.accent.primary}
-        outlineColor="rgba(31,31,31,0.10)"
-        theme={inputTheme}
+        outlineColor="rgba(0,81,58,0.12)"
+        theme={authInputTheme}
         disabled={loading}
         error={!!errors.password}
         left={<TextInput.Icon icon="lock-outline" />}
@@ -114,69 +111,27 @@ export default function LoginForm() {
         }
       />
       {errors.password && (
-        <HelperText type="error">{errors.password}</HelperText>
+        <HelperText type="error" style={authFormStyles.helper}>
+          {errors.password}
+        </HelperText>
       )}
 
       {!!authError && (
-        <HelperText type="error" visible>
+        <HelperText type="error" visible style={authFormStyles.helper}>
           {authError}
         </HelperText>
       )}
 
-      <Button
-        mode="contained"
+      <MatchaButton
+        label="Continuer"
+        icon="arrow-forward"
         onPress={handleLogin}
         loading={loading}
         disabled={loading}
-        buttonColor={Colors.accent.primary}
-        textColor="#FFFFFF"
-        contentStyle={styles.continueButtonContent}
-        style={styles.continueButton}
-        labelStyle={styles.continueButtonLabel}
-      >
-        Continuer
-      </Button>
+        variant="primary"
+        fullWidth
+        style={authFormStyles.submitButton}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  inputContainer: {
-    width: '100%',
-    marginBottom: 18,
-  },
-  input: {
-    marginBottom: 6,
-    backgroundColor: '#F8FAF8',
-    fontFamily: bodyFontFamily,
-    height: 54,
-  },
-  inputContent: {
-    height: 54,
-    fontFamily: bodyFontFamily,
-    color: '#111820',
-    paddingTop: 0,
-    paddingBottom: 0,
-  },
-  inputOutline: {
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  continueButton: {
-    marginTop: 14,
-    borderRadius: 16,
-    shadowColor: '#1A5C45',
-    shadowOpacity: 0.22,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
-  },
-  continueButtonContent: {
-    minHeight: 52,
-  },
-  continueButtonLabel: {
-    fontFamily: titleFontFamily,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-});

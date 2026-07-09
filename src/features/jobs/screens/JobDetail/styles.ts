@@ -1,5 +1,8 @@
 import { StyleSheet } from 'react-native';
 
+import Colors from '@/themes/colors';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+
 export const styles = StyleSheet.create({
   safeArea: { backgroundColor: 'transparent' },
   container: { paddingBottom: 24 },
@@ -14,25 +17,29 @@ export const styles = StyleSheet.create({
 
   errorText: {
     fontSize: 14,
-    color: 'rgba(0,0,0,0.93)',
+    fontFamily: bodyFontFamily,
+    color: Colors.text.strong,
     marginBottom: 12,
   },
 
   retryButton: {
     paddingVertical: 10,
     paddingHorizontal: 18,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.6)',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: Colors.accent.border,
   },
 
   retryText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1F1F1F',
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
   },
 
   hero: {
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 10,
   },
@@ -41,7 +48,8 @@ export const styles = StyleSheet.create({
     marginBottom: 6,
     fontSize: 12,
     fontWeight: '700',
-    color: '#70635B',
+    fontFamily: titleFontFamily,
+    color: Colors.accent.strong,
     letterSpacing: 0.6,
   },
 
@@ -49,17 +57,20 @@ export const styles = StyleSheet.create({
     fontSize: 29,
     lineHeight: 36,
     fontWeight: '700',
-    color: '#1F1F1F',
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
     marginBottom: 14,
   },
 
   sectionCard: {
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     marginTop: 12,
     padding: 16,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.86)',
-    shadowColor: '#000',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: Colors.accent.border,
+    shadowColor: '#5C5148',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.05,
     shadowRadius: 22,
@@ -75,13 +86,15 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 23,
     fontWeight: '700',
-    color: '#1B2530',
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
   },
 
   bodyText: {
     fontSize: 15,
     lineHeight: 24,
-    color: 'rgba(0,0,0,0.82)',
+    fontFamily: bodyFontFamily,
+    color: Colors.text.base,
   },
 
   bulletList: {
@@ -99,21 +112,22 @@ export const styles = StyleSheet.create({
     height: 7,
     borderRadius: 99,
     marginTop: 9,
-    backgroundColor: '#2B8A6E',
+    backgroundColor: Colors.accent.primary,
   },
 
   bulletText: {
     flex: 1,
     fontSize: 15,
     lineHeight: 23,
-    color: 'rgba(0,0,0,0.84)',
+    fontFamily: bodyFontFamily,
+    color: Colors.text.base,
   },
 
   statGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     marginTop: 14,
   },
 
@@ -123,22 +137,26 @@ export const styles = StyleSheet.create({
     minWidth: 116,
     paddingVertical: 12,
     paddingHorizontal: 12,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: Colors.accent.border,
   },
 
   statLabel: {
     marginBottom: 4,
     fontSize: 11,
     fontWeight: '700',
-    color: 'rgba(0,0,0,0.47)',
+    fontFamily: titleFontFamily,
+    color: Colors.text.muted,
   },
 
   statValue: {
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '700',
-    color: '#1F1F1F',
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
   },
 
   dashboardStack: {

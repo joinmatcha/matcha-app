@@ -23,6 +23,7 @@ import Svg, { Circle } from 'react-native-svg';
 import BackgroundRadial from '@/components/layout/BackgroundRadial';
 import MatchaButton from '@/components/ui/MatchaButton';
 import { useBilan } from '@/features/bilan/hooks/useBilan';
+import { useMatchaProfile } from '@/features/home/hooks/useMatchaProfile';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import {
   Preferences,
@@ -39,7 +40,6 @@ import {
 } from '@/themes/typography';
 import { primaryButton } from '@/themes/ui';
 import { RootStackParamList, TabParamList } from '@/types/navigation';
-import { computeProfileCompletion } from '@/utils/computeProfileCompletion';
 
 type BilanDraftData = {
   answers: [string, number | string][];
@@ -213,12 +213,14 @@ function ProfileSnapshot({
   return (
     <View style={styles.profileCard}>
       <View style={styles.profileCopy}>
-        <Text style={styles.profileTitle}>Ton profil</Text>
+        <Text style={styles.profileTitle}>Ton profil Matcha</Text>
         <Text style={styles.profileText}>
-          Plus tu le complètes, plus tes résultats deviennent pertinents.
+          Tes résultats, tes signaux et tes métiers cohérents au même endroit.
         </Text>
         <MatchaButton
-          label={isComplete ? 'Voir mon profil' : 'Compléter mon profil'}
+          label={
+            isComplete ? 'Voir mon profil Matcha' : 'Construire mon profil'
+          }
           onPress={onPress}
           variant="primary"
         />
@@ -283,6 +285,11 @@ export default function HomeScreen() {
     loading: workStyleLoading,
     refreshWorkStyle,
   } = useWorkStyle();
+  const {
+    profile: matchaProfile,
+    loading: matchaProfileLoading,
+    refresh: refreshMatchaProfile,
+  } = useMatchaProfile();
   const [hasPersonalityDraft, setHasPersonalityDraft] = useState(false);
   const [hasBilanDraft, setHasBilanDraft] = useState(false);
   const [hasStartedBilanDraft, setHasStartedBilanDraft] = useState(false);
@@ -296,6 +303,7 @@ export default function HomeScreen() {
       refresh();
       refreshBilan();
       refreshWorkStyle();
+      refreshMatchaProfile();
 
       let isActive = true;
 
@@ -357,10 +365,17 @@ export default function HomeScreen() {
       return () => {
         isActive = false;
       };
-    }, [refresh, refreshBilan, refreshWorkStyle, userId, bilan?.createdAt]),
+    }, [
+      refresh,
+      refreshBilan,
+      refreshWorkStyle,
+      refreshMatchaProfile,
+      userId,
+      bilan?.createdAt,
+    ]),
   );
 
-  if (loading || bilanLoading || workStyleLoading) {
+  if (loading || bilanLoading || workStyleLoading || matchaProfileLoading) {
     return (
       <BackgroundRadial bubbles>
         <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
@@ -387,7 +402,6 @@ export default function HomeScreen() {
     );
   }
 
-  const completion = user ? computeProfileCompletion(user) : 0;
   const bilanCreatedAtMs = bilan?.createdAt
     ? new Date(bilan.createdAt).getTime()
     : null;
@@ -399,6 +413,13 @@ export default function HomeScreen() {
   const shouldUseBilanDraft = hasBilanDraft && !draftIsStaleComparedToBilan;
   const hasBilan = !!bilan && !shouldUseBilanDraft;
   const hasPersonality = Boolean(user?.personality);
+  const hasWorkStyle = Boolean(workStyle);
+  const completion =
+    matchaProfile?.completion ??
+    Math.round(
+      ([hasBilan, hasPersonality, hasWorkStyle].filter(Boolean).length / 3) *
+        100,
+    );
   const firstName = getFirstName(user);
 
   const personalityTitle = hasPersonality
@@ -454,7 +475,7 @@ export default function HomeScreen() {
           <SectionHeader title="Profil" />
           <ProfileSnapshot
             completion={completion}
-            onPress={() => navigation.navigate('Profil')}
+            onPress={() => navigation.navigate('MatchaProfile')}
           />
 
           <SectionHeader title="Tests & analyses" />
@@ -514,7 +535,7 @@ export default function HomeScreen() {
               eyebrow="Style professionnel"
               title={workStyleTitle}
               description={workStyleDescription}
-              buttonLabel={workStyle ? 'Voir / Repasser' : 'Découvrir'}
+              buttonLabel={workStyle ? 'Voir mon style' : 'Découvrir'}
               icon="tune"
               tone="stone"
               onPress={() =>

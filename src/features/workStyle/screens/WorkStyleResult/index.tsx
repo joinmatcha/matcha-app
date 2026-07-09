@@ -10,14 +10,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import { WorkStyleDimension } from '@/features/workStyle/api/workStyleApi';
 import Colors from '@/themes/colors';
-import {
-  bodyFontFamily,
-  displayFontFamily,
-  titleFontFamily,
-} from '@/themes/typography';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import {
   cardSurface,
   primaryButton,
@@ -108,7 +104,7 @@ export default function WorkStyleResultScreen() {
   );
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content}>
           <View style={styles.hero}>
@@ -193,21 +189,21 @@ export default function WorkStyleResultScreen() {
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 40,
     gap: 12,
   },
   hero: {
     backgroundColor: 'rgba(255,255,255,0.94)',
-    borderRadius: 24,
+    borderRadius: 8,
     paddingHorizontal: 18,
     paddingVertical: 18,
   },
@@ -223,7 +219,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 34,
     fontWeight: '800',
-    fontFamily: displayFontFamily,
+    fontFamily: titleFontFamily,
     color: Colors.text.strong,
   },
   subtitle: {
@@ -233,9 +229,10 @@ const styles = StyleSheet.create({
     fontFamily: bodyFontFamily,
     color: Colors.text.base,
   },
-  card: { ...cardSurface, padding: 16 },
+  card: { ...cardSurface, borderRadius: 8, padding: 16 },
   summaryCard: {
     ...cardSurface,
+    borderRadius: 8,
     padding: 16,
     borderWidth: 1,
     borderColor: '#DDEBE5',
@@ -289,7 +286,7 @@ const styles = StyleSheet.create({
     color: Colors.text.base,
   },
   insightRow: {
-    borderRadius: 14,
+    borderRadius: 8,
     backgroundColor: Colors.ui.surfaceSoft,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -310,7 +307,7 @@ const styles = StyleSheet.create({
   },
   crossSignalCard: {
     backgroundColor: Colors.accent.soft,
-    borderRadius: 18,
+    borderRadius: 8,
     padding: 16,
   },
   crossSignalTitle: {

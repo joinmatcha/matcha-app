@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import MatchaButton from '@/components/ui/MatchaButton';
 import {
   SupportContactPayload,
@@ -117,7 +117,7 @@ export default function HelpSupportScreen() {
   };
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <ScrollView
           contentContainerStyle={styles.container}
@@ -226,7 +226,7 @@ export default function HelpSupportScreen() {
           />
         </ScrollView>
       </SafeAreaView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 

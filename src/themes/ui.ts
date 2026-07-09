@@ -5,17 +5,19 @@ import { fontWeightSemibold, titleFontFamily } from '@/themes/typography';
 
 export const cardSurface: ViewStyle = {
   backgroundColor: '#FFFFFF',
-  borderRadius: 22,
-  shadowColor: '#0D1520',
-  shadowOpacity: 0.07,
-  shadowRadius: 14,
-  shadowOffset: { width: 0, height: 8 },
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: Colors.accent.border,
+  shadowColor: '#5C5148',
+  shadowOpacity: 0.06,
+  shadowRadius: 16,
+  shadowOffset: { width: 0, height: 10 },
   elevation: 2,
 };
 
 export const mutedCardSurface: ViewStyle = {
   backgroundColor: 'rgba(255,255,255,0.9)',
-  borderRadius: 20,
+  borderRadius: 8,
 };
 
 export const secondaryButton: ViewStyle = {
