@@ -2,16 +2,15 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Text } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text } from 'react-native-paper';
 
-import { Branding } from '@/assets';
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
-import KeyboardAwareScrollView from '@/components/layout/KeyboardAwareScrollView';
+import MatchaButton from '@/components/ui/MatchaButton';
+import AuthCard from '@/features/auth/components/AuthCard';
+import AuthLayout from '@/features/auth/components/AuthLayout';
 import LoginLink from '@/features/auth/components/LoginLink';
 import NewPasswordForm from '@/features/auth/forms/NewPasswordForm';
-import { bodyFontFamily, displayFontFamily } from '@/themes/typography';
-import { cardSurface } from '@/themes/ui';
+import Colors from '@/themes/colors';
+import { bodyFontFamily } from '@/themes/typography';
 import { AuthStackParamList } from '@/types/navigation';
 
 type ResetPasswordScreenRouteProp = RouteProp<
@@ -36,105 +35,49 @@ export default function ResetPasswordScreen() {
   };
 
   return (
-    <BackgroundRadial bubbles>
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
-        <KeyboardAwareScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.contentContainer}
-        >
-          <View style={styles.logoContainer}>
-            <Branding.Logo />
+    <AuthLayout>
+      <AuthCard
+        eyebrow="Sécurité"
+        title="Nouveau mot de passe"
+        subtitle="Choisis un mot de passe solide pour protéger ton espace Matcha."
+      >
+        {token ? (
+          <NewPasswordForm token={token} onSuccess={handleSuccess} />
+        ) : (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>
+              Aucun token de réinitialisation trouvé.
+            </Text>
+            <MatchaButton
+              label="Demander un nouveau lien"
+              icon="mail-outline"
+              variant="primary"
+              onPress={() => navigation.navigate('ForgotPassword')}
+              fullWidth
+            />
           </View>
+        )}
 
-          <View style={styles.card}>
-            <Text style={styles.title}>Nouveau mot de passe</Text>
-
-            {token ? (
-              <>
-                <Text style={styles.subtitle}>
-                  Veuillez saisir votre nouveau mot de passe.
-                </Text>
-                <NewPasswordForm token={token} onSuccess={handleSuccess} />
-              </>
-            ) : (
-              <View style={styles.centeredView}>
-                <Text style={styles.subtitle}>
-                  Aucun token de réinitialisation trouvé.
-                </Text>
-
-                <Button
-                  mode="contained"
-                  onPress={() => navigation.navigate('ForgotPassword')}
-                  buttonColor="#E9E6E2"
-                  textColor="#2B2A29"
-                  style={styles.continueButton}
-                >
-                  Demander un nouveau lien
-                </Button>
-              </View>
-            )}
-
-            <View style={styles.linksContainer}>
-              <LoginLink />
-            </View>
-          </View>
-        </KeyboardAwareScrollView>
-      </SafeAreaView>
-    </BackgroundRadial>
+        <View style={styles.links}>
+          <LoginLink />
+        </View>
+      </AuthCard>
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'transparent',
+  emptyState: {
+    gap: 14,
   },
-  scroll: {
-    flex: 1,
-  },
-  contentContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 32,
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-    zIndex: 5,
-  },
-  card: {
-    ...cardSurface,
-    paddingHorizontal: 22,
-    paddingVertical: 24,
-    zIndex: 5,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    fontFamily: displayFontFamily,
-    color: '#1F1F1F',
-    marginBottom: 8,
-    letterSpacing: 0,
-  },
-  subtitle: {
+  emptyText: {
     fontSize: 15,
-    fontFamily: bodyFontFamily,
-    color: 'rgba(45,33,27,0.72)',
     lineHeight: 22,
-    marginBottom: 20,
-    textAlign: 'left',
+    fontFamily: bodyFontFamily,
+    color: Colors.text.muted,
   },
-  centeredView: {
-    alignItems: 'center',
-  },
-  continueButton: {
-    marginTop: 12,
-    borderRadius: 16,
-  },
-  linksContainer: {
-    marginTop: 16,
+  links: {
+    marginTop: 14,
     alignItems: 'center',
     gap: 4,
   },

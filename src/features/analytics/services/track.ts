@@ -4,6 +4,7 @@ import {
   postAnalyticsEvent,
 } from '@/features/analytics/api/analyticsApi';
 import { getAnalyticsSessionId } from '@/features/analytics/services/session';
+import { logger } from '@/utils/logger';
 
 export type TrackAnalyticsEventInput = {
   eventType: AnalyticsEventType;
@@ -23,8 +24,13 @@ export const trackAnalyticsEvent = (input: TrackAnalyticsEventInput) => {
         source: 'mobile',
         occurredAt: new Date().toISOString(),
       });
-    } catch {
+    } catch (error) {
       // Analytics must never block or disturb the user experience.
+      logger.debug('analytics_event_failed', {
+        eventType: input.eventType,
+        entityType: input.entityType,
+        error,
+      });
     }
   })();
 };

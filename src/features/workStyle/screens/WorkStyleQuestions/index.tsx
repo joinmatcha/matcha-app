@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import { trackAnalyticsEvent } from '@/features/analytics';
 import QuestionCard from '@/features/personality/components/QuestionCard';
 import TestHeader from '@/features/personality/components/TestHeader';
@@ -22,6 +22,8 @@ import {
   getActiveWorkStyleTest,
   submitWorkStyleTest,
 } from '@/features/workStyle/api/workStyleApi';
+import { useAuth } from '@/hooks/useAuth';
+import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
 import { bodyFontFamily } from '@/themes/typography';
 import { primaryButton, primaryButtonText } from '@/themes/ui';
@@ -29,6 +31,9 @@ import { RootStackParamList } from '@/types/navigation';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+type WorkStyleDraftData = {
+  answers: [string, number][];
+};
 
 const options = [
   { value: 1, label: 'Pas du tout' },
@@ -40,6 +45,8 @@ const options = [
 
 export default function WorkStyleQuestionsScreen() {
   const navigation = useNavigation<Nav>();
+  const { user } = useAuth();
+  const userId = user?.id;
   const [test, setTest] = useState<WorkStyleTemplate | null>(null);
   const [answers, setAnswers] = useState<Map<string, number>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -50,6 +57,29 @@ export default function WorkStyleQuestionsScreen() {
   const completedRef = useRef(false);
   const answersRef = useRef(answers);
   const testRef = useRef<WorkStyleTemplate | null>(null);
+  const restoredOnceRef = useRef(false);
+  const pendingRestoreScrollRef = useRef<string | null>(null);
+
+  const serializeAnswers = (m: Map<string, number>) => Array.from(m.entries());
+  const deserializeAnswers = (arr: [string, number][]) => new Map(arr);
+
+  const scrollToQuestion = (questionId: string, animated = false) => {
+    const y = questionPositions.current.get(questionId);
+    if (typeof y !== 'number') return false;
+
+    scrollViewRef.current?.scrollTo({
+      y: Math.max(y - 20, 0),
+      animated,
+    });
+    return true;
+  };
+
+  const getFirstUnansweredQuestionId = (
+    currentTest: WorkStyleTemplate,
+    currentAnswers: Map<string, number>,
+  ) =>
+    currentTest.questions.find((question) => !currentAnswers.has(question.id))
+      ?.id ?? currentTest.questions[currentTest.questions.length - 1]?.id;
 
   useEffect(() => {
     answersRef.current = answers;
@@ -95,6 +125,42 @@ export default function WorkStyleQuestionsScreen() {
   }, []);
 
   useEffect(() => {
+    const restoreDraft = async () => {
+      if (!userId || !test || restoredOnceRef.current) return;
+
+      restoredOnceRef.current = true;
+
+      const draft = await loadDraft<WorkStyleDraftData>('work_style', userId);
+      if (!draft) return;
+
+      if (
+        draft.templateId === test._id &&
+        draft.templateVersion === String(test.version)
+      ) {
+        const restoredAnswers = deserializeAnswers(draft.data.answers);
+        const firstUnansweredId = getFirstUnansweredQuestionId(
+          test,
+          restoredAnswers,
+        );
+        setAnswers(restoredAnswers);
+        pendingRestoreScrollRef.current = firstUnansweredId ?? null;
+        setTimeout(() => {
+          if (
+            pendingRestoreScrollRef.current &&
+            scrollToQuestion(pendingRestoreScrollRef.current)
+          ) {
+            pendingRestoreScrollRef.current = null;
+          }
+        }, 350);
+      } else {
+        await clearDraft('work_style', userId);
+      }
+    };
+
+    restoreDraft().catch(() => {});
+  }, [userId, test]);
+
+  useEffect(() => {
     return () => {
       const currentTest = testRef.current;
       if (
@@ -125,6 +191,17 @@ export default function WorkStyleQuestionsScreen() {
     const nextAnswers = new Map(answers);
     nextAnswers.set(questionId, value);
     setAnswers(nextAnswers);
+    if (test && userId) {
+      saveDraft<WorkStyleDraftData>({
+        userId,
+        module: 'work_style',
+        schemaVersion: 1,
+        templateId: test._id,
+        templateVersion: String(test.version),
+        updatedAt: Date.now(),
+        data: { answers: serializeAnswers(nextAnswers) },
+      }).catch(() => {});
+    }
 
     if (!test) return;
     const index = test.questions.findIndex(
@@ -183,6 +260,7 @@ export default function WorkStyleQuestionsScreen() {
           topAxes: result.topAxes,
         },
       });
+      if (userId) await clearDraft('work_style', userId);
       navigation.replace('WorkStyleResult', { result });
     } catch (error) {
       Alert.alert(
@@ -204,20 +282,20 @@ export default function WorkStyleQuestionsScreen() {
 
   if (!test) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
           <View style={styles.centerContainer}>
             <Text style={styles.errorText}>Aucun test disponible.</Text>
           </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
   const isComplete = answers.size === test.questions.length;
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <View style={styles.container}>
           <TestHeader
@@ -240,6 +318,13 @@ export default function WorkStyleQuestionsScreen() {
                     question.id,
                     event.nativeEvent.layout.y,
                   );
+                  if (pendingRestoreScrollRef.current === question.id) {
+                    setTimeout(() => {
+                      if (scrollToQuestion(question.id)) {
+                        pendingRestoreScrollRef.current = null;
+                      }
+                    }, 50);
+                  }
                 }}
               >
                 <QuestionCard
@@ -267,7 +352,7 @@ export default function WorkStyleQuestionsScreen() {
           </ScrollView>
         </View>
       </SafeAreaView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
@@ -288,7 +373,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   questionsContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 40,
     gap: 16,

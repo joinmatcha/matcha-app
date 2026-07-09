@@ -21,6 +21,7 @@ const Colors = {
     strong: '#1F6653',
     soft: '#E8F2EE',
     glow: '#6DB89F',
+    border: '#DDEBE5',
   },
   ui: {
     borderSoft: '#E7ECEF',

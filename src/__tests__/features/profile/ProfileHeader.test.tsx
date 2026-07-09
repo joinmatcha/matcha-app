@@ -22,9 +22,9 @@ describe('ProfileHeader', () => {
     expect(() => render(<ProfileHeader user={user} />)).not.toThrow();
   });
 
-  it("affiche les initiales quand pas d'avatar", () => {
-    const { getByText } = render(<ProfileHeader user={user} />);
-    expect(getByText('JD')).toBeTruthy();
+  it("n'affiche pas d'eyebrow profil redondant", () => {
+    const { queryByText } = render(<ProfileHeader user={user} />);
+    expect(queryByText('PROFIL')).toBeNull();
   });
 
   it("affiche le nom et l'email", () => {

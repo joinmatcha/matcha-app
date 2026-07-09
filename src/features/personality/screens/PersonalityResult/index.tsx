@@ -1,4 +1,9 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {
@@ -10,7 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import { resetPersonalityTest } from '@/features/personality/api/personalityApi';
 import PersonalityProfileHeader from '@/features/personality/components/PersonalityProfileHeader';
 import RadarChart from '@/features/personality/components/RadarChart';
@@ -56,7 +61,12 @@ export default function PersonalityResultScreen() {
 
   const handleContinue = async () => {
     await refreshUser();
-    navigation.navigate('Main', { screen: 'Home' });
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Main', params: { screen: 'Home' } }],
+      }),
+    );
   };
 
   const handleRedoTest = async () => {
@@ -72,7 +82,7 @@ export default function PersonalityResultScreen() {
   ];
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea} />
 
       <View style={styles.container}>
@@ -148,7 +158,7 @@ export default function PersonalityResultScreen() {
           <View style={styles.spacerLg} />
         </ScrollView>
       </View>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
@@ -156,7 +166,7 @@ const styles = StyleSheet.create({
   safeArea: { backgroundColor: 'transparent' },
   container: { flex: 1 },
   scroll: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 40 },
+  scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
   spacerLg: { height: 40 },
   spacerMd: { height: 20 },
   insightsRow: {
@@ -166,6 +176,7 @@ const styles = StyleSheet.create({
   },
   insightCard: {
     ...cardSurface,
+    borderRadius: 8,
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 10,
@@ -174,18 +185,19 @@ const styles = StyleSheet.create({
   insightLabel: {
     fontSize: 11,
     fontFamily: bodyFontFamily,
-    color: '#6A615C',
+    color: Colors.text.muted,
   },
   insightValue: {
     marginTop: 2,
     fontSize: 14,
     fontFamily: titleFontFamily,
     fontWeight: '400',
-    color: '#232220',
+    color: Colors.text.strong,
   },
 
   card: {
     ...cardSurface,
+    borderRadius: 8,
     paddingVertical: 22,
     alignItems: 'center',
     marginBottom: 14,
@@ -211,6 +223,7 @@ const styles = StyleSheet.create({
   },
   sectionCard: {
     ...cardSurface,
+    borderRadius: 8,
     marginTop: 12,
     paddingVertical: 18,
     paddingHorizontal: 16,
@@ -222,7 +235,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: titleFontFamily,
     fontWeight: '600',
-    color: '#232220',
+    color: Colors.text.strong,
     marginBottom: 12,
     letterSpacing: 0,
   },
@@ -231,7 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 23,
     fontFamily: bodyFontFamily,
-    color: '#1F1F1F',
+    color: Colors.text.base,
   },
 
   jobsList: { gap: 12 },
@@ -245,7 +258,7 @@ const styles = StyleSheet.create({
   jobText: {
     fontSize: 15,
     fontFamily: bodyFontFamily,
-    color: '#1F1F1F',
+    color: Colors.text.base,
   },
 
   redoButton: {

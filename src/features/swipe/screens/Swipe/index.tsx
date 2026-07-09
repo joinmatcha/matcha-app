@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import MatchaButton from '@/components/ui/MatchaButton';
 import { useSwipe } from '@/features/swipe/hooks/useSwipe';
 import Colors from '@/themes/colors';
 import { RootStackParamList, TabParamList } from '@/types/navigation';
@@ -35,7 +36,7 @@ function SwipeBackground({ children }: { children: React.ReactNode }) {
   return (
     <View style={styles.backgroundRoot}>
       <LinearGradient
-        colors={['#F8F4EE', '#EEF6F1', '#F7F4EF']}
+        colors={['#F8F4EE', '#F5F1EA', '#F9F6EF']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.absoluteFill}
@@ -43,8 +44,8 @@ function SwipeBackground({ children }: { children: React.ReactNode }) {
 
       <LinearGradient
         colors={[
-          'rgba(255,167,38,0.18)',
-          'rgba(255,167,38,0.05)',
+          'rgba(255,255,255,0.34)',
+          'rgba(255,255,255,0.10)',
           'transparent',
         ]}
         start={{ x: 0, y: 0 }}
@@ -53,11 +54,7 @@ function SwipeBackground({ children }: { children: React.ReactNode }) {
       />
 
       <LinearGradient
-        colors={[
-          'rgba(45,190,139,0.20)',
-          'rgba(45,190,139,0.06)',
-          'transparent',
-        ]}
+        colors={['rgba(0,81,58,0.07)', 'rgba(0,81,58,0.025)', 'transparent']}
         start={{ x: 1, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.backgroundWash}
@@ -279,9 +276,10 @@ export default function SwipeScreen() {
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerCopy}>
+            <Text style={styles.headerEyebrow}>Matching métier</Text>
             <Text style={styles.headerTitle}>Métiers à explorer</Text>
             <Text style={styles.headerSubtitle}>
-              Swipe ou consulte la fiche.
+              Garde les pistes qui t’attirent, écarte les autres.
             </Text>
           </View>
 
@@ -300,9 +298,12 @@ export default function SwipeScreen() {
                 style={[styles.progressFill, { width: `${progress * 100}%` }]}
               />
             </View>
-            <Text style={styles.progressText}>
-              {swipedToday}/{limit} swipes utilisés
-            </Text>
+            <View style={styles.progressMeta}>
+              <Text style={styles.progressText}>Progression du jour</Text>
+              <Text style={styles.progressValue}>
+                {swipedToday}/{limit} utilisés
+              </Text>
+            </View>
           </View>
         ) : null}
 
@@ -350,13 +351,9 @@ export default function SwipeScreen() {
               <Text style={styles.nopeLabel}>Je passe</Text>
             </Animated.View>
 
-            <TouchableOpacity
-              activeOpacity={0.96}
-              style={styles.cardPressArea}
-              onPress={openCurrentJob}
-            >
+            <View style={styles.cardPressArea}>
               <LinearGradient
-                colors={['rgba(29,185,132,0.16)', 'rgba(255,255,255,0)']}
+                colors={['rgba(0,81,58,0.10)', 'rgba(255,255,255,0)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.cardGradient}
@@ -375,38 +372,49 @@ export default function SwipeScreen() {
               </View>
 
               <View style={styles.heroPanel}>
-                <View style={styles.titleAccent} />
-                <Text style={styles.cardTitle} numberOfLines={5}>
+                <View style={styles.titleAccentWrap}>
+                  <View style={styles.titleAccent} />
+                  <Text style={styles.cardKicker}>Piste proposée</Text>
+                </View>
+                <Text style={styles.cardTitle} numberOfLines={3}>
                   {currentJob?.title}
                 </Text>
               </View>
 
               {currentJob?.tags && currentJob.tags.length > 0 && (
                 <View style={styles.tagsSection}>
+                  <Text style={styles.tagsTitle}>Repère métier</Text>
                   <View style={styles.tagsRow}>
                     {currentJob.tags.slice(0, 1).map((tag) => (
                       <View key={tag} style={styles.tag}>
-                        <Text style={styles.tagText} numberOfLines={1}>
+                        <Text
+                          style={styles.tagText}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
                           {tag}
                         </Text>
                       </View>
                     ))}
+                    {currentJob.tags.length > 1 ? (
+                      <View style={styles.tagCount}>
+                        <Text style={styles.tagCountText}>
+                          +{currentJob.tags.length - 1}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                 </View>
               )}
 
-              <View style={styles.cardFooter}>
-                <View style={styles.footerButton}>
-                  <Text style={styles.footerText}>Voir la fiche</Text>
-                </View>
-                <MaterialIcons
-                  name="arrow-forward"
-                  size={18}
-                  color="#FFFFFF"
-                  style={styles.footerIcon}
-                />
-              </View>
-            </TouchableOpacity>
+              <MatchaButton
+                label="Voir la fiche"
+                icon="arrow-forward"
+                variant="primary"
+                onPress={openCurrentJob}
+                style={styles.cardFooter}
+              />
+            </View>
           </Animated.View>
         </View>
 

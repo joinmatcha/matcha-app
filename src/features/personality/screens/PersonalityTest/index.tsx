@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import { trackAnalyticsEvent } from '@/features/analytics';
 import {
   PersonalityAnswer,
@@ -53,12 +53,31 @@ export default function PersonalityTestScreen() {
   const completedRef = useRef(false);
   const answersRef = useRef(answers);
   const testRef = useRef<PersonalityTemplate | null>(null);
+  const pendingRestoreScrollRef = useRef<string | null>(null);
 
   // évite de restaurer plusieurs fois
   const restoredOnceRef = useRef(false);
 
   const serializeAnswers = (m: Map<string, number>) => Array.from(m.entries());
   const deserializeAnswers = (arr: [string, number][]) => new Map(arr);
+
+  const scrollToQuestion = (questionId: string, animated = false) => {
+    const y = questionPositions.current.get(questionId);
+    if (typeof y !== 'number') return false;
+
+    scrollViewRef.current?.scrollTo({
+      y: Math.max(y - 20, 0),
+      animated,
+    });
+    return true;
+  };
+
+  const getFirstUnansweredQuestionId = (
+    currentTest: PersonalityTemplate,
+    currentAnswers: Map<string, number>,
+  ) =>
+    currentTest.questions.find((question) => !currentAnswers.has(question.id))
+      ?.id ?? currentTest.questions[currentTest.questions.length - 1]?.id;
 
   useEffect(() => {
     loadTest();
@@ -117,7 +136,21 @@ export default function PersonalityTestScreen() {
         draft.templateId === test._id &&
         draft.templateVersion === test.version
       ) {
-        setAnswers(deserializeAnswers(draft.data.answers));
+        const restoredAnswers = deserializeAnswers(draft.data.answers);
+        const firstUnansweredId = getFirstUnansweredQuestionId(
+          test,
+          restoredAnswers,
+        );
+        setAnswers(restoredAnswers);
+        pendingRestoreScrollRef.current = firstUnansweredId ?? null;
+        setTimeout(() => {
+          if (
+            pendingRestoreScrollRef.current &&
+            scrollToQuestion(pendingRestoreScrollRef.current)
+          ) {
+            pendingRestoreScrollRef.current = null;
+          }
+        }, 350);
       } else {
         await clearDraft('personality', userId);
       }
@@ -288,7 +321,7 @@ export default function PersonalityTestScreen() {
 
   if (!test) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
           <View style={styles.centerContainer}>
             <Text style={styles.errorTitle}>Aucun test disponible</Text>
@@ -306,14 +339,14 @@ export default function PersonalityTestScreen() {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
   const isComplete = answers.size === test.questions.length;
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <View style={styles.container}>
           <TestHeader
@@ -348,6 +381,13 @@ export default function PersonalityTestScreen() {
                     q.id,
                     event.nativeEvent.layout.y,
                   );
+                  if (pendingRestoreScrollRef.current === q.id) {
+                    setTimeout(() => {
+                      if (scrollToQuestion(q.id)) {
+                        pendingRestoreScrollRef.current = null;
+                      }
+                    }, 50);
+                  }
                 }}
               >
                 <QuestionCard
@@ -391,7 +431,7 @@ export default function PersonalityTestScreen() {
           </View>
         </View>
       </SafeAreaView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
@@ -405,11 +445,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   scrollView: { flex: 1 },
-  scrollContent: { padding: 20, paddingBottom: 24 },
+  scrollContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 24 },
   scrollSpacer: { height: 8 },
 
   actionsRow: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 10,
     paddingBottom: 4,
     alignItems: 'flex-end',
@@ -417,19 +457,21 @@ const styles = StyleSheet.create({
   restartButton: {
     paddingVertical: 6,
     paddingHorizontal: 10,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.72)',
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: Colors.accent.border,
+    shadowColor: '#5C5148',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
     elevation: 1,
   },
   restartText: {
     fontSize: 13,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#232323',
+    color: Colors.text.strong,
   },
 
   submitButton: {
@@ -447,16 +489,16 @@ const styles = StyleSheet.create({
   },
   footer: {
     borderTopWidth: 1,
-    borderTopColor: '#EEE7DF',
-    paddingHorizontal: 20,
+    borderTopColor: Colors.accent.border,
+    paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 14,
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: '#FFFFFF',
   },
   footerMeta: {
     fontSize: 12,
     fontFamily: titleFontFamily,
-    color: '#2A2725',
+    color: Colors.text.strong,
     marginBottom: 8,
     textAlign: 'center',
     fontWeight: '600',
@@ -490,16 +532,18 @@ const styles = StyleSheet.create({
   logoutButton: {
     paddingVertical: 12,
     paddingHorizontal: 28,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    shadowColor: '#000',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: Colors.accent.border,
+    shadowColor: '#5C5148',
     shadowOpacity: 0.05,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
     elevation: 1,
   },
   logoutButtonText: {
-    color: '#232323',
+    color: Colors.text.strong,
     fontWeight: '600',
     fontFamily: titleFontFamily,
   },

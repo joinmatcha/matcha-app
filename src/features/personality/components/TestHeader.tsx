@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
-import { cardSurface } from '@/themes/ui';
 
 interface TestHeaderProps {
   title: string;
@@ -41,25 +40,33 @@ export default function TestHeader({
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: 24,
+    paddingTop: 18,
     marginBottom: 16,
   },
   headerCard: {
-    ...cardSurface,
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0,81,58,0.08)',
     padding: 18,
+    shadowColor: '#5C5148',
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 4,
   },
   title: {
-    fontSize: 21,
+    fontSize: 22,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#1F1F1F',
+    color: Colors.text.strong,
     marginBottom: 4,
   },
   summary: {
     fontSize: 13,
     fontFamily: bodyFontFamily,
-    color: '#2A2A2A',
+    color: Colors.text.muted,
     marginBottom: 14,
   },
   progressRow: {
@@ -70,7 +77,7 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 7,
-    backgroundColor: '#DFF0E8',
+    backgroundColor: Colors.accent.soft,
     borderRadius: 999,
     overflow: 'hidden',
   },
@@ -86,7 +93,7 @@ const styles = StyleSheet.create({
     color: Colors.accent.strong,
     minWidth: 56,
     textAlign: 'center',
-    backgroundColor: '#EAF7F1',
+    backgroundColor: Colors.accent.soft,
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 3,

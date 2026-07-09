@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
-import { Button, Text, TextInput } from 'react-native-paper';
+import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput } from 'react-native-paper';
 
-import BottomSheetSelect from '@/components/ui/BottomSheetSelect';
+import MatchaButton from '@/components/ui/MatchaButton';
 import YearPickerInput from '@/components/ui/YearPickerInput';
 import { AuthContext } from '@/contexts/AuthContext';
 import {
@@ -13,11 +13,35 @@ import {
 } from '@/features/profile/api/profileApi';
 import { changePasswordSchema } from '@/schemas/change-password';
 import Colors from '@/themes/colors';
-import rnpTheme from '@/themes/rnpTheme';
-import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+import { bodyFontFamily } from '@/themes/typography';
 import { UserFull } from '@/types/user';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
+
+type ChoiceOption<T extends string | boolean> = {
+  label: string;
+  value: T;
+};
+type GenderValue = NonNullable<UserFull['gender']>;
+type LocationPrefValue = NonNullable<UserFull['locationPref']>;
+
+const genderOptions: ChoiceOption<GenderValue>[] = [
+  { label: 'Homme', value: 'male' },
+  { label: 'Femme', value: 'female' },
+  { label: 'Autre', value: 'other' },
+  { label: 'Non renseigné', value: 'undisclosed' },
+];
+
+const locationOptions: ChoiceOption<LocationPrefValue>[] = [
+  { label: 'Télétravail', value: 'remote' },
+  { label: 'Hybride', value: 'hybrid' },
+  { label: 'Sur site', value: 'on-site' },
+];
+
+const booleanOptions: ChoiceOption<boolean>[] = [
+  { label: 'Oui', value: true },
+  { label: 'Non', value: false },
+];
 
 export default function ProfileSections({
   section,
@@ -39,7 +63,7 @@ export default function ProfileSections({
   const [birthDate, setBirthDate] = useState<Date | null>(
     user.birthYear ? new Date(user.birthYear, 0, 1) : null,
   );
-  const [gender, setGender] = useState<UserFull['gender']>(
+  const [gender, setGender] = useState<GenderValue>(
     user.gender ?? 'undisclosed',
   );
 
@@ -48,7 +72,7 @@ export default function ProfileSections({
   const [postal, setPostal] = useState(user.addressPostalCode ?? '');
   const [country, setCountry] = useState(user.addressCountry ?? '');
 
-  const [locationPref, setLocationPref] = useState<UserFull['locationPref']>(
+  const [locationPref, setLocationPref] = useState<LocationPrefValue>(
     user.locationPref ?? 'remote',
   );
   const [remote, setRemote] = useState<boolean | null>(user.remote ?? null);
@@ -191,6 +215,10 @@ export default function ProfileSections({
             value={firstName}
             onChangeText={setFirstName}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
 
           <TextInput
@@ -199,6 +227,10 @@ export default function ProfileSections({
             value={lastName}
             onChangeText={setLastName}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
 
           <YearPickerInput
@@ -207,16 +239,11 @@ export default function ProfileSections({
             onChange={setBirthDate}
           />
 
-          <BottomSheetSelect<UserFull['gender']>
+          <ChoiceGroup<GenderValue>
             label="Genre"
             value={gender}
             onChange={setGender}
-            options={[
-              { label: 'Homme', value: 'male' },
-              { label: 'Femme', value: 'female' },
-              { label: 'Autre', value: 'other' },
-              { label: 'Non renseigné', value: 'undisclosed' },
-            ]}
+            options={genderOptions}
           />
         </>
       )}
@@ -231,6 +258,10 @@ export default function ProfileSections({
             value={newEmail}
             onChangeText={setNewEmail}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
 
           <Text style={styles.infoText}>
@@ -249,6 +280,10 @@ export default function ProfileSections({
             value={currentPassword}
             onChangeText={setCurrentPassword}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
 
           <TextInput
@@ -258,6 +293,10 @@ export default function ProfileSections({
             value={newPassword}
             onChangeText={setNewPassword}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
 
           <TextInput
@@ -267,6 +306,10 @@ export default function ProfileSections({
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
         </>
       )}
@@ -279,6 +322,10 @@ export default function ProfileSections({
             value={street}
             onChangeText={setStreet}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
 
           <TextInput
@@ -287,6 +334,10 @@ export default function ProfileSections({
             value={city}
             onChangeText={setCity}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
 
           <TextInput
@@ -295,6 +346,10 @@ export default function ProfileSections({
             value={postal}
             onChangeText={setPostal}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
 
           <TextInput
@@ -303,45 +358,39 @@ export default function ProfileSections({
             value={country}
             onChangeText={setCountry}
             style={styles.input}
+            outlineColor={Colors.ui.borderSoft}
+            activeOutlineColor={Colors.accent.primary}
+            textColor={Colors.text.strong}
+            outlineStyle={styles.inputOutline}
           />
         </>
       )}
 
       {section === 'work' && (
         <>
-          <BottomSheetSelect<UserFull['locationPref']>
+          <ChoiceGroup<LocationPrefValue>
             label="Mode de travail"
             value={locationPref}
             onChange={setLocationPref}
-            options={[
-              { label: 'Télétravail', value: 'remote' },
-              { label: 'Hybride', value: 'hybrid' },
-              { label: 'Sur site', value: 'on-site' },
-            ]}
+            options={locationOptions}
           />
 
-          <BottomSheetSelect<boolean>
+          <ChoiceGroup<boolean>
             label="Télétravail possible ?"
             value={remote}
             onChange={setRemote}
-            options={[
-              { label: 'Oui', value: true },
-              { label: 'Non', value: false },
-            ]}
+            options={booleanOptions}
           />
         </>
       )}
 
       {section === 'privacy' && (
         <>
-          <BottomSheetSelect<boolean>
+          <ChoiceGroup<boolean>
             label="Consentement RGPD"
             value={consent}
             onChange={setConsent}
-            options={[
-              { label: 'Oui', value: true },
-              { label: 'Non', value: false },
-            ]}
+            options={booleanOptions}
           />
 
           <Text style={styles.infoText}>
@@ -352,27 +401,62 @@ export default function ProfileSections({
       )}
 
       <View style={styles.actions}>
-        <Button
-          mode="text"
+        <MatchaButton
+          label="Annuler"
+          icon="close"
+          variant="light"
           onPress={onCancel}
           disabled={loading}
-          labelStyle={styles.cancelLabel}
-        >
-          Annuler
-        </Button>
+        />
 
-        <Button
-          mode="contained"
+        <MatchaButton
+          label={loading ? 'Enregistrement...' : 'Enregistrer'}
+          icon="check"
+          variant="primary"
           onPress={handleSave}
-          loading={loading}
-          buttonColor={Colors.accent.primary}
-          textColor={Colors.text.inverse}
-          contentStyle={styles.saveButtonContent}
-          style={styles.saveButton}
-          labelStyle={styles.saveButtonLabel}
-        >
-          Enregistrer
-        </Button>
+          disabled={loading}
+        />
+      </View>
+    </View>
+  );
+}
+
+function ChoiceGroup<T extends string | boolean>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: T | null;
+  options: readonly ChoiceOption<T>[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <View style={styles.choiceGroup}>
+      <Text style={styles.choiceLabel}>{label}</Text>
+      <View style={styles.choiceGrid}>
+        {options.map((option) => {
+          const selected = option.value === value;
+
+          return (
+            <TouchableOpacity
+              key={String(option.value)}
+              activeOpacity={0.84}
+              onPress={() => onChange(option.value)}
+              style={[styles.choicePill, selected && styles.choicePillSelected]}
+            >
+              <Text
+                style={[
+                  styles.choiceText,
+                  selected && styles.choiceTextSelected,
+                ]}
+              >
+                {option.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -382,10 +466,49 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: 'transparent',
     paddingTop: 4,
-    gap: rnpTheme.spacing.md,
+    gap: 12,
   },
   input: {
-    backgroundColor: rnpTheme.colors.background,
+    backgroundColor: '#FFFFFF',
+  },
+  inputOutline: {
+    borderRadius: 8,
+  },
+  choiceGroup: {
+    gap: 8,
+  },
+  choiceLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: bodyFontFamily,
+    color: Colors.text.soft,
+  },
+  choiceGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  choicePill: {
+    minHeight: 38,
+    paddingHorizontal: 14,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F6F4',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  choicePillSelected: {
+    backgroundColor: '#DDEDE4',
+    borderColor: Colors.accent.primary,
+  },
+  choiceText: {
+    fontSize: 14,
+    fontFamily: bodyFontFamily,
+    color: Colors.text.base,
+  },
+  choiceTextSelected: {
+    color: Colors.accent.strong,
   },
   actions: {
     flexDirection: 'row',
@@ -393,23 +516,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     marginTop: 12,
-  },
-  cancelLabel: {
-    fontFamily: titleFontFamily,
-    fontSize: 15,
-    color: '#5A534E',
-  },
-  saveButton: {
-    borderRadius: 999,
-  },
-  saveButtonContent: {
-    minHeight: 46,
-    paddingHorizontal: 8,
-  },
-  saveButtonLabel: {
-    fontFamily: titleFontFamily,
-    fontSize: 15,
-    color: Colors.text.inverse,
   },
   infoText: {
     fontSize: 13,

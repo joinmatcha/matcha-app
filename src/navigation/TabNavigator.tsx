@@ -1,5 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { StyleSheet, View } from 'react-native';
 
 import { HomeScreen } from '@/features/home';
 import { ProfileScreen } from '@/features/profile';
@@ -16,6 +17,9 @@ export default function TabNavigator() {
         headerShown: false,
         tabBarActiveTintColor: Colors.accent.primary,
         tabBarInactiveTintColor: '#8B9097',
+        tabBarShowLabel: false,
+        tabBarStyle: styles.tabBar,
+        tabBarItemStyle: styles.tabBarItem,
       }}
     >
       <Tab.Screen
@@ -23,8 +27,10 @@ export default function TabNavigator() {
         component={HomeScreen}
         options={{
           title: 'Accueil',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="home" color={color} size={size} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[styles.iconShell, focused && styles.iconShellActive]}>
+              <MaterialIcons name="home" color={color} size={26} />
+            </View>
           ),
         }}
       />
@@ -34,8 +40,10 @@ export default function TabNavigator() {
         component={SwipeScreen}
         options={{
           title: 'Métiers',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="favorite" color={color} size={size} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[styles.iconShell, focused && styles.iconShellActive]}>
+              <MaterialIcons name="favorite" color={color} size={25} />
+            </View>
           ),
         }}
       />
@@ -45,11 +53,42 @@ export default function TabNavigator() {
         component={ProfileScreen}
         options={{
           title: 'Profil',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="person" color={color} size={size} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[styles.iconShell, focused && styles.iconShellActive]}>
+              <MaterialIcons name="person" color={color} size={26} />
+            </View>
           ),
         }}
       />
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    height: 74,
+    paddingTop: 10,
+    paddingBottom: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0, 81, 58, 0.08)',
+    backgroundColor: 'rgba(255, 253, 249, 0.96)',
+    shadowColor: '#22332C',
+    shadowOpacity: 0.06,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: -8 },
+    elevation: 10,
+  },
+  tabBarItem: {
+    paddingVertical: 0,
+  },
+  iconShell: {
+    width: 44,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconShellActive: {
+    backgroundColor: 'rgba(16, 24, 32, 0.08)',
+  },
+});

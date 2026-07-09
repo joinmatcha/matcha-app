@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import {
   ComparedJob,
   JobComparison,
@@ -19,11 +19,7 @@ import {
   compareJobs,
 } from '@/features/jobs/api/jobsApi';
 import Colors from '@/themes/colors';
-import {
-  bodyFontFamily,
-  displayFontFamily,
-  titleFontFamily,
-} from '@/themes/typography';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import {
   cardSurface,
   primaryButton,
@@ -195,17 +191,17 @@ export default function JobCompareScreen() {
 
   if (loading) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <View style={styles.centered}>
           <ActivityIndicator />
         </View>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
   if (error || !comparison) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <View style={styles.centered}>
           <Text style={styles.errorText}>
             {error ?? 'Comparaison indisponible.'}
@@ -217,12 +213,12 @@ export default function JobCompareScreen() {
             <Text style={styles.retryButtonText}>Retour</Text>
           </TouchableOpacity>
         </View>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea} />
 
       <ScrollView
@@ -319,7 +315,7 @@ export default function JobCompareScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
@@ -336,7 +332,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   hero: {
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 12,
   },
@@ -351,15 +347,15 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 26,
     fontWeight: '700',
-    fontFamily: displayFontFamily,
+    fontFamily: titleFontFamily,
     color: Colors.text.strong,
   },
   contextCard: {
     ...cardSurface,
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     marginBottom: 12,
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 8,
   },
   contextTitle: {
     fontSize: 14,
@@ -386,8 +382,8 @@ const styles = StyleSheet.create({
   },
   scoreCard: {
     ...cardSurface,
-    marginHorizontal: 20,
-    borderRadius: 16,
+    marginHorizontal: 24,
+    borderRadius: 8,
     padding: 16,
     backgroundColor: '#FFFFFF',
     marginBottom: 14,
@@ -408,7 +404,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
-    borderRadius: 14,
+    borderRadius: 8,
     backgroundColor: Colors.ui.surfaceSoft,
     padding: 12,
   },
@@ -458,7 +454,7 @@ const styles = StyleSheet.create({
   scoreBadge: {
     width: 58,
     minHeight: 44,
-    borderRadius: 12,
+    borderRadius: 8,
     backgroundColor: Colors.accent.soft,
     alignItems: 'center',
     justifyContent: 'center',
@@ -479,12 +475,12 @@ const styles = StyleSheet.create({
   },
   criteriaStack: {
     gap: 12,
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     marginTop: 14,
   },
   criterionCard: {
     ...cardSurface,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 14,
     backgroundColor: '#FFFFFF',
   },
@@ -500,7 +496,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   criterionRow: {
-    borderRadius: 14,
+    borderRadius: 8,
     backgroundColor: Colors.ui.surfaceSoft,
     padding: 12,
   },
@@ -523,7 +519,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     ...primaryButton,
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     marginTop: 18,
   },
   backButtonText: {

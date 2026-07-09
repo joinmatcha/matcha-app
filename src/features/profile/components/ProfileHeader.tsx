@@ -1,32 +1,15 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import Colors from '@/themes/colors';
-import {
-  bodyFontFamily,
-  displayFontFamily,
-  titleFontFamily,
-} from '@/themes/typography';
-import { cardSurface } from '@/themes/ui';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { UserFull } from '@/types/user';
 
 export default function ProfileHeader({ user }: { user: UserFull }) {
-  const initials =
-    `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase();
-
   return (
     <View style={styles.wrapper}>
       <View style={styles.heroCard}>
-        {user.avatarUrl ? (
-          <Image source={{ uri: user.avatarUrl }} style={styles.avatar} />
-        ) : (
-          <View style={styles.initialsCircle}>
-            <Text style={styles.initialsText}>{initials || 'U'}</Text>
-          </View>
-        )}
-
         <View style={styles.identityBlock}>
-          <Text style={styles.eyebrow}>PROFIL</Text>
           <Text style={styles.name}>
             {user.firstName} {user.lastName}
           </Text>
@@ -53,83 +36,59 @@ export default function ProfileHeader({ user }: { user: UserFull }) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 26,
+    marginBottom: 18,
   },
   heroCard: {
-    ...cardSurface,
     backgroundColor: 'rgba(255,255,255,0.95)',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 22,
-  },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-  },
-  initialsCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: '#EEF2EC',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  initialsText: {
-    fontSize: 34,
-    fontWeight: '700',
-    fontFamily: displayFontFamily,
-    color: '#1F1F1F',
+    alignItems: 'stretch',
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    borderRadius: 8,
+    shadowColor: '#22332C',
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 2,
   },
   identityBlock: {
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  eyebrow: {
-    fontSize: 11,
-    fontWeight: '600',
-    fontFamily: titleFontFamily,
-    letterSpacing: 1,
-    color: Colors.text.soft,
+    alignItems: 'flex-start',
   },
   name: {
-    marginTop: 6,
-    fontSize: 24,
-    fontWeight: '700',
-    fontFamily: displayFontFamily,
+    fontSize: 26,
+    lineHeight: 31,
+    fontFamily: titleFontFamily,
     color: Colors.text.strong,
     letterSpacing: 0,
-    textAlign: 'center',
   },
   email: {
     marginTop: 6,
     fontSize: 15,
+    lineHeight: 20,
     fontFamily: bodyFontFamily,
     color: Colors.text.muted,
   },
   metaRow: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 18,
+    marginTop: 16,
   },
   metaPill: {
-    backgroundColor: 'rgba(248,251,249,0.95)',
-    borderRadius: 16,
+    backgroundColor: '#F3F6F4',
+    borderRadius: 8,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 9,
     alignItems: 'center',
     minWidth: 112,
   },
   metaLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: bodyFontFamily,
     color: Colors.text.soft,
   },
   metaValue: {
     marginTop: 3,
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: titleFontFamily,
-    fontWeight: '600',
     color: Colors.accent.primary,
   },
 });

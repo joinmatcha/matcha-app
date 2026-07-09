@@ -52,7 +52,7 @@ export default function WorkStyleSummaryCard({ result, onPress }: Props) {
         onPress={onPress}
         style={styles.button}
       >
-        <Text style={styles.buttonLabel}>Voir / Repasser</Text>
+        <Text style={styles.buttonLabel}>Voir mon style</Text>
       </TouchableOpacity>
     </View>
   );
