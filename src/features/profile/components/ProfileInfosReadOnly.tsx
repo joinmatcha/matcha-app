@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import EditableSection from '@/components/ui/EditableSection';
+import MatchaButton from '@/components/ui/MatchaButton';
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
-import { secondaryButton, secondaryButtonText } from '@/themes/ui';
 import { UserFull } from '@/types/user';
 
 import ProfileSections from './ProfileSections';
@@ -201,9 +201,12 @@ export default function ProfileInfosReadOnly({
           effacées.
         </Text>
 
-        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-          <Text style={styles.deleteButtonLabel}>Supprimer mon compte</Text>
-        </TouchableOpacity>
+        <MatchaButton
+          label="Supprimer mon compte"
+          icon="delete-outline"
+          variant="danger"
+          onPress={onDelete}
+        />
       </View>
     </View>
   );
@@ -249,17 +252,17 @@ function formatLocationPref(t?: string) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 10,
+    marginTop: 0,
   },
   readOnlyWrapper: {
-    gap: 14,
+    gap: 10,
   },
 
   row: {
-    backgroundColor: 'rgba(250,252,250,0.96)',
-    borderRadius: 16,
+    backgroundColor: '#F7FAF8',
+    borderRadius: 8,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 11,
   },
   label: {
     fontSize: 12,
@@ -268,7 +271,7 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 17,
-    fontWeight: '600',
+    lineHeight: 22,
     fontFamily: titleFontFamily,
     color: Colors.text.strong,
     marginTop: 4,
@@ -276,13 +279,14 @@ const styles = StyleSheet.create({
 
   dangerCard: {
     backgroundColor: 'rgba(255,246,245,0.92)',
-    padding: 22,
-    borderRadius: 24,
-    marginTop: 18,
+    padding: 18,
+    borderRadius: 8,
+    marginTop: 4,
+    marginBottom: 16,
   },
   dangerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 19,
+    lineHeight: 24,
     fontFamily: titleFontFamily,
     color: '#b30000',
     marginBottom: 8,
@@ -293,16 +297,5 @@ const styles = StyleSheet.create({
     color: Colors.text.muted,
     marginBottom: 16,
     lineHeight: 19,
-  },
-
-  deleteButton: {
-    ...secondaryButton,
-    paddingHorizontal: 18,
-    alignSelf: 'flex-start',
-    backgroundColor: '#F8E4E3',
-  },
-  deleteButtonLabel: {
-    ...secondaryButtonText,
-    color: '#b30000',
   },
 });

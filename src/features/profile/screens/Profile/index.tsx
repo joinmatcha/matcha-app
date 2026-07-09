@@ -11,18 +11,17 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ConfirmDeleteAccountModal from '@/components/Modals/ConfirmDeleteAccountModal';
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
+import MatchaButton from '@/components/ui/MatchaButton';
 import ProfileHeader from '@/features/profile/components/ProfileHeader';
 import ProfileInfosReadOnly from '@/features/profile/components/ProfileInfosReadOnly';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
 import Colors from '@/themes/colors';
-import { bodyFontFamily } from '@/themes/typography';
-import { secondaryButton, secondaryButtonText } from '@/themes/ui';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import { RootStackParamList } from '@/types/navigation';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -40,30 +39,32 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={Colors.accent.primary} />
           </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
   if (error || !user) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>
               {error ?? 'Impossible de charger le profil.'}
             </Text>
-            <Button mode="contained" onPress={refresh}>
-              Réessayer
-            </Button>
+            <MatchaButton
+              label="Réessayer"
+              variant="primary"
+              onPress={refresh}
+            />
           </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
@@ -85,10 +86,17 @@ export default function ProfileScreen() {
   };
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.topActions}>
+          <View style={styles.heroRow}>
+            <View style={styles.heroCopy}>
+              <Text style={styles.screenTitle}>Profil</Text>
+              <Text style={styles.screenSubtitle}>
+                Gère ton compte, tes préférences et tes informations.
+              </Text>
+            </View>
+
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="Aide et support"
@@ -117,14 +125,14 @@ export default function ProfileScreen() {
             onDelete={() => setShowDeleteModal(true)}
           />
 
-          <Button
-            mode="contained"
+          <MatchaButton
+            label="Se déconnecter"
+            icon="logout"
+            variant="light"
+            fullWidth
             onPress={handleLogout}
             style={styles.logoutButton}
-            labelStyle={styles.logoutButtonLabel}
-          >
-            Se déconnecter
-          </Button>
+          />
         </ScrollView>
 
         <ConfirmDeleteAccountModal
@@ -133,7 +141,7 @@ export default function ProfileScreen() {
           onConfirm={handleDeleteAccount}
         />
       </SafeAreaView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
@@ -148,18 +156,38 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 40,
+    paddingTop: 18,
+    paddingBottom: 118,
     zIndex: 5,
   },
-  topActions: {
-    alignItems: 'flex-end',
-    marginBottom: 8,
+  heroRow: {
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  heroCopy: {
+    flex: 1,
+  },
+  screenTitle: {
+    fontSize: 30,
+    lineHeight: 36,
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
+  },
+  screenSubtitle: {
+    marginTop: 6,
+    maxWidth: 280,
+    fontSize: 16,
+    lineHeight: 22,
+    fontFamily: bodyFontFamily,
+    color: Colors.text.base,
   },
   helpButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.92)',
@@ -185,12 +213,8 @@ const styles = StyleSheet.create({
     fontFamily: bodyFontFamily,
   },
   logoutButton: {
-    ...secondaryButton,
-    marginTop: 4,
+    marginTop: 0,
     marginBottom: 8,
-  },
-  logoutButtonLabel: {
-    ...secondaryButtonText,
-    color: Colors.text.strong,
+    backgroundColor: '#DDE5EA',
   },
 });

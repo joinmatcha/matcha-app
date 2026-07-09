@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 
 import AnswerButton from './AnswerButton';
@@ -57,29 +58,31 @@ export default function QuestionCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderRadius: 8,
     padding: 20,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.06,
-    shadowRadius: 7,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0,81,58,0.08)',
+    shadowColor: '#5C5148',
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 4,
   },
   badge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: '#DEF1E7',
+    backgroundColor: Colors.accent.soft,
     marginBottom: 10,
   },
   badgeText: {
     fontSize: 11,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#2C7056',
+    color: Colors.accent.strong,
     textTransform: 'uppercase',
     letterSpacing: 0.7,
   },
@@ -87,7 +90,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#20201F',
+    color: Colors.text.strong,
     marginBottom: 18,
     lineHeight: 25,
   },
@@ -109,7 +112,7 @@ const styles = StyleSheet.create({
   labelText: {
     fontSize: 11,
     fontFamily: bodyFontFamily,
-    color: '#2A2A2A',
+    color: Colors.text.muted,
     maxWidth: '45%',
     fontWeight: '600',
   },

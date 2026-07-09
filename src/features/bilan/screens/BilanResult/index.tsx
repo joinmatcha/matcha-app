@@ -10,17 +10,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import PersonalityProfileHeader from '@/features/personality/components/PersonalityProfileHeader';
 import ProfileSection from '@/features/personality/components/ProfileSection';
 import { useAuth } from '@/hooks/useAuth';
 import { clearDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
-import {
-  bodyFontFamily,
-  displayFontFamily,
-  titleFontFamily,
-} from '@/themes/typography';
+import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import {
   cardSurface,
   primaryButton,
@@ -87,7 +83,7 @@ export default function BilanResultScreen() {
   };
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea} />
 
       <ScrollView contentContainerStyle={styles.container}>
@@ -326,16 +322,15 @@ export default function BilanResultScreen() {
 
         <View style={styles.spacerLg} />
       </ScrollView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: { backgroundColor: 'transparent' },
-  container: { paddingBottom: 32 },
+  container: { paddingHorizontal: 24, paddingBottom: 32 },
 
   hero: {
-    marginHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
   },
@@ -350,24 +345,24 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 26,
     fontWeight: '700',
-    fontFamily: displayFontFamily,
-    color: '#232220',
+    fontFamily: titleFontFamily,
+    color: Colors.text.strong,
   },
   heroSubtitle: {
     marginTop: 6,
     fontSize: 15,
     lineHeight: 21,
     fontFamily: bodyFontFamily,
-    color: 'rgba(0,0,0,0.9)',
+    color: Colors.text.base,
   },
   overviewRow: {
     flexDirection: 'row',
     gap: 8,
-    marginHorizontal: 20,
     marginBottom: 2,
   },
   overviewCard: {
     ...cardSurface,
+    borderRadius: 8,
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -393,7 +388,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: 'rgba(0,0,0,0.82)',
+    color: Colors.text.strong,
     marginBottom: 6,
   },
   spacerSm: {
@@ -411,7 +406,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     fontFamily: bodyFontFamily,
-    color: 'rgba(0,0,0,0.86)',
+    color: Colors.text.base,
     marginBottom: 8,
   },
   sectionIntro: {
@@ -430,7 +425,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     backgroundColor: '#F8FBF9',
-    borderRadius: 16,
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
@@ -453,7 +448,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontFamily: bodyFontFamily,
-    color: '#232220',
+    color: Colors.text.strong,
   },
   inlineList: {
     flexDirection: 'row',
@@ -477,7 +472,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
@@ -492,14 +487,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontFamily: bodyFontFamily,
-    color: '#232220',
+    color: Colors.text.strong,
   },
   improvementList: {
     gap: 12,
   },
   improvementRow: {
     backgroundColor: '#FFF6EF',
-    borderRadius: 16,
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
@@ -523,12 +518,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontFamily: bodyFontFamily,
-    color: '#232220',
+    color: Colors.text.strong,
   },
 
   envCard: {
     ...cardSurface,
-    borderRadius: 14,
+    borderRadius: 8,
     padding: 14,
     marginBottom: 12,
     backgroundColor: '#F8FBF9',
@@ -548,14 +543,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: '#232220',
+    color: Colors.text.strong,
   },
   envText: {
     marginTop: 6,
     fontSize: 14,
     lineHeight: 20,
     fontFamily: bodyFontFamily,
-    color: 'rgba(0,0,0,0.86)',
+    color: Colors.text.base,
   },
   envTags: {
     flexDirection: 'row',
@@ -575,7 +570,7 @@ const styles = StyleSheet.create({
 
   jobCard: {
     ...cardSurface,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
     backgroundColor: '#FFFFFF',

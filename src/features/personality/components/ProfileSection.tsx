@@ -32,7 +32,6 @@ export default function ProfileSection({
 const styles = StyleSheet.create({
   section: {
     ...cardSurface,
-    marginHorizontal: 20,
     marginTop: 16,
     paddingVertical: 20,
     paddingHorizontal: 18,
@@ -52,6 +51,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     fontFamily: titleFontFamily,
-    color: Colors.text.base,
+    color: Colors.text.strong,
   },
 });

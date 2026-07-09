@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import BackgroundRadial from '@/components/layout/BackgroundRadial';
+import AppScreen from '@/components/layout/AppScreen';
 import { trackAnalyticsEvent } from '@/features/analytics';
 import QuestionCard from '@/features/personality/components/QuestionCard';
 import TestHeader from '@/features/personality/components/TestHeader';
@@ -204,20 +204,20 @@ export default function WorkStyleQuestionsScreen() {
 
   if (!test) {
     return (
-      <BackgroundRadial>
+      <AppScreen>
         <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
           <View style={styles.centerContainer}>
             <Text style={styles.errorText}>Aucun test disponible.</Text>
           </View>
         </SafeAreaView>
-      </BackgroundRadial>
+      </AppScreen>
     );
   }
 
   const isComplete = answers.size === test.questions.length;
 
   return (
-    <BackgroundRadial>
+    <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
         <View style={styles.container}>
           <TestHeader
@@ -267,7 +267,7 @@ export default function WorkStyleQuestionsScreen() {
           </ScrollView>
         </View>
       </SafeAreaView>
-    </BackgroundRadial>
+    </AppScreen>
   );
 }
 
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   questionsContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 40,
     gap: 16,

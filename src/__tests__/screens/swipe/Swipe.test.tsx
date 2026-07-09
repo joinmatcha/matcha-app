@@ -31,8 +31,16 @@ jest.mock('react-native-paper', () => {
 });
 jest.mock('@/features/swipe/hooks/useSwipe', () => ({
   useSwipe: () => ({
-    deck: [{ id: 'j1', title: 'Dev', tags: ['tech'] }],
+    deck: [
+      {
+        id: 'j1',
+        title: 'Développeur web',
+        sector: 'Informatique',
+        tags: ['Digital', 'Autonomie'],
+      },
+    ],
     remaining: 5,
+    limit: 10,
     loading: false,
     error: null,
     loadDeck: jest.fn(),
@@ -43,5 +51,16 @@ jest.mock('@/features/swipe/hooks/useSwipe', () => ({
 describe('SwipeScreen', () => {
   it('se rend sans erreur', () => {
     expect(() => render(<SwipeScreen />)).not.toThrow();
+  });
+
+  it("affiche le métier courant et l'état des swipes", () => {
+    const screen = render(<SwipeScreen />);
+
+    expect(screen.getByText('Métiers à explorer')).toBeTruthy();
+    expect(screen.getByText('Développeur web')).toBeTruthy();
+    expect(screen.getByText('Informatique')).toBeTruthy();
+    expect(screen.getByText('5')).toBeTruthy();
+    expect(screen.getByText('5/10 utilisés')).toBeTruthy();
+    expect(screen.getByText('Voir la fiche')).toBeTruthy();
   });
 });

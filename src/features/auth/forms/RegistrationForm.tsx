@@ -1,27 +1,20 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, HelperText, TextInput } from 'react-native-paper';
+import { View } from 'react-native';
+import { HelperText, TextInput } from 'react-native-paper';
 
+import MatchaButton from '@/components/ui/MatchaButton';
 import { useAuth } from '@/hooks/useAuth';
 import { registrationSchema } from '@/schemas/registration';
 import Colors from '@/themes/colors';
-import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import type { AuthStackParamList } from '@/types/navigation';
 import { getApiErrorMessage, getApiErrorStatus } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
 
-type NavProps = NativeStackNavigationProp<AuthStackParamList>;
+import { authFormStyles, authInputTheme } from './authFormStyles';
 
-const inputTheme = {
-  colors: {
-    primary: Colors.accent.primary,
-    error: Colors.error,
-    outline: 'rgba(31,31,31,0.10)',
-    onSurfaceVariant: 'rgba(31,31,31,0.58)',
-  },
-};
+type NavProps = NativeStackNavigationProp<AuthStackParamList>;
 
 export default function RegistrationForm() {
   const navigation = useNavigation<NavProps>();
@@ -92,7 +85,7 @@ export default function RegistrationForm() {
   };
 
   return (
-    <View style={styles.inputContainer}>
+    <View style={authFormStyles.inputContainer}>
       <TextInput
         label="Prénom"
         value={firstName}
@@ -101,18 +94,20 @@ export default function RegistrationForm() {
           resetServerError();
         }}
         mode="outlined"
-        style={styles.input}
-        contentStyle={styles.inputContent}
-        outlineStyle={styles.inputOutline}
+        style={authFormStyles.input}
+        contentStyle={authFormStyles.inputContent}
+        outlineStyle={authFormStyles.inputOutline}
         activeOutlineColor={Colors.accent.primary}
-        outlineColor="rgba(31,31,31,0.10)"
-        theme={inputTheme}
+        outlineColor="rgba(0,81,58,0.12)"
+        theme={authInputTheme}
         disabled={loading}
         error={!!errors.firstName}
         left={<TextInput.Icon icon="account-outline" />}
       />
       {errors.firstName ? (
-        <HelperText type="error">{errors.firstName}</HelperText>
+        <HelperText type="error" style={authFormStyles.helper}>
+          {errors.firstName}
+        </HelperText>
       ) : null}
 
       <TextInput
@@ -123,18 +118,20 @@ export default function RegistrationForm() {
           resetServerError();
         }}
         mode="outlined"
-        style={styles.input}
-        contentStyle={styles.inputContent}
-        outlineStyle={styles.inputOutline}
+        style={authFormStyles.input}
+        contentStyle={authFormStyles.inputContent}
+        outlineStyle={authFormStyles.inputOutline}
         activeOutlineColor={Colors.accent.primary}
-        outlineColor="rgba(31,31,31,0.10)"
-        theme={inputTheme}
+        outlineColor="rgba(0,81,58,0.12)"
+        theme={authInputTheme}
         disabled={loading}
         error={!!errors.lastName}
         left={<TextInput.Icon icon="account-outline" />}
       />
       {errors.lastName ? (
-        <HelperText type="error">{errors.lastName}</HelperText>
+        <HelperText type="error" style={authFormStyles.helper}>
+          {errors.lastName}
+        </HelperText>
       ) : null}
 
       <TextInput
@@ -149,18 +146,20 @@ export default function RegistrationForm() {
         keyboardType="email-address"
         textContentType="emailAddress"
         mode="outlined"
-        style={styles.input}
-        contentStyle={styles.inputContent}
-        outlineStyle={styles.inputOutline}
+        style={authFormStyles.input}
+        contentStyle={authFormStyles.inputContent}
+        outlineStyle={authFormStyles.inputOutline}
         activeOutlineColor={Colors.accent.primary}
-        outlineColor="rgba(31,31,31,0.10)"
-        theme={inputTheme}
+        outlineColor="rgba(0,81,58,0.12)"
+        theme={authInputTheme}
         disabled={loading}
         error={!!errors.email}
         left={<TextInput.Icon icon="email-outline" />}
       />
       {errors.email ? (
-        <HelperText type="error">{errors.email}</HelperText>
+        <HelperText type="error" style={authFormStyles.helper}>
+          {errors.email}
+        </HelperText>
       ) : null}
 
       <TextInput
@@ -173,12 +172,12 @@ export default function RegistrationForm() {
         secureTextEntry={!showPassword}
         textContentType="password"
         mode="outlined"
-        style={styles.input}
-        contentStyle={styles.inputContent}
-        outlineStyle={styles.inputOutline}
+        style={authFormStyles.input}
+        contentStyle={authFormStyles.inputContent}
+        outlineStyle={authFormStyles.inputOutline}
         activeOutlineColor={Colors.accent.primary}
-        outlineColor="rgba(31,31,31,0.10)"
-        theme={inputTheme}
+        outlineColor="rgba(0,81,58,0.12)"
+        theme={authInputTheme}
         disabled={loading}
         error={!!errors.password}
         left={<TextInput.Icon icon="lock-outline" />}
@@ -190,73 +189,27 @@ export default function RegistrationForm() {
         }
       />
       {errors.password ? (
-        <HelperText type="error">{errors.password}</HelperText>
+        <HelperText type="error" style={authFormStyles.helper}>
+          {errors.password}
+        </HelperText>
       ) : null}
 
       {authError ? (
-        <HelperText type="error" visible style={styles.authError}>
+        <HelperText type="error" visible style={authFormStyles.helper}>
           {authError}
         </HelperText>
       ) : null}
 
-      <Button
-        mode="contained"
+      <MatchaButton
+        label="Continuer"
+        icon="arrow-forward"
         loading={loading}
         disabled={loading}
-        buttonColor={Colors.accent.primary}
-        textColor="#FFFFFF"
-        contentStyle={styles.continueButtonContent}
-        style={styles.continueButton}
-        labelStyle={styles.continueButtonLabel}
+        variant="primary"
+        fullWidth
+        style={authFormStyles.submitButton}
         onPress={handleRegister}
-      >
-        Continuer
-      </Button>
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  inputContainer: {
-    width: '100%',
-    marginBottom: 18,
-  },
-  input: {
-    marginBottom: 6,
-    backgroundColor: '#F8FAF8',
-    fontFamily: bodyFontFamily,
-    height: 54,
-  },
-  inputContent: {
-    height: 54,
-    fontFamily: bodyFontFamily,
-    color: '#111820',
-    paddingTop: 0,
-    paddingBottom: 0,
-  },
-  inputOutline: {
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  authError: {
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  continueButton: {
-    marginTop: 14,
-    borderRadius: 16,
-    shadowColor: '#1A5C45',
-    shadowOpacity: 0.22,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
-  },
-  continueButtonContent: {
-    minHeight: 52,
-  },
-  continueButtonLabel: {
-    fontFamily: titleFontFamily,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-});

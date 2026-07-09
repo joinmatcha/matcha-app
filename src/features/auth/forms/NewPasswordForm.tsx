@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, HelperText, TextInput } from 'react-native-paper';
+import { View } from 'react-native';
+import { HelperText, TextInput } from 'react-native-paper';
 
 import { resetPassword } from '@/api/auth';
+import MatchaButton from '@/components/ui/MatchaButton';
 import { newPasswordSchema } from '@/schemas/password-reset';
-import { titleFontFamily } from '@/themes/typography';
+import Colors from '@/themes/colors';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { validateZod } from '@/utils/validation';
+
+import { authFormStyles, authInputTheme } from './authFormStyles';
 
 interface NewPasswordFormProps {
   token: string;
@@ -56,16 +59,22 @@ export default function NewPasswordForm({
   };
 
   return (
-    <View style={styles.inputContainer}>
+    <View style={authFormStyles.inputContainer}>
       <TextInput
         label="Nouveau mot de passe"
         value={password}
         onChangeText={setPassword}
         mode="outlined"
         secureTextEntry={!showPassword}
-        style={styles.input}
+        style={authFormStyles.input}
+        contentStyle={authFormStyles.inputContent}
+        outlineStyle={authFormStyles.inputOutline}
+        activeOutlineColor={Colors.accent.primary}
+        outlineColor="rgba(0,81,58,0.12)"
+        theme={authInputTheme}
         disabled={loading}
         error={!!error}
+        left={<TextInput.Icon icon="lock-outline" />}
         right={
           <TextInput.Icon
             icon={showPassword ? 'eye-off' : 'eye'}
@@ -80,9 +89,15 @@ export default function NewPasswordForm({
         onChangeText={setConfirm}
         mode="outlined"
         secureTextEntry={!showConfirm}
-        style={styles.input}
+        style={authFormStyles.input}
+        contentStyle={authFormStyles.inputContent}
+        outlineStyle={authFormStyles.inputOutline}
+        activeOutlineColor={Colors.accent.primary}
+        outlineColor="rgba(0,81,58,0.12)"
+        theme={authInputTheme}
         disabled={loading}
         error={!!error}
+        left={<TextInput.Icon icon="lock-check-outline" />}
         right={
           <TextInput.Icon
             icon={showConfirm ? 'eye-off' : 'eye'}
@@ -91,38 +106,22 @@ export default function NewPasswordForm({
         }
       />
 
-      {error && <HelperText type="error">{error}</HelperText>}
+      {error && (
+        <HelperText type="error" style={authFormStyles.helper}>
+          {error}
+        </HelperText>
+      )}
 
-      <Button
-        mode="contained"
+      <MatchaButton
+        label="Réinitialiser le mot de passe"
+        icon="check"
         onPress={handleSubmit}
         loading={loading}
         disabled={loading}
-        buttonColor="#E9E6E2"
-        textColor="#2B2A29"
-        style={styles.continueButton}
-        labelStyle={styles.continueButtonLabel}
-      >
-        Réinitialiser le mot de passe
-      </Button>
+        variant="primary"
+        fullWidth
+        style={authFormStyles.submitButton}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  inputContainer: {
-    width: '100%',
-    marginBottom: 24,
-  },
-  input: {
-    marginBottom: 8,
-  },
-  continueButton: {
-    marginTop: 12,
-    borderRadius: 16,
-  },
-  continueButtonLabel: {
-    fontFamily: titleFontFamily,
-    fontSize: 15,
-  },
-});

@@ -28,6 +28,8 @@ export type HomeStackParamList = {
   BilanResult: {
     bilan: BilanResult;
   };
+  MatchaProfile: undefined;
+  CareerPreferences: undefined;
   JobDetail: { jobId: string };
   JobCompare: { jobIds: string[] };
   WorkStyleIntro: undefined;
