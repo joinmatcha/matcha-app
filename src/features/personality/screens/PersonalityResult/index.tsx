@@ -1,4 +1,9 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {
@@ -56,7 +61,12 @@ export default function PersonalityResultScreen() {
 
   const handleContinue = async () => {
     await refreshUser();
-    navigation.navigate('Main', { screen: 'Home' });
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Main', params: { screen: 'Home' } }],
+      }),
+    );
   };
 
   const handleRedoTest = async () => {

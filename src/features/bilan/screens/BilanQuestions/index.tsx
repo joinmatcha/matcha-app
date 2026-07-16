@@ -45,6 +45,7 @@ export default function BilanQuestionsScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const questionPositions = useRef<Map<string, number>>(new Map());
   const restoredOnceRef = useRef(false);
+  const pendingRestoreScrollRef = useRef<string | null>(null);
   const startedAtRef = useRef<number | null>(null);
   const completedRef = useRef(false);
 
@@ -73,6 +74,27 @@ export default function BilanQuestionsScreen() {
     versionRef.current = version;
   }, [version]);
 
+  const scrollToQuestion = (questionCode: string, animated = false) => {
+    const y = questionPositions.current.get(questionCode);
+    if (typeof y !== 'number') return false;
+
+    scrollRef.current?.scrollTo({
+      y: Math.max(y - 20, 0),
+      animated,
+    });
+    return true;
+  };
+
+  const getFirstUnansweredQuestionCode = (
+    currentQuestions: BilanQuestion[],
+    currentAnswers: Record<string, number | string>,
+  ) =>
+    currentQuestions.find((question) => {
+      const answer = currentAnswers[question.code];
+      if (typeof answer === 'string') return answer.trim().length === 0;
+      return answer === undefined;
+    })?.code ?? currentQuestions[currentQuestions.length - 1]?.code;
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -96,7 +118,21 @@ export default function BilanQuestionsScreen() {
           const draft = await loadDraft<BilanDraftData>('bilan', userId);
 
           if (draft && draft.templateVersion === String(res.version)) {
-            setAnswers(Object.fromEntries(draft.data.answers));
+            const restoredAnswers = Object.fromEntries(draft.data.answers);
+            const firstUnansweredCode = getFirstUnansweredQuestionCode(
+              res.questions,
+              restoredAnswers,
+            );
+            setAnswers(restoredAnswers);
+            pendingRestoreScrollRef.current = firstUnansweredCode ?? null;
+            setTimeout(() => {
+              if (
+                pendingRestoreScrollRef.current &&
+                scrollToQuestion(pendingRestoreScrollRef.current)
+              ) {
+                pendingRestoreScrollRef.current = null;
+              }
+            }, 350);
           } else if (draft) {
             await clearDraft('bilan', userId);
           }
@@ -329,6 +365,13 @@ export default function BilanQuestionsScreen() {
                     q.code,
                     event.nativeEvent.layout.y,
                   );
+                  if (pendingRestoreScrollRef.current === q.code) {
+                    setTimeout(() => {
+                      if (scrollToQuestion(q.code)) {
+                        pendingRestoreScrollRef.current = null;
+                      }
+                    }, 50);
+                  }
                 }}
               >
                 {/* ----------------- LIKERT ----------------- */}

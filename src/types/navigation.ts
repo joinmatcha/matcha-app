@@ -32,7 +32,7 @@ export type HomeStackParamList = {
   CareerPreferences: undefined;
   JobDetail: { jobId: string };
   JobCompare: { jobIds: string[] };
-  WorkStyleIntro: undefined;
+  WorkStyleIntro: { hasDraft?: boolean } | undefined;
   WorkStyleQuestions: undefined;
   WorkStyleResult: { result: WorkStyleResult };
 };

@@ -73,3 +73,7 @@ export const submitWorkStyleTest = async (answers: WorkStyleAnswer[]) => {
   const response = await api.post('/api/work-style/submit', { answers });
   return response.data.result as WorkStyleResult;
 };
+
+export const resetWorkStyleTest = async (): Promise<void> => {
+  await api.post('/api/work-style/reset');
+};

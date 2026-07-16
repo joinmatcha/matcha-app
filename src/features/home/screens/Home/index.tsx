@@ -45,6 +45,10 @@ type BilanDraftData = {
   answers: [string, number | string][];
 };
 
+type WorkStyleDraftData = {
+  answers: [string, number][];
+};
+
 type HomeNavigation = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList, 'Home'>,
   NativeStackNavigationProp<RootStackParamList>
@@ -293,6 +297,7 @@ export default function HomeScreen() {
   const [hasPersonalityDraft, setHasPersonalityDraft] = useState(false);
   const [hasBilanDraft, setHasBilanDraft] = useState(false);
   const [hasStartedBilanDraft, setHasStartedBilanDraft] = useState(false);
+  const [hasWorkStyleDraft, setHasWorkStyleDraft] = useState(false);
   const [bilanDraftUpdatedAt, setBilanDraftUpdatedAt] = useState<number | null>(
     null,
   );
@@ -313,14 +318,17 @@ export default function HomeScreen() {
           setHasPersonalityDraft(false);
           setHasBilanDraft(false);
           setHasStartedBilanDraft(false);
+          setHasWorkStyleDraft(false);
           setBilanDraftUpdatedAt(null);
           return;
         }
 
-        const [personalityDraft, bilanDraft] = await Promise.all([
-          loadDraft('personality', userId),
-          loadDraft<BilanDraftData>('bilan', userId),
-        ]);
+        const [personalityDraft, bilanDraft, workStyleDraft] =
+          await Promise.all([
+            loadDraft('personality', userId),
+            loadDraft<BilanDraftData>('bilan', userId),
+            loadDraft<WorkStyleDraftData>('work_style', userId),
+          ]);
 
         const bilanCreatedAtMs = bilan?.createdAt
           ? new Date(bilan.createdAt).getTime()
@@ -341,6 +349,7 @@ export default function HomeScreen() {
         setHasStartedBilanDraft(
           !!bilanDraft && !draftIsStale && !!bilanDraft.data.answers.length,
         );
+        setHasWorkStyleDraft(!!workStyleDraft?.data.answers.length);
         setBilanDraftUpdatedAt(
           !!bilanDraft && !draftIsStale ? bilanDraft.updatedAt : null,
         );
@@ -351,6 +360,7 @@ export default function HomeScreen() {
         setHasPersonalityDraft(false);
         setHasBilanDraft(false);
         setHasStartedBilanDraft(false);
+        setHasWorkStyleDraft(false);
         setBilanDraftUpdatedAt(null);
       });
 
@@ -413,13 +423,10 @@ export default function HomeScreen() {
   const shouldUseBilanDraft = hasBilanDraft && !draftIsStaleComparedToBilan;
   const hasBilan = !!bilan && !shouldUseBilanDraft;
   const hasPersonality = Boolean(user?.personality);
-  const hasWorkStyle = Boolean(workStyle);
-  const completion =
-    matchaProfile?.completion ??
-    Math.round(
-      ([hasBilan, hasPersonality, hasWorkStyle].filter(Boolean).length / 3) *
-        100,
-    );
+  const hasWorkStyle = Boolean(workStyle) && !hasWorkStyleDraft;
+  const completion = Math.round(
+    ([hasBilan, hasPersonality, hasWorkStyle].filter(Boolean).length / 3) * 100,
+  );
   const firstName = getFirstName(user);
 
   const personalityTitle = hasPersonality
@@ -448,14 +455,22 @@ export default function HomeScreen() {
       : 'Découvre tes forces, tes préférences et tes points forts.';
 
   const workStyleTitle =
-    workStyle?.profile?.title ??
-    (workStyle ? 'Ton style professionnel' : 'Ton style pro');
+    (hasWorkStyle ? workStyle?.profile?.title : undefined) ??
+    (workStyle
+      ? 'Ton style professionnel'
+      : hasWorkStyleDraft
+        ? 'Style professionnel en cours'
+        : 'Ton style pro');
   const workStyleDescription = workStyle
-    ? joinSignals(
-        workStyle.topAxisLabels,
-        'Tes environnements de travail les plus naturels.',
-      )
-    : 'Identifie le cadre de travail dans lequel tu avances le mieux.';
+    ? hasWorkStyle
+      ? joinSignals(
+          workStyle.topAxisLabels,
+          'Tes environnements de travail les plus naturels.',
+        )
+      : 'Tu peux reprendre directement à la prochaine question.'
+    : hasWorkStyleDraft
+      ? 'Tu peux reprendre directement à la prochaine question.'
+      : 'Identifie le cadre de travail dans lequel tu avances le mieux.';
 
   return (
     <BackgroundRadial bubbles>
@@ -497,13 +512,11 @@ export default function HomeScreen() {
               onPress={() =>
                 hasBilan && bilan
                   ? navigation.navigate('BilanResult', { bilan })
-                  : navigation.navigate('BilanIntro', {
-                      mode: shouldUseBilanDraft
-                        ? hasStartedBilanDraft
-                          ? 'resume'
-                          : 'restart'
-                        : 'start',
-                    })
+                  : shouldUseBilanDraft && hasStartedBilanDraft
+                    ? navigation.navigate('BilanQuestions')
+                    : navigation.navigate('BilanIntro', {
+                        mode: shouldUseBilanDraft ? 'restart' : 'start',
+                      })
               }
             />
 
@@ -525,9 +538,9 @@ export default function HomeScreen() {
                   ? navigation.navigate('PersonalityResult', {
                       result: user.personality,
                     })
-                  : navigation.navigate('PersonalityIntro', {
-                      hasDraft: hasPersonalityDraft,
-                    })
+                  : hasPersonalityDraft
+                    ? navigation.navigate('PersonalityTest')
+                    : navigation.navigate('PersonalityIntro')
               }
             />
 
@@ -535,15 +548,23 @@ export default function HomeScreen() {
               eyebrow="Style professionnel"
               title={workStyleTitle}
               description={workStyleDescription}
-              buttonLabel={workStyle ? 'Voir mon style' : 'Découvrir'}
+              buttonLabel={
+                hasWorkStyle
+                  ? 'Voir mon style'
+                  : hasWorkStyleDraft
+                    ? 'Reprendre'
+                    : 'Découvrir'
+              }
               icon="tune"
               tone="stone"
               onPress={() =>
-                workStyle
+                hasWorkStyle && workStyle
                   ? navigation.navigate('WorkStyleResult', {
                       result: workStyle,
                     })
-                  : navigation.navigate('WorkStyleIntro')
+                  : hasWorkStyleDraft
+                    ? navigation.navigate('WorkStyleQuestions')
+                    : navigation.navigate('WorkStyleIntro')
               }
             />
           </View>
@@ -556,16 +577,18 @@ export default function HomeScreen() {
           />
 
           <SectionHeader title="À venir" />
-          <FeatureCard
-            eyebrow="Ton aventure"
-            title="Passe à l’action"
-            description="Transforme bientôt tes résultats en plan d’action concret, étape par étape."
-            buttonLabel="Bientôt disponible"
-            icon="flag"
-            tone="locked"
-            disabled
-            onPress={() => undefined}
-          />
+          <View style={styles.featureStack}>
+            <FeatureCard
+              eyebrow="Ton aventure"
+              title="Passe à l’action"
+              description="Transforme bientôt tes résultats en plan d’action concret, étape par étape."
+              buttonLabel="Bientôt disponible"
+              icon="flag"
+              tone="locked"
+              disabled
+              onPress={() => undefined}
+            />
+          </View>
         </ScrollView>
       </SafeAreaView>
     </BackgroundRadial>
@@ -727,6 +750,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.38)',
   },
   careerCard: {
+    marginBottom: 18,
     padding: 18,
     borderRadius: 8,
     borderWidth: 1,

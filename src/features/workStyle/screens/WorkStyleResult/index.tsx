@@ -1,4 +1,9 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useMemo } from 'react';
 import {
@@ -11,7 +16,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AppScreen from '@/components/layout/AppScreen';
-import { WorkStyleDimension } from '@/features/workStyle/api/workStyleApi';
+import {
+  WorkStyleDimension,
+  resetWorkStyleTest,
+} from '@/features/workStyle/api/workStyleApi';
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import {
@@ -103,6 +111,11 @@ export default function WorkStyleResultScreen() {
     [result.topAxes],
   );
 
+  const handleRedo = async () => {
+    await resetWorkStyleTest();
+    navigation.navigate('WorkStyleIntro', { hasDraft: false });
+  };
+
   return (
     <AppScreen>
       <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
@@ -174,16 +187,20 @@ export default function WorkStyleResultScreen() {
             </Text>
           </View>
 
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('WorkStyleQuestions')}
-          >
+          <TouchableOpacity style={styles.primaryButton} onPress={handleRedo}>
             <Text style={styles.primaryButtonText}>Repasser le test</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={() => navigation.navigate('Main', { screen: 'Home' })}
+            onPress={() =>
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'Main', params: { screen: 'Home' } }],
+                }),
+              )
+            }
           >
             <Text style={styles.secondaryButtonText}>Retour à l’accueil</Text>
           </TouchableOpacity>

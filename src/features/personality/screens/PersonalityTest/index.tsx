@@ -53,12 +53,31 @@ export default function PersonalityTestScreen() {
   const completedRef = useRef(false);
   const answersRef = useRef(answers);
   const testRef = useRef<PersonalityTemplate | null>(null);
+  const pendingRestoreScrollRef = useRef<string | null>(null);
 
   // évite de restaurer plusieurs fois
   const restoredOnceRef = useRef(false);
 
   const serializeAnswers = (m: Map<string, number>) => Array.from(m.entries());
   const deserializeAnswers = (arr: [string, number][]) => new Map(arr);
+
+  const scrollToQuestion = (questionId: string, animated = false) => {
+    const y = questionPositions.current.get(questionId);
+    if (typeof y !== 'number') return false;
+
+    scrollViewRef.current?.scrollTo({
+      y: Math.max(y - 20, 0),
+      animated,
+    });
+    return true;
+  };
+
+  const getFirstUnansweredQuestionId = (
+    currentTest: PersonalityTemplate,
+    currentAnswers: Map<string, number>,
+  ) =>
+    currentTest.questions.find((question) => !currentAnswers.has(question.id))
+      ?.id ?? currentTest.questions[currentTest.questions.length - 1]?.id;
 
   useEffect(() => {
     loadTest();
@@ -117,7 +136,21 @@ export default function PersonalityTestScreen() {
         draft.templateId === test._id &&
         draft.templateVersion === test.version
       ) {
-        setAnswers(deserializeAnswers(draft.data.answers));
+        const restoredAnswers = deserializeAnswers(draft.data.answers);
+        const firstUnansweredId = getFirstUnansweredQuestionId(
+          test,
+          restoredAnswers,
+        );
+        setAnswers(restoredAnswers);
+        pendingRestoreScrollRef.current = firstUnansweredId ?? null;
+        setTimeout(() => {
+          if (
+            pendingRestoreScrollRef.current &&
+            scrollToQuestion(pendingRestoreScrollRef.current)
+          ) {
+            pendingRestoreScrollRef.current = null;
+          }
+        }, 350);
       } else {
         await clearDraft('personality', userId);
       }
@@ -348,6 +381,13 @@ export default function PersonalityTestScreen() {
                     q.id,
                     event.nativeEvent.layout.y,
                   );
+                  if (pendingRestoreScrollRef.current === q.id) {
+                    setTimeout(() => {
+                      if (scrollToQuestion(q.id)) {
+                        pendingRestoreScrollRef.current = null;
+                      }
+                    }, 50);
+                  }
                 }}
               >
                 <QuestionCard

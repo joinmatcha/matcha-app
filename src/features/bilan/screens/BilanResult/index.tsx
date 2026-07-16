@@ -1,4 +1,9 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import {
@@ -315,7 +320,14 @@ export default function BilanResultScreen() {
 
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate('Main', { screen: 'Home' })}
+          onPress={() =>
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'Main', params: { screen: 'Home' } }],
+              }),
+            )
+          }
         >
           <Text style={styles.backButtonText}>Retour à l’accueil</Text>
         </TouchableOpacity>

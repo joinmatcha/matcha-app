@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type Module = 'personality' | 'bilan';
+type Module = 'personality' | 'bilan' | 'work_style';
 
 export type Draft<T> = {
   userId: string;

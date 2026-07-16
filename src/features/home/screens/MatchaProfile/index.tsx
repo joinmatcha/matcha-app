@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
@@ -20,6 +20,8 @@ import {
   MatchaProfileTestCard,
 } from '@/features/home/api/matchaProfileApi';
 import { useMatchaProfile } from '@/features/home/hooks/useMatchaProfile';
+import { useAuth } from '@/hooks/useAuth';
+import { loadDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
 import {
   bodyFontFamily,
@@ -29,6 +31,12 @@ import {
 import { RootStackParamList } from '@/types/navigation';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+type BilanDraftData = {
+  answers: [string, number | string][];
+};
+type NumericDraftData = {
+  answers: [string, number][];
+};
 
 const INK = '#101820';
 const HOME_ACCENT = '#00513A';
@@ -140,17 +148,74 @@ function JobRow({
 
 export default function MatchaProfileScreen() {
   const navigation = useNavigation<Nav>();
+  const { user } = useAuth();
+  const userId = user?.id;
   const { profile, loading, refresh } = useMatchaProfile();
+  const [hasBilanDraft, setHasBilanDraft] = useState(false);
+  const [hasPersonalityDraft, setHasPersonalityDraft] = useState(false);
+  const [hasWorkStyleDraft, setHasWorkStyleDraft] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       refresh();
-    }, [refresh]),
+
+      let isActive = true;
+
+      const checkDrafts = async () => {
+        if (!userId) {
+          if (isActive) {
+            setHasBilanDraft(false);
+            setHasPersonalityDraft(false);
+            setHasWorkStyleDraft(false);
+          }
+          return;
+        }
+
+        const [bilanDraft, personalityDraft, workStyleDraft] =
+          await Promise.all([
+            loadDraft<BilanDraftData>('bilan', userId),
+            loadDraft<NumericDraftData>('personality', userId),
+            loadDraft<NumericDraftData>('work_style', userId),
+          ]);
+
+        if (isActive) {
+          setHasBilanDraft(!!bilanDraft?.data.answers.length);
+          setHasPersonalityDraft(!!personalityDraft?.data.answers.length);
+          setHasWorkStyleDraft(!!workStyleDraft?.data.answers.length);
+        }
+      };
+
+      checkDrafts().catch(() => {
+        if (isActive) {
+          setHasBilanDraft(false);
+          setHasPersonalityDraft(false);
+          setHasWorkStyleDraft(false);
+        }
+      });
+
+      return () => {
+        isActive = false;
+      };
+    }, [refresh, userId]),
   );
 
   const navigateFromAction = (action: MatchaProfileNextAction) => {
     if (action.route === 'BilanIntro') {
+      if (hasBilanDraft) {
+        navigation.navigate('BilanQuestions');
+        return;
+      }
       navigation.navigate('BilanIntro', { mode: 'start' });
+      return;
+    }
+
+    if (action.route === 'PersonalityIntro' && hasPersonalityDraft) {
+      navigation.navigate('PersonalityTest');
+      return;
+    }
+
+    if (action.route === 'WorkStyleIntro' && hasWorkStyleDraft) {
+      navigation.navigate('WorkStyleQuestions');
       return;
     }
 
@@ -196,6 +261,48 @@ export default function MatchaProfileScreen() {
   const recommendedJobs = profile.recommendedJobs;
   const likedJobs = profile.likedJobs;
   const [bilanTest, personalityTest, workStyleTest] = profile.tests;
+  const buildAdjustedTest = (
+    test: MatchaProfileTestCard | undefined,
+    hasDraft: boolean,
+  ) =>
+    test
+      ? {
+          ...test,
+          title: hasDraft ? 'En cours' : test.title,
+          description: hasDraft
+            ? "Reprends là où tu t'es arrêté."
+            : test.description,
+          completed: hasDraft ? false : test.completed,
+        }
+      : null;
+  const adjustedBilanTest = buildAdjustedTest(bilanTest, hasBilanDraft);
+  const adjustedPersonalityTest = buildAdjustedTest(
+    personalityTest,
+    hasPersonalityDraft,
+  );
+  const adjustedWorkStyleTest = buildAdjustedTest(
+    workStyleTest,
+    hasWorkStyleDraft,
+  );
+  const effectiveCompletedTests = {
+    ...profile.completedTests,
+    bilan: hasBilanDraft ? false : profile.completedTests.bilan,
+    personality: hasPersonalityDraft
+      ? false
+      : profile.completedTests.personality,
+    workStyle: hasWorkStyleDraft ? false : profile.completedTests.workStyle,
+  };
+  const effectiveCompletedTotal = [
+    effectiveCompletedTests.bilan,
+    effectiveCompletedTests.personality,
+    effectiveCompletedTests.workStyle,
+  ].filter(Boolean).length;
+  const effectiveCompletion = Math.round((effectiveCompletedTotal / 3) * 100);
+  const nextActionIsTest = [
+    'BilanIntro',
+    'PersonalityIntro',
+    'WorkStyleIntro',
+  ].includes(profile.nextBestAction.route);
   const likedJobsCount = likedJobs.reduce(
     (total, job) => total + (job.likesCount ?? 0),
     0,
@@ -219,11 +326,11 @@ export default function MatchaProfileScreen() {
             <Text style={styles.profileTitle}>{profile.mainProfile.title}</Text>
             <View style={styles.metricsRow}>
               <MetricCard
-                value={`${profile.completion}%`}
+                value={`${effectiveCompletion}%`}
                 label="profil complété"
               />
               <MetricCard
-                value={`${profile.completedTests.total}/3`}
+                value={`${effectiveCompletedTotal}/3`}
                 label="tests terminés"
               />
               <MetricCard value={likedJobsCount} label="métiers aimés" />
@@ -320,27 +427,37 @@ export default function MatchaProfileScreen() {
             subtitle="Chaque test apporte un angle différent à ton profil."
           />
           <View style={styles.testStack}>
-            {bilanTest ? (
+            {adjustedBilanTest ? (
               <TestSignalCard
-                test={bilanTest}
+                test={adjustedBilanTest}
                 icon="psychology"
                 onPress={() =>
-                  navigation.navigate('BilanIntro', { mode: 'start' })
+                  hasBilanDraft
+                    ? navigation.navigate('BilanQuestions')
+                    : navigation.navigate('BilanIntro', { mode: 'start' })
                 }
               />
             ) : null}
-            {personalityTest ? (
+            {adjustedPersonalityTest ? (
               <TestSignalCard
-                test={personalityTest}
+                test={adjustedPersonalityTest}
                 icon="favorite-border"
-                onPress={() => navigation.navigate('PersonalityIntro')}
+                onPress={() =>
+                  hasPersonalityDraft
+                    ? navigation.navigate('PersonalityTest')
+                    : navigation.navigate('PersonalityIntro')
+                }
               />
             ) : null}
-            {workStyleTest ? (
+            {adjustedWorkStyleTest ? (
               <TestSignalCard
-                test={workStyleTest}
+                test={adjustedWorkStyleTest}
                 icon="tune"
-                onPress={() => navigation.navigate('WorkStyleIntro')}
+                onPress={() =>
+                  hasWorkStyleDraft
+                    ? navigation.navigate('WorkStyleQuestions')
+                    : navigation.navigate('WorkStyleIntro')
+                }
               />
             ) : null}
           </View>
@@ -405,16 +522,18 @@ export default function MatchaProfileScreen() {
 
           <SectionTitle title="Prochaines actions" />
           <View style={styles.actionsCard}>
-            <MatchaButton
-              label={profile.nextBestAction.label}
-              variant="primary"
-              fullWidth
-              disabled={
-                profile.nextBestAction.route === 'JobCompare' &&
-                (profile.nextBestAction.jobIds?.length ?? 0) < 2
-              }
-              onPress={() => navigateFromAction(profile.nextBestAction)}
-            />
+            {!nextActionIsTest ? (
+              <MatchaButton
+                label={profile.nextBestAction.label}
+                variant="primary"
+                fullWidth
+                disabled={
+                  profile.nextBestAction.route === 'JobCompare' &&
+                  (profile.nextBestAction.jobIds?.length ?? 0) < 2
+                }
+                onPress={() => navigateFromAction(profile.nextBestAction)}
+              />
+            ) : null}
             <MatchaButton
               label="Voir mes métiers favoris"
               fullWidth

@@ -2,6 +2,7 @@ import api from '@/api/api';
 import {
   getActiveWorkStyleTest,
   getMyWorkStyle,
+  resetWorkStyleTest,
   submitWorkStyleTest,
 } from '@/features/workStyle/api/workStyleApi';
 
@@ -44,5 +45,13 @@ describe('workStyleApi', () => {
       answers: [{ questionId: 'Q1', value: 5 }],
     });
     expect(result.id).toBe('w1');
+  });
+
+  it('resetWorkStyleTest appelle POST /api/work-style/reset', async () => {
+    mockedApi.post.mockResolvedValue({ data: {} });
+
+    await resetWorkStyleTest();
+
+    expect(mockedApi.post).toHaveBeenCalledWith('/api/work-style/reset');
   });
 });

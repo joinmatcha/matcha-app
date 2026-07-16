@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 
@@ -6,6 +6,7 @@ import TestIntroLayout from '@/features/shared/TestIntroLayout';
 import { RootStackParamList } from '@/types/navigation';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'WorkStyleIntro'>;
+type IntroRoute = RouteProp<RootStackParamList, 'WorkStyleIntro'>;
 
 const flow = [
   'Tu réponds à 16 situations concrètes',
@@ -22,24 +23,32 @@ const benefits = [
 
 export default function WorkStyleIntroScreen() {
   const navigation = useNavigation<Nav>();
+  const route = useRoute<IntroRoute>();
+  const hasDraft = !!route.params?.hasDraft;
 
   return (
     <TestIntroLayout
-      eyebrow="Style professionnel"
-      title="Ton cadre de travail idéal"
-      subtitle="Un test court pour comprendre les environnements dans lesquels tu avances avec le plus d’énergie."
+      eyebrow={hasDraft ? 'Pour rappel' : 'Style professionnel'}
+      title={
+        hasDraft ? "Reprends où tu t'es arrêté" : 'Ton cadre de travail idéal'
+      }
+      subtitle={
+        hasDraft
+          ? 'Ton brouillon est enregistré. Tu peux continuer sans perdre tes réponses.'
+          : 'Un test court pour comprendre les environnements dans lesquels tu avances avec le plus d’énergie.'
+      }
       stats={[
         { value: '16', label: 'questions' },
         { value: '~2 min', label: 'à ton rythme' },
         { value: '0', label: 'bonne réponse' },
       ]}
-      flowTitle="Comment ça marche"
-      flow={flow}
+      flowTitle={hasDraft ? undefined : 'Comment ça marche'}
+      flow={hasDraft ? [] : flow}
       benefitsTitle="Ce que tu récupères"
       benefits={benefits}
       noteTitle="Pourquoi c’est utile"
       note="Ton résultat est croisé avec ton profil, ton auto-évaluation et tes métiers favoris pour mieux lire les fiches métier."
-      ctaLabel="Commencer le test"
+      ctaLabel={hasDraft ? 'Reprendre le test' : 'Commencer le test'}
       onPress={() => navigation.navigate('WorkStyleQuestions')}
     />
   );
