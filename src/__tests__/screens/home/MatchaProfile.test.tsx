@@ -103,6 +103,12 @@ jest.mock('@/features/home/hooks/useMatchaProfile', () => ({
   }),
 }));
 
+jest.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: { id: 'user-1' },
+  }),
+}));
+
 describe('MatchaProfileScreen', () => {
   it('affiche une synthèse croisée des tests et des métiers aimés', async () => {
     const screen = render(<MatchaProfileScreen />);

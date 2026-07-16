@@ -13,6 +13,7 @@ jest.mock('react-native-safe-area-context', () => {
 });
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: jest.fn() }),
+  useRoute: () => ({ params: undefined }),
 }));
 
 describe('WorkStyleIntroScreen', () => {
