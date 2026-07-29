@@ -1,4 +1,5 @@
 export { default as JobDetailScreen } from './screens/JobDetail';
+export { default as JobMatchingScreen } from './screens/JobMatching';
 export { default as JobCompareScreen } from './screens/JobCompare';
 
 export { default as InfoRow } from './components/InfoRow';

@@ -337,19 +337,22 @@ export default function WorkStyleQuestionsScreen() {
               </View>
             ))}
 
-            <TouchableOpacity
-              style={[
-                styles.submitButton,
-                !isComplete && styles.disabledButton,
-              ]}
-              disabled={!isComplete || submitting}
-              onPress={handleSubmit}
-            >
-              <Text style={styles.submitButtonText}>
-                {submitting ? 'Analyse...' : 'Voir mon résultat'}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.scrollSpacer} />
           </ScrollView>
+
+          {isComplete ? (
+            <View style={styles.footer}>
+              <TouchableOpacity
+                style={styles.submitButton}
+                disabled={submitting}
+                onPress={handleSubmit}
+              >
+                <Text style={styles.submitButtonText}>
+                  {submitting ? 'Analyse...' : 'Voir mon résultat'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </View>
       </SafeAreaView>
     </AppScreen>
@@ -375,15 +378,25 @@ const styles = StyleSheet.create({
   questionsContainer: {
     paddingHorizontal: 24,
     paddingTop: 12,
-    paddingBottom: 40,
+    paddingBottom: 32,
     gap: 16,
+  },
+  scrollSpacer: { height: 118 },
+  footer: {
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 30,
+    backgroundColor: 'transparent',
   },
   submitButton: {
     ...primaryButton,
-    marginTop: 4,
-  },
-  disabledButton: {
-    opacity: 0.5,
+    minHeight: 50,
+    borderRadius: 14,
+    shadowColor: '#1B6F52',
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
   submitButtonText: {
     ...primaryButtonText,

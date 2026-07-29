@@ -52,7 +52,7 @@ export function useProfile() {
               description: data.personality.description,
               strengths: data.personality.strengths || [],
               weaknesses: data.personality.weaknesses || [],
-              recommendedJobs: data.personality.recommendedJobs || [],
+              suggestedSectors: data.personality.suggestedSectors || [],
               scoreBreakdown: {
                 EI: data.personality.scoreBreakdown?.EI ?? 0,
                 SN: data.personality.scoreBreakdown?.SN ?? 0,

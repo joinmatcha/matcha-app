@@ -22,17 +22,16 @@ export default function TestHeader({
   return (
     <View style={styles.wrapper}>
       <View style={styles.headerCard}>
-        <Text style={styles.title}>{title}</Text>
-        {summary && <Text style={styles.summary}>{summary}</Text>}
-
-        <View style={styles.progressRow}>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${progress}%` }]} />
-          </View>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{title}</Text>
           <Text style={styles.progressText}>
             {currentQuestion} / {totalQuestions}
           </Text>
         </View>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        </View>
+        {summary && <Text style={styles.summary}>{summary}</Text>}
       </View>
     </View>
   );
@@ -41,43 +40,46 @@ export default function TestHeader({
 const styles = StyleSheet.create({
   wrapper: {
     paddingHorizontal: 24,
-    paddingTop: 18,
-    marginBottom: 16,
+    paddingTop: 10,
+    marginBottom: 12,
   },
   headerCard: {
-    backgroundColor: 'rgba(255,255,255,0.94)',
     borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: 'rgba(255,255,255,0.92)',
     borderWidth: 1,
-    borderColor: 'rgba(0,81,58,0.08)',
-    padding: 18,
+    borderColor: 'rgba(15,20,28,0.06)',
     shadowColor: '#5C5148',
-    shadowOpacity: 0.1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 4,
+    shadowOpacity: 0.05,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2,
   },
   title: {
-    fontSize: 22,
+    flex: 1,
+    fontSize: 17,
+    lineHeight: 21,
     fontWeight: '600',
     fontFamily: titleFontFamily,
     color: Colors.text.strong,
-    marginBottom: 4,
   },
   summary: {
-    fontSize: 13,
+    marginTop: 7,
+    fontSize: 12,
+    lineHeight: 17,
     fontFamily: bodyFontFamily,
     color: Colors.text.muted,
-    marginBottom: 14,
   },
-  progressRow: {
+  titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   progressBar: {
-    flex: 1,
-    height: 7,
-    backgroundColor: Colors.accent.soft,
+    marginTop: 9,
+    height: 5,
+    backgroundColor: 'rgba(42,127,104,0.13)',
     borderRadius: 999,
     overflow: 'hidden',
   },
@@ -91,11 +93,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: titleFontFamily,
     color: Colors.accent.strong,
-    minWidth: 56,
+    minWidth: 58,
     textAlign: 'center',
     backgroundColor: Colors.accent.soft,
     borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
   },
 });

@@ -21,7 +21,7 @@ type Props = {
 
 export default function BilanSummaryCard({ bilan, onPress }: Props) {
   const strengths = bilan.conclusion.keyStrengths.slice(0, 3);
-  const jobs = bilan.conclusion.recommendedJobs.slice(0, 2);
+  const sectors = bilan.conclusion.recommendedSectors.slice(0, 3);
 
   return (
     <View style={styles.card}>
@@ -46,18 +46,17 @@ export default function BilanSummaryCard({ bilan, onPress }: Props) {
         </View>
       </View>
 
-      {/* Jobs */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Pistes métiers</Text>
+        <Text style={styles.sectionLabel}>Secteurs à explorer</Text>
 
         <View style={styles.badges}>
-          {jobs.length === 0 && (
+          {sectors.length === 0 && (
             <Text style={styles.placeholder}>Suggestions dans ton profil</Text>
           )}
 
-          {jobs.map((job) => (
-            <View key={job.id} style={styles.badgeLight}>
-              <Text style={styles.badgeLightText}>{job.title}</Text>
+          {sectors.map((sector) => (
+            <View key={sector} style={styles.badgeLight}>
+              <Text style={styles.badgeLightText}>{sector}</Text>
             </View>
           ))}
         </View>

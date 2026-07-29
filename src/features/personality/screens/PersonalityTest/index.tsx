@@ -403,32 +403,24 @@ export default function PersonalityTestScreen() {
             <View style={styles.scrollSpacer} />
           </ScrollView>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerMeta}>
-              {isComplete
-                ? 'Parfait, tu peux finaliser.'
-                : `${test.questions.length - answers.size} question(s) restante(s)`}
-            </Text>
-
-            <TouchableOpacity
-              style={[
-                styles.submitButton,
-                (!isComplete || submitting) && styles.submitButtonDisabled,
-              ]}
-              disabled={!isComplete || submitting}
-              onPress={handleSubmit}
-            >
-              {submitting ? (
-                <ActivityIndicator color="#4F4741" />
-              ) : (
-                <Text style={styles.submitButtonText}>
-                  {isComplete
-                    ? 'Terminer le test'
-                    : 'Complète toutes les questions'}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          {isComplete ? (
+            <View style={styles.footer}>
+              <TouchableOpacity
+                style={[
+                  styles.submitButton,
+                  submitting && styles.submitButtonDisabled,
+                ]}
+                disabled={submitting}
+                onPress={handleSubmit}
+              >
+                {submitting ? (
+                  <ActivityIndicator color="#4F4741" />
+                ) : (
+                  <Text style={styles.submitButtonText}>Terminer le test</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </View>
       </SafeAreaView>
     </AppScreen>
@@ -445,8 +437,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   scrollView: { flex: 1 },
-  scrollContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 24 },
-  scrollSpacer: { height: 8 },
+  scrollContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 },
+  scrollSpacer: { height: 118 },
 
   actionsRow: {
     paddingHorizontal: 24,
@@ -478,7 +470,8 @@ const styles = StyleSheet.create({
     ...primaryButton,
     backgroundColor: Colors.accent.primary,
     shadowColor: '#1B6F52',
-    minHeight: 52,
+    minHeight: 50,
+    borderRadius: 14,
   },
   submitButtonDisabled: { opacity: 0.5 },
   submitButtonText: {
@@ -488,12 +481,10 @@ const styles = StyleSheet.create({
     fontFamily: titleFontFamily,
   },
   footer: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.accent.border,
     paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 14,
-    backgroundColor: '#FFFFFF',
+    paddingTop: 8,
+    paddingBottom: 30,
+    backgroundColor: 'transparent',
   },
   footerMeta: {
     fontSize: 12,

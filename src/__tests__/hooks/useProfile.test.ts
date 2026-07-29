@@ -35,7 +35,7 @@ const rawUser = {
     description: 'desc',
     strengths: ['s1'],
     weaknesses: ['w1'],
-    recommendedJobs: ['dev'],
+    suggestedSectors: ['dev'],
     scoreBreakdown: { EI: 1, SN: 2, TF: 3, JP: 4 },
   },
 };

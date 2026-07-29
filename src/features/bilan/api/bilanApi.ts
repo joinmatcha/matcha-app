@@ -1,6 +1,6 @@
 import api from '@/api/api';
 
-export type BilanQuestionType = 'likert_1_5' | 'open_text';
+export type BilanQuestionType = 'likert_1_5';
 
 export interface BilanQuestion {
   code: string;
@@ -12,8 +12,7 @@ export interface BilanQuestion {
 
 export interface BilanAnswersPayload {
   questionCode: string;
-  valueNumber?: number;
-  valueText?: string;
+  valueNumber: number;
 }
 
 export interface BilanArchetype {
@@ -23,22 +22,12 @@ export interface BilanArchetype {
   description: string;
 }
 
-export interface BilanRecommendedJob {
-  id: string;
-  title: string;
-  description?: string;
-  sector?: string;
-  score: number;
-  reasons: string[];
-}
-
 export interface BilanConclusion {
   archetype: BilanArchetype;
   profileSummary: string;
   keyStrengths: string[];
   improvementAxes: string[];
-  recommendedEnvironments: string[];
-  recommendedJobs: BilanRecommendedJob[];
+  recommendedSectors: string[];
   actionPlan: string[];
 }
 

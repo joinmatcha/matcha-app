@@ -39,7 +39,18 @@ jest.mock('@react-navigation/native', () => ({
         description: 'desc',
         strengths: ['Analytique'],
         weaknesses: ['Perfectionniste'],
-        recommendedJobs: ['Dev'],
+        suggestedSectors: ['Dev'],
+        dimensionInsights: [
+          {
+            key: 'EI',
+            label: 'Énergie relationnelle',
+            preference: 'Concentration individuelle',
+            score: -4,
+            intensity: 'marqué',
+            description: 'Besoin de temps calmes.',
+          },
+        ],
+        workPreferences: ['Prévoir des plages de concentration.'],
         scoreBreakdown: { EI: 0.7, SN: 0.4, TF: 0.8, JP: 0.3 },
       },
     },
@@ -75,5 +86,17 @@ jest.mock('@/hooks/useAuth', () => ({
 describe('PersonalityResultScreen', () => {
   it('se rend sans erreur', () => {
     expect(() => render(<PersonalityResultScreen />)).not.toThrow();
+  });
+
+  it('affiche les axes et préférences calculés par le backend', () => {
+    const screen = render(<PersonalityResultScreen />);
+
+    expect(screen.getByText('Lecture de tes axes')).toBeTruthy();
+    expect(screen.getByText('Énergie relationnelle')).toBeTruthy();
+    expect(screen.getByText('Concentration individuelle')).toBeTruthy();
+    expect(screen.getByText('À privilégier au travail')).toBeTruthy();
+    expect(
+      screen.getByText('Prévoir des plages de concentration.'),
+    ).toBeTruthy();
   });
 });

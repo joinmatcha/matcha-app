@@ -175,18 +175,6 @@ export default function WorkStyleResultScreen() {
             items={result.profile.advice}
           />
 
-          <View style={styles.crossSignalCard}>
-            <Text style={styles.crossSignalTitle}>
-              Pris en compte dans tes recommandations
-            </Text>
-            <Text style={styles.crossSignalText}>
-              Matcha croise ce style avec ton auto-évaluation professionnelle,
-              ton profil et tes interactions métiers. Il ne remplace pas le
-              classement principal : il ajoute un signal de compatibilité sur
-              les fiches métier et la comparaison.
-            </Text>
-          </View>
-
           <TouchableOpacity style={styles.primaryButton} onPress={handleRedo}>
             <Text style={styles.primaryButtonText}>Repasser le test</Text>
           </TouchableOpacity>

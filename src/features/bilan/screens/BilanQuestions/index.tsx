@@ -7,7 +7,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -27,14 +26,14 @@ import TestHeader from '@/features/personality/components/TestHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { clearDraft, loadDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
-import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
+import { titleFontFamily } from '@/themes/typography';
 import { primaryButton, primaryButtonText } from '@/themes/ui';
 import { RootStackParamList } from '@/types/navigation';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type BilanDraftData = {
-  answers: [string, number | string][];
+  answers: [string, number][];
 };
 
 export default function BilanQuestionsScreen() {
@@ -57,8 +56,8 @@ export default function BilanQuestionsScreen() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // réponses stockées comme pour le test perso
-  const [answers, setAnswers] = useState<Record<string, number | string>>({});
-  const answersRef = useRef<Record<string, number | string>>({});
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const answersRef = useRef<Record<string, number>>({});
   const questionsRef = useRef<BilanQuestion[]>([]);
   const versionRef = useRef(1);
 
@@ -87,11 +86,10 @@ export default function BilanQuestionsScreen() {
 
   const getFirstUnansweredQuestionCode = (
     currentQuestions: BilanQuestion[],
-    currentAnswers: Record<string, number | string>,
+    currentAnswers: Record<string, number>,
   ) =>
     currentQuestions.find((question) => {
       const answer = currentAnswers[question.code];
-      if (typeof answer === 'string') return answer.trim().length === 0;
       return answer === undefined;
     })?.code ?? currentQuestions[currentQuestions.length - 1]?.code;
 
@@ -180,7 +178,7 @@ export default function BilanQuestionsScreen() {
     };
   }, []);
 
-  const persistDraft = (nextAnswers: Record<string, number | string>) => {
+  const persistDraft = (nextAnswers: Record<string, number>) => {
     if (!userId || !version) return;
 
     saveDraft<BilanDraftData>({
@@ -236,14 +234,6 @@ export default function BilanQuestionsScreen() {
     scrollToNext(index);
   };
 
-  const handleTextAnswer = (code: string, text: string) => {
-    setAnswers((prev) => {
-      const nextAnswers = { ...prev, [code]: text };
-      persistDraft(nextAnswers);
-      return nextAnswers;
-    });
-  };
-
   const scrollToNext = (currentIndex: number) => {
     if (currentIndex >= questions.length - 1) return;
 
@@ -265,8 +255,7 @@ export default function BilanQuestionsScreen() {
     const payload: BilanAnswersPayload[] = Object.entries(answers).map(
       ([code, value]) => ({
         questionCode: code,
-        valueNumber: typeof value === 'number' ? value : undefined,
-        valueText: typeof value === 'string' ? value : undefined,
+        valueNumber: value,
       }),
     );
 
@@ -285,20 +274,6 @@ export default function BilanQuestionsScreen() {
           archetypeId: generated.bilan.conclusion.archetype.id,
           archetypeTitle: generated.bilan.conclusion.archetype.title,
         },
-      });
-      generated.bilan.conclusion.recommendedJobs.forEach((job, index) => {
-        trackAnalyticsEvent({
-          eventType: 'job_matched',
-          entityType: 'job',
-          entityId: job.id,
-          metadata: {
-            jobTitle: job.title,
-            domain: job.sector,
-            rank: index + 1,
-            score: job.score,
-            sourceTest: 'bilan',
-          },
-        });
       });
       if (userId) await clearDraft('bilan', userId);
       setErrorMessage(null);
@@ -374,100 +349,45 @@ export default function BilanQuestionsScreen() {
                   }
                 }}
               >
-                {/* ----------------- LIKERT ----------------- */}
-                {q.type === 'likert_1_5' && (
-                  <QuestionCard
-                    questionNumber={index + 1}
-                    questionText={q.question}
-                    options={[
-                      { value: 1, label: '' },
-                      { value: 2, label: '' },
-                      { value: 3, label: '' },
-                      { value: 4, label: '' },
-                      { value: 5, label: '' },
-                    ]}
-                    selectedValue={
-                      typeof answers[q.code] === 'number'
-                        ? (answers[q.code] as number)
-                        : undefined
-                    }
-                    onAnswer={(value) =>
-                      handleLikertAnswer(q.code, value, index)
-                    }
-                  />
-                )}
-
-                {/* ---------------- OPEN TEXT --------------- */}
-                {q.type === 'open_text' &&
-                  (() => {
-                    const answerValue = answers[q.code];
-                    const hasTextAnswer =
-                      typeof answerValue === 'string' &&
-                      answerValue.trim().length > 0;
-
-                    return (
-                      <View style={styles.textCard}>
-                        <Text style={styles.badge}>Question {index + 1}</Text>
-                        <Text style={styles.textQuestion}>{q.question}</Text>
-                        <Text style={styles.textHint}>
-                          Quelques lignes suffisent. Va droit au plus utile.
-                        </Text>
-
-                        <TextInput
-                          style={[
-                            styles.input,
-                            hasTextAnswer && styles.inputAnswered,
-                          ]}
-                          multiline
-                          placeholder="Écris ta réponse..."
-                          placeholderTextColor="rgba(87, 82, 77, 0.62)"
-                          value={
-                            typeof answerValue === 'string' ? answerValue : ''
-                          }
-                          onChangeText={(t) => handleTextAnswer(q.code, t)}
-                        />
-
-                        <TouchableOpacity
-                          style={styles.nextBtn}
-                          onPress={() => scrollToNext(index)}
-                        >
-                          <Text style={styles.nextBtnText}>Continuer</Text>
-                        </TouchableOpacity>
-                      </View>
-                    );
-                  })()}
+                <QuestionCard
+                  questionNumber={index + 1}
+                  questionText={q.question}
+                  options={[
+                    { value: 1, label: '' },
+                    { value: 2, label: '' },
+                    { value: 3, label: '' },
+                    { value: 4, label: '' },
+                    { value: 5, label: '' },
+                  ]}
+                  selectedValue={answers[q.code]}
+                  onAnswer={(value) => handleLikertAnswer(q.code, value, index)}
+                />
               </View>
             ))}
 
             <View style={styles.scrollSpacer} />
           </ScrollView>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerMeta}>
-              {isComplete
-                ? 'Parfait, tu peux finaliser.'
-                : `${totalQuestions - answeredCount} question(s) restante(s)`}
-            </Text>
-
-            <TouchableOpacity
-              style={[
-                styles.submitButton,
-                (!isComplete || submitting) && styles.submitButtonDisabled,
-              ]}
-              disabled={!isComplete || submitting}
-              onPress={handleSubmit}
-            >
-              {submitting ? (
-                <ActivityIndicator color="#4F4741" />
-              ) : (
-                <Text style={styles.submitButtonText}>
-                  {isComplete
-                    ? "Terminer l'auto-évaluation"
-                    : 'Complète toutes les questions'}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          {isComplete ? (
+            <View style={styles.footer}>
+              <TouchableOpacity
+                style={[
+                  styles.submitButton,
+                  submitting && styles.submitButtonDisabled,
+                ]}
+                disabled={submitting}
+                onPress={handleSubmit}
+              >
+                {submitting ? (
+                  <ActivityIndicator color="#4F4741" />
+                ) : (
+                  <Text style={styles.submitButtonText}>
+                    Terminer l'auto-évaluation
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </View>
       </SafeAreaView>
     </AppScreen>
@@ -480,8 +400,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, zIndex: 2 },
 
   scroll: { flex: 1 },
-  scrollContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 24 },
-  scrollSpacer: { height: 8 },
+  scrollContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 },
+  scrollSpacer: { height: 118 },
 
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   actionsRow: {
@@ -517,76 +437,11 @@ const styles = StyleSheet.create({
     fontFamily: titleFontFamily,
   },
 
-  textCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.accent.border,
-    padding: 18,
-    marginBottom: 20,
-    shadowColor: '#5C5148',
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 2,
-  },
-  badge: {
-    fontSize: 12,
-    fontWeight: '600',
-    fontFamily: titleFontFamily,
-    color: Colors.accent.strong,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-  },
-  textQuestion: {
-    fontSize: 17,
-    fontWeight: '600',
-    fontFamily: titleFontFamily,
-    color: Colors.text.strong,
-    marginBottom: 8,
-    lineHeight: 24,
-  },
-  textHint: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontFamily: bodyFontFamily,
-    color: Colors.text.muted,
-    marginBottom: 12,
-  },
-  input: {
-    minHeight: 120,
-    backgroundColor: Colors.accent.soft,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    fontSize: 15,
-    fontFamily: bodyFontFamily,
-    color: Colors.text.strong,
-    lineHeight: 21,
-    textAlignVertical: 'top',
-  },
-  inputAnswered: {
-    backgroundColor: '#EEF6F1',
-  },
-
-  nextBtn: {
-    ...primaryButton,
-    minHeight: 46,
-  },
-  nextBtnText: {
-    ...primaryButtonText,
-    fontSize: 15,
-    fontFamily: titleFontFamily,
-  },
-
   footer: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.accent.border,
     paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 14,
-    backgroundColor: '#FFFFFF',
+    paddingTop: 8,
+    paddingBottom: 30,
+    backgroundColor: 'transparent',
   },
   footerMeta: {
     fontSize: 12,
@@ -600,7 +455,8 @@ const styles = StyleSheet.create({
     ...primaryButton,
     backgroundColor: Colors.accent.primary,
     shadowColor: '#1B6F52',
-    minHeight: 52,
+    minHeight: 50,
+    borderRadius: 14,
   },
   submitButtonDisabled: { opacity: 0.5 },
   submitButtonText: {

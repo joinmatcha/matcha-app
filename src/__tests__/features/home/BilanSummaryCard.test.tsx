@@ -22,11 +22,7 @@ const bilan = {
     profileSummary: 'summary',
     keyStrengths: ['Analyse', 'Communication', 'Leadership'],
     improvementAxes: [],
-    recommendedEnvironments: [],
-    recommendedJobs: [
-      { id: 'j1', title: 'Dev', score: 90, reasons: [] },
-      { id: 'j2', title: 'Designer', score: 80, reasons: [] },
-    ],
+    recommendedSectors: ['Informatique', 'Design'],
     actionPlan: [],
   },
   investigation: {
@@ -54,12 +50,12 @@ describe('BilanSummaryCard', () => {
     expect(getByText('Communication')).toBeTruthy();
   });
 
-  it('affiche les pistes métiers', () => {
+  it('affiche les secteurs à explorer', () => {
     const { getByText } = render(
       <BilanSummaryCard bilan={bilan as any} onPress={onPress} />,
     );
-    expect(getByText('Dev')).toBeTruthy();
-    expect(getByText('Designer')).toBeTruthy();
+    expect(getByText('Informatique')).toBeTruthy();
+    expect(getByText('Design')).toBeTruthy();
   });
 
   it('appelle onPress quand on clique', () => {

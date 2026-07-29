@@ -140,7 +140,7 @@ describe('PersonalityTestScreen', () => {
 
     fireEvent.press(screen.getByLabelText('Réponse 1'));
     await waitFor(() => {
-      expect(screen.getByText('Parfait, tu peux finaliser.')).toBeTruthy();
+      expect(screen.getByText('Terminer le test')).toBeTruthy();
     });
     fireEvent.press(screen.getByText('Terminer le test'));
 
