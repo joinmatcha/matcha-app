@@ -14,7 +14,11 @@ import {
   BilanResultScreen,
 } from '@/features/bilan';
 import { CareerPreferencesScreen, MatchaProfileScreen } from '@/features/home';
-import { JobCompareScreen, JobDetailScreen } from '@/features/jobs';
+import {
+  JobCompareScreen,
+  JobDetailScreen,
+  JobMatchingScreen,
+} from '@/features/jobs';
 import {
   PersonalityIntroScreen,
   PersonalityResultScreen,
@@ -64,6 +68,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       BilanIntro: 'professional-self-assessment',
       BilanQuestions: 'professional-self-assessment/questions',
       MatchaProfile: 'matcha-profile',
+      JobMatching: 'job-matching',
       CareerPreferences: 'career-preferences',
       WorkStyleIntro: 'work-style',
       WorkStyleQuestions: 'work-style/questions',
@@ -137,6 +142,11 @@ export default function AppNavigator() {
             <RootStack.Screen
               name="MatchaProfile"
               component={MatchaProfileScreen}
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="JobMatching"
+              component={JobMatchingScreen}
               options={secondaryScreenOptions}
             />
             <RootStack.Screen

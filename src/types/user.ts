@@ -4,7 +4,16 @@ export interface PersonalitySummary {
   description: string; // Texte complet
   strengths: string[]; // Ex: ["Créatif", "Logique"]
   weaknesses: string[]; // Ex: ["Impulsif", "Impatient"]
-  recommendedJobs: string[]; // Ex: ["Product Manager", "UX Designer"]
+  suggestedSectors: string[]; // Ex: ["Product Manager", "UX Designer"]
+  dimensionInsights?: Array<{
+    key: 'EI' | 'SN' | 'TF' | 'JP';
+    label: string;
+    preference: string;
+    score: number;
+    intensity: 'léger' | 'marqué' | 'fort';
+    description: string;
+  }>;
+  workPreferences?: string[];
 
   scoreBreakdown: {
     EI: number;

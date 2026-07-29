@@ -95,14 +95,7 @@ describe('BilanQuestionsScreen', () => {
     scores: [],
     conclusion: {
       archetype: { id: 'balanced', title: 'Profil équilibré' },
-      recommendedJobs: [
-        {
-          id: 'job1',
-          title: 'Développeur web',
-          sector: 'Informatique',
-          score: 82,
-        },
-      ],
+      recommendedSectors: ['Informatique'],
     },
   };
 
@@ -141,7 +134,7 @@ describe('BilanQuestionsScreen', () => {
 
     fireEvent.press(screen.getByLabelText('Réponse 5'));
     await waitFor(() => {
-      expect(screen.getByText('Parfait, tu peux finaliser.')).toBeTruthy();
+      expect(screen.getByText("Terminer l'auto-évaluation")).toBeTruthy();
     });
     fireEvent.press(screen.getByText("Terminer l'auto-évaluation"));
 

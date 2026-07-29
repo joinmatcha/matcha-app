@@ -4,6 +4,7 @@ export type MatchaProfileRoute =
   | 'BilanIntro'
   | 'PersonalityIntro'
   | 'WorkStyleIntro'
+  | 'JobMatching'
   | 'JobCompare'
   | 'CareerPreferences';
 
@@ -35,6 +36,7 @@ export type MatchaProfileNextAction = {
     | 'start_bilan'
     | 'start_personality'
     | 'start_work_style'
+    | 'start_matching'
     | 'compare_jobs'
     | 'view_liked_jobs';
   label: string;
@@ -62,8 +64,16 @@ export type MatchaProfileSummary = {
     sectors: string[];
   };
   tests: MatchaProfileTestCard[];
-  recommendedJobs: MatchaProfileJob[];
+  matchedJobs: MatchaProfileJob[];
   likedJobs: MatchaProfileJob[];
+  matchingStatus: {
+    unlocked: boolean;
+    total: number;
+    remaining: number;
+    completed: boolean;
+    liked: number;
+    disliked: number;
+  };
   nextBestAction: MatchaProfileNextAction;
 };
 

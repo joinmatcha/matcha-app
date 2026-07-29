@@ -21,21 +21,25 @@ export default function AnswerButton({
   const middleIndex = (totalOptions - 1) / 2;
   const distanceFromMiddle = Math.abs(index - middleIndex);
 
-  const sizeScale = 0.82 + (distanceFromMiddle / middleIndex) * 0.34;
-  const circleSize = 34 * sizeScale;
+  const sizeScale = 0.86 + (distanceFromMiddle / middleIndex) * 0.24;
+  const circleSize = 32 * sizeScale;
 
-  let circleColor = '#F5F3F0';
-  let shadowOpacity = 0.05;
+  let circleColor = '#F1EFEA';
+  let borderColor = 'rgba(31,31,31,0.035)';
+  let shadowOpacity = 0.03;
 
   if (isSelected) {
     if (index < 2) {
       circleColor = '#CFEBDD';
+      borderColor = '#A8D8C5';
     } else if (index === 2) {
       circleColor = '#99D3BA';
+      borderColor = '#6DB89F';
     } else {
       circleColor = Colors.accent.primary;
+      borderColor = Colors.accent.primary;
     }
-    shadowOpacity = 0.16;
+    shadowOpacity = 0.12;
   }
 
   const dynamicCircleStyle = {
@@ -43,6 +47,7 @@ export default function AnswerButton({
     height: circleSize,
     borderRadius: circleSize / 2,
     backgroundColor: circleColor,
+    borderColor,
     shadowOpacity,
   };
 
@@ -68,10 +73,11 @@ const styles = StyleSheet.create({
   circle: {
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
     shadowColor: '#6A5D4E',
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 6,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 1,
   },
   innerDot: {
     width: 7,

@@ -14,7 +14,7 @@ const personality = {
   description: 'desc',
   strengths: ['Analytique', 'Stratégique', 'Déterminé', 'Extra'],
   weaknesses: ['Perfectionniste'],
-  recommendedJobs: ['Dev'],
+  suggestedSectors: ['Dev'],
   scoreBreakdown: { EI: 1, SN: 2, TF: 3, JP: 4 },
 };
 

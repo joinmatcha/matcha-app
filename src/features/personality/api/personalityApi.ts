@@ -18,7 +18,7 @@ export interface PersonalityProfile {
   description: string;
   strengths: string[];
   weaknesses: string[];
-  recommendedJobs: string[];
+  suggestedSectors: string[];
 }
 
 export interface PersonalityTemplate {
@@ -42,7 +42,16 @@ export interface PersonalityResult {
   description: string;
   strengths: string[];
   weaknesses: string[];
-  recommendedJobs: string[];
+  suggestedSectors: string[];
+  dimensionInsights?: Array<{
+    key: 'EI' | 'SN' | 'TF' | 'JP';
+    label: string;
+    preference: string;
+    score: number;
+    intensity: 'léger' | 'marqué' | 'fort';
+    description: string;
+  }>;
+  workPreferences?: string[];
   scoreBreakdown: {
     EI: number;
     SN: number;

@@ -207,30 +207,53 @@ function ProgressRing({ completion }: { completion: number }) {
 
 function ProfileSnapshot({
   completion,
-  onPress,
+  matchingCompleted,
+  matchingTotal,
+  onPrimaryPress,
 }: {
   completion: number;
-  onPress: () => void;
+  matchingCompleted: boolean;
+  matchingTotal: number;
+  onPrimaryPress: () => void;
 }) {
   const isComplete = completion >= 100;
+  const title = !isComplete
+    ? 'Profil Matcha verrouillé'
+    : matchingCompleted
+      ? 'Ton profil Matcha est prêt'
+      : 'Matching métier débloqué';
+  const description = !isComplete
+    ? 'Termine les 3 tests pour débloquer ton matching métier personnalisé.'
+    : matchingCompleted
+      ? 'Retrouve tes signaux clés, tes secteurs et les métiers que tu as gardés.'
+      : `${matchingTotal || 20} métiers cohérents avec tes résultats croisés t’attendent.`;
+  const buttonLabel = !isComplete
+    ? 'Continuer mes tests'
+    : matchingCompleted
+      ? 'Voir mon profil complet'
+      : 'Lancer mon matching métier';
 
   return (
-    <View style={styles.profileCard}>
+    <View style={[styles.profileCard, !isComplete && styles.profileCardLocked]}>
       <View style={styles.profileCopy}>
-        <Text style={styles.profileTitle}>Ton profil Matcha</Text>
-        <Text style={styles.profileText}>
-          Tes résultats, tes signaux et tes métiers cohérents au même endroit.
-        </Text>
+        {!isComplete ? (
+          <View style={styles.lockBadge}>
+            <MaterialIcons name="lock" size={14} color="#6E7772" />
+            <Text style={styles.lockBadgeText}>Bloqué</Text>
+          </View>
+        ) : null}
+        <Text style={styles.profileTitle}>{title}</Text>
+        <Text style={styles.profileText}>{description}</Text>
         <MatchaButton
-          label={
-            isComplete ? 'Voir mon profil Matcha' : 'Construire mon profil'
-          }
-          onPress={onPress}
+          label={buttonLabel}
+          onPress={onPrimaryPress}
           variant="primary"
         />
       </View>
 
-      <ProgressRing completion={completion} />
+      <View style={[!isComplete && styles.lockedProgressWrap]}>
+        <ProgressRing completion={completion} />
+      </View>
     </View>
   );
 }
@@ -427,6 +450,40 @@ export default function HomeScreen() {
   const completion = Math.round(
     ([hasBilan, hasPersonality, hasWorkStyle].filter(Boolean).length / 3) * 100,
   );
+  const matchingCompleted = Boolean(matchaProfile?.matchingStatus?.completed);
+  const matchingTotal = matchaProfile?.matchingStatus?.total ?? 0;
+  const openProfileCard = () => {
+    if (completion < 100) {
+      if (!hasBilan) {
+        if (shouldUseBilanDraft && hasStartedBilanDraft) {
+          navigation.navigate('BilanQuestions');
+        } else {
+          navigation.navigate('BilanIntro', {
+            mode: shouldUseBilanDraft ? 'restart' : 'start',
+          });
+        }
+        return;
+      }
+
+      if (!hasPersonality) {
+        if (hasPersonalityDraft) {
+          navigation.navigate('PersonalityTest');
+        } else {
+          navigation.navigate('PersonalityIntro');
+        }
+        return;
+      }
+
+      if (hasWorkStyleDraft) {
+        navigation.navigate('WorkStyleQuestions');
+      } else {
+        navigation.navigate('WorkStyleIntro');
+      }
+      return;
+    }
+
+    navigation.navigate(matchingCompleted ? 'MatchaProfile' : 'JobMatching');
+  };
   const firstName = getFirstName(user);
 
   const personalityTitle = hasPersonality
@@ -490,7 +547,9 @@ export default function HomeScreen() {
           <SectionHeader title="Profil" />
           <ProfileSnapshot
             completion={completion}
-            onPress={() => navigation.navigate('MatchaProfile')}
+            matchingCompleted={matchingCompleted}
+            matchingTotal={matchingTotal}
+            onPrimaryPress={openProfileCard}
           />
 
           <SectionHeader title="Tests & analyses" />
@@ -651,6 +710,39 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 10 },
     elevation: 2,
+  },
+  profileCardLocked: {
+    backgroundColor: '#ECE8E1',
+    borderWidth: 1,
+    borderColor: '#CFC9BE',
+    shadowOpacity: 0.03,
+    opacity: 0.92,
+  },
+  lockBadge: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginBottom: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.44)',
+  },
+  lockBadgeText: {
+    fontSize: 11,
+    fontFamily: labelFontFamily,
+    color: '#6E7772',
+  },
+  lockedProgressWrap: {
+    width: 82,
+    height: 82,
+    borderRadius: 41,
+    borderWidth: 2,
+    borderColor: '#9EA7A2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.34)',
   },
   profileCopy: {
     flex: 1,

@@ -224,6 +224,11 @@ export default function MatchaProfileScreen() {
       return;
     }
 
+    if (action.route === 'JobMatching') {
+      navigation.navigate('JobMatching');
+      return;
+    }
+
     navigation.navigate(action.route);
   };
 
@@ -258,7 +263,7 @@ export default function MatchaProfileScreen() {
   const values = profile.keyDimensions.values;
   const environments = profile.keyDimensions.environments;
   const sectors = profile.keyDimensions.sectors;
-  const recommendedJobs = profile.recommendedJobs;
+  const matchedJobs = profile.matchedJobs;
   const likedJobs = profile.likedJobs;
   const [bilanTest, personalityTest, workStyleTest] = profile.tests;
   const buildAdjustedTest = (
@@ -464,12 +469,12 @@ export default function MatchaProfileScreen() {
 
           <SectionTitle title="Métiers cohérents" />
           <View style={styles.card}>
-            {recommendedJobs.length ? (
+            {matchedJobs.length ? (
               <>
                 <Text style={styles.groupTitle}>
                   Recommandés par tes résultats
                 </Text>
-                {recommendedJobs.map((job) => (
+                {matchedJobs.map((job) => (
                   <JobRow
                     key={job.id}
                     job={{
@@ -512,7 +517,7 @@ export default function MatchaProfileScreen() {
               </>
             ) : null}
 
-            {!recommendedJobs.length && !likedJobs.length ? (
+            {!matchedJobs.length && !likedJobs.length ? (
               <Text style={styles.emptyText}>
                 Aucun métier à croiser pour le moment. Termine l’auto-évaluation
                 ou commence à swiper.

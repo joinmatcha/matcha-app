@@ -5,7 +5,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -46,31 +46,6 @@ export default function BilanResultScreen() {
 
   const { bilan } = route.params;
   const { conclusion, investigation } = bilan;
-  const [isCompareMode, setIsCompareMode] = useState(false);
-  const [selectedJobIds, setSelectedJobIds] = useState<string[]>([]);
-  const canCompare = selectedJobIds.length >= 2;
-
-  const toggleCompareMode = () => {
-    setIsCompareMode((current) => {
-      if (current) {
-        setSelectedJobIds([]);
-      }
-      return !current;
-    });
-  };
-
-  const toggleJobSelection = (jobId: string) => {
-    setSelectedJobIds((current) => {
-      if (current.includes(jobId)) {
-        return current.filter((id) => id !== jobId);
-      }
-      if (current.length >= 3) {
-        return current;
-      }
-      return [...current, jobId];
-    });
-  };
-
   const handleRedo = async () => {
     if (user?.id) {
       await clearDraft('bilan', user.id);
@@ -123,9 +98,9 @@ export default function BilanResultScreen() {
           </View>
           <View style={styles.overviewCard}>
             <Text style={styles.overviewValue}>
-              {conclusion.recommendedJobs.length}
+              {conclusion.recommendedSectors.length}
             </Text>
-            <Text style={styles.overviewLabel}>métiers à explorer</Text>
+            <Text style={styles.overviewLabel}>secteurs à explorer</Text>
           </View>
         </View>
 
@@ -184,8 +159,8 @@ export default function BilanResultScreen() {
           </View>
         </ProfileSection>
 
-        <ProfileSection title="Environnements où tu peux t’épanouir">
-          {conclusion.recommendedEnvironments.map((env, idx) => (
+        <ProfileSection title="Secteurs et environnements à explorer">
+          {conclusion.recommendedSectors.map((env, idx) => (
             <View key={idx} style={styles.envCard}>
               <View style={styles.envTitleRow}>
                 <View style={styles.envAccent} />
@@ -193,114 +168,18 @@ export default function BilanResultScreen() {
               </View>
 
               <Text style={styles.envText}>
-                Tu es particulièrement à l’aise dans des contextes où la
-                relation humaine, l’écoute et l’accompagnement jouent un rôle
-                central.
+                Ce secteur ressort comme une zone à explorer. Il sera croisé
+                avec tes autres résultats et tes likes pour préciser les métiers
+                qui méritent vraiment ton attention.
               </Text>
 
               <View style={styles.envTags}>
-                <Text style={styles.envTag}>Accompagnement</Text>
-                <Text style={styles.envTag}>Transmission</Text>
-                <Text style={styles.envTag}>Impact humain</Text>
+                <Text style={styles.envTag}>Signal du bilan</Text>
+                <Text style={styles.envTag}>À croiser</Text>
+                <Text style={styles.envTag}>À vérifier</Text>
               </View>
             </View>
           ))}
-        </ProfileSection>
-
-        <ProfileSection
-          title="Pistes métiers à explorer"
-          headerRight={
-            conclusion.recommendedJobs.length >= 2 ? (
-              <TouchableOpacity
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                onPress={toggleCompareMode}
-              >
-                <Text style={styles.compareModeButtonText}>
-                  {isCompareMode ? 'Annuler' : 'Comparer'}
-                </Text>
-              </TouchableOpacity>
-            ) : null
-          }
-        >
-          {conclusion.recommendedJobs.map((job) => (
-            <View key={job.id} style={styles.jobCard}>
-              <View style={styles.jobHeader}>
-                <Text style={styles.jobTitle}>{job.title}</Text>
-                {job.sector && (
-                  <Text style={styles.jobSector}>{job.sector}</Text>
-                )}
-              </View>
-
-              {/* Raisons */}
-              {job.reasons?.length ? (
-                <View style={styles.reasonsContainer}>
-                  {job.reasons.slice(0, 2).map((r, i) => (
-                    <View key={i} style={styles.reasonRow}>
-                      <View style={styles.reasonDot} />
-                      <Text style={styles.jobReason}>{r}</Text>
-                    </View>
-                  ))}
-                </View>
-              ) : null}
-
-              {isCompareMode ? (
-                <TouchableOpacity
-                  style={styles.selectionRow}
-                  onPress={() => toggleJobSelection(job.id)}
-                >
-                  <View
-                    style={[
-                      styles.selectionCircle,
-                      selectedJobIds.includes(job.id) &&
-                        styles.selectionCircleActive,
-                    ]}
-                  >
-                    {selectedJobIds.includes(job.id) ? (
-                      <View style={styles.selectionCircleDot} />
-                    ) : null}
-                  </View>
-                  <Text style={styles.selectionText}>
-                    {selectedJobIds.includes(job.id)
-                      ? 'Sélectionné pour comparaison'
-                      : 'Ajouter à la comparaison'}
-                  </Text>
-                </TouchableOpacity>
-              ) : null}
-
-              <TouchableOpacity
-                style={styles.jobLinkButton}
-                onPress={() =>
-                  navigation.navigate('JobDetail', { jobId: job.id })
-                }
-              >
-                <Text style={styles.jobLink}>Explorer ce métier</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-
-          {isCompareMode ? (
-            <TouchableOpacity
-              disabled={!canCompare}
-              style={[
-                styles.compareButton,
-                !canCompare && styles.compareButtonDisabled,
-              ]}
-              onPress={() =>
-                navigation.navigate('JobCompare', { jobIds: selectedJobIds })
-              }
-            >
-              <Text
-                style={[
-                  styles.compareButtonText,
-                  !canCompare && styles.compareButtonTextDisabled,
-                ]}
-              >
-                {canCompare
-                  ? `Comparer ${selectedJobIds.length} métiers`
-                  : `${selectedJobIds.length}/3 sélectionné(s)`}
-              </Text>
-            </TouchableOpacity>
-          ) : null}
         </ProfileSection>
 
         <ProfileSection title="Prochaines étapes" isLast>
@@ -730,6 +609,15 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontFamily: bodyFontFamily,
     color: '#232220',
+  },
+
+  primaryCta: {
+    ...primaryButton,
+    marginTop: 16,
+  },
+  primaryCtaText: {
+    ...primaryButtonText,
+    fontFamily: titleFontFamily,
   },
 
   redoButton: {

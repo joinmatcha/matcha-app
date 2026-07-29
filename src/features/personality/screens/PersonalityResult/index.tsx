@@ -78,7 +78,7 @@ export default function PersonalityResultScreen() {
   const insightCards = [
     { label: 'Type', value: result.type ?? 'Profil' },
     { label: 'Forces clés', value: `${result.strengths.length}` },
-    { label: 'Pistes métiers', value: `${result.recommendedJobs.length}` },
+    { label: 'Secteurs', value: `${result.suggestedSectors.length}` },
   ];
 
   return (
@@ -121,6 +121,40 @@ export default function PersonalityResultScreen() {
             <Text style={styles.description}>{result.description}</Text>
           </View>
 
+          {result.dimensionInsights?.length ? (
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionTitle}>Lecture de tes axes</Text>
+              <View style={styles.axisList}>
+                {result.dimensionInsights.map((axis) => (
+                  <View key={axis.key} style={styles.axisItem}>
+                    <View style={styles.axisHeader}>
+                      <Text style={styles.axisTitle}>{axis.label}</Text>
+                      <Text style={styles.axisBadge}>{axis.intensity}</Text>
+                    </View>
+                    <Text style={styles.axisPreference}>{axis.preference}</Text>
+                    <Text style={styles.axisDescription}>
+                      {axis.description}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : null}
+
+          {result.workPreferences?.length ? (
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionTitle}>À privilégier au travail</Text>
+              <View style={styles.jobsList}>
+                {result.workPreferences.map((preference) => (
+                  <View key={preference} style={styles.jobItem}>
+                    <View style={styles.jobBullet} />
+                    <Text style={styles.jobText}>{preference}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : null}
+
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>Forces</Text>
             <TagList items={result.strengths} variant="success" />
@@ -132,9 +166,14 @@ export default function PersonalityResultScreen() {
           </View>
 
           <View style={[styles.sectionCard, styles.lastSectionCard]}>
-            <Text style={styles.sectionTitle}>Métiers recommandés</Text>
+            <Text style={styles.sectionTitle}>Secteurs indicatifs</Text>
+            <Text style={styles.description}>
+              Ces pistes ne sont pas des recommandations finales. Elles servent
+              de signal dans ton profil Matcha avec tes autres tests et tes
+              likes.
+            </Text>
             <View style={styles.jobsList}>
-              {result.recommendedJobs.map((job, i) => (
+              {result.suggestedSectors.map((job, i) => (
                 <View key={i} style={styles.jobItem}>
                   <View style={styles.jobBullet} />
                   <Text style={styles.jobText}>{job}</Text>
@@ -245,6 +284,46 @@ const styles = StyleSheet.create({
     lineHeight: 23,
     fontFamily: bodyFontFamily,
     color: Colors.text.base,
+  },
+  axisList: {
+    gap: 10,
+  },
+  axisItem: {
+    borderRadius: 8,
+    backgroundColor: Colors.ui.surfaceSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+  },
+  axisHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  axisTitle: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: titleFontFamily,
+    fontWeight: '700',
+    color: Colors.text.strong,
+  },
+  axisBadge: {
+    fontSize: 11,
+    fontFamily: titleFontFamily,
+    fontWeight: '700',
+    color: Colors.accent.strong,
+  },
+  axisPreference: {
+    marginTop: 5,
+    fontSize: 14,
+    fontFamily: titleFontFamily,
+    color: Colors.accent.strong,
+  },
+  axisDescription: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 19,
+    fontFamily: bodyFontFamily,
+    color: Colors.text.muted,
   },
 
   jobsList: { gap: 12 },

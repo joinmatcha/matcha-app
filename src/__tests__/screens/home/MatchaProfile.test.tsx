@@ -77,7 +77,7 @@ jest.mock('@/features/home/hooks/useMatchaProfile', () => ({
           completed: true,
         },
       ],
-      recommendedJobs: [
+      matchedJobs: [
         {
           id: 'job-1',
           title: 'Conseiller clientèle',
@@ -93,6 +93,14 @@ jest.mock('@/features/home/hooks/useMatchaProfile', () => ({
           likesCount: 2,
         },
       ],
+      matchingStatus: {
+        unlocked: true,
+        total: 20,
+        remaining: 0,
+        completed: true,
+        liked: 4,
+        disliked: 16,
+      },
       nextBestAction: {
         type: 'compare_jobs',
         label: 'Comparer mes métiers',

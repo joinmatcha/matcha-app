@@ -4,6 +4,7 @@ import React from 'react';
 import BilanResultScreen from '@/features/bilan/screens/BilanResult';
 
 const mockNavigate = jest.fn();
+const mockDispatch = jest.fn();
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -35,7 +36,14 @@ jest.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 'u1' } }),
 }));
 jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({ navigate: mockNavigate, goBack: jest.fn() }),
+  CommonActions: {
+    reset: (payload: any) => ({ type: 'RESET', payload }),
+  },
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    dispatch: mockDispatch,
+    goBack: jest.fn(),
+  }),
   useRoute: () => ({
     params: {
       bilan: {
@@ -52,25 +60,7 @@ jest.mock('@react-navigation/native', () => ({
           profileSummary: 'summary',
           keyStrengths: ['Force'],
           improvementAxes: ['Axe'],
-          recommendedEnvironments: ['Remote'],
-          recommendedJobs: [
-            {
-              id: 'j1',
-              title: 'Développeur web',
-              description: 'Conçoit des applications',
-              sector: 'Tech',
-              score: 82,
-              reasons: ['Compatible avec ton profil'],
-            },
-            {
-              id: 'j2',
-              title: 'Data analyst',
-              description: 'Analyse des données',
-              sector: 'Data',
-              score: 76,
-              reasons: ['Mobilise tes compétences'],
-            },
-          ],
+          recommendedSectors: ['Remote'],
           actionPlan: [],
         },
         investigation: {
@@ -108,22 +98,21 @@ jest.mock('react-native-svg', () => {
 describe('BilanResultScreen', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
+    mockDispatch.mockClear();
   });
 
   it('se rend sans erreur', () => {
     expect(() => render(<BilanResultScreen />)).not.toThrow();
   });
 
-  it('permet de sélectionner deux métiers et de lancer la comparaison', () => {
+  it("retourne à l'accueil sans ouvrir le profil Matcha", () => {
     const screen = render(<BilanResultScreen />);
 
-    fireEvent.press(screen.getByText('Comparer'));
-    fireEvent.press(screen.getAllByText('Ajouter à la comparaison')[0]);
-    fireEvent.press(screen.getAllByText('Ajouter à la comparaison')[0]);
-    fireEvent.press(screen.getByText('Comparer 2 métiers'));
+    fireEvent.press(screen.getByText('Retour à l’accueil'));
 
-    expect(mockNavigate).toHaveBeenCalledWith('JobCompare', {
-      jobIds: ['j1', 'j2'],
-    });
+    expect(mockNavigate).not.toHaveBeenCalledWith('MatchaProfile');
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'RESET' }),
+    );
   });
 });

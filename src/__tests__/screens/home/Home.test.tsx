@@ -4,6 +4,10 @@ import React from 'react';
 import HomeScreen from '@/features/home/screens/Home';
 
 const mockNavigate = jest.fn();
+const mockUseProfile = jest.fn();
+const mockUseBilan = jest.fn();
+const mockUseWorkStyle = jest.fn();
+const mockUseMatchaProfile = jest.fn();
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -54,37 +58,16 @@ jest.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 'u1' }, logout: jest.fn() }),
 }));
 jest.mock('@/features/profile/hooks/useProfile', () => ({
-  useProfile: () => ({
-    user: { id: 'u1', firstName: 'John', lastName: 'Doe', email: 'a@b.com' },
-    loading: false,
-    error: null,
-    refresh: jest.fn(),
-  }),
+  useProfile: () => mockUseProfile(),
 }));
 jest.mock('@/features/bilan/hooks/useBilan', () => ({
-  useBilan: () => ({
-    bilan: null,
-    loading: false,
-    error: null,
-    refreshBilan: jest.fn(),
-  }),
+  useBilan: () => mockUseBilan(),
 }));
 jest.mock('@/features/home/hooks/useMatchaProfile', () => ({
-  useMatchaProfile: () => ({
-    profile: {
-      completion: 0,
-    },
-    loading: false,
-    error: null,
-    refresh: jest.fn(),
-  }),
+  useMatchaProfile: () => mockUseMatchaProfile(),
 }));
 jest.mock('@/features/workStyle', () => ({
-  useWorkStyle: () => ({
-    latestResult: null,
-    loading: false,
-    refreshWorkStyle: jest.fn(),
-  }),
+  useWorkStyle: () => mockUseWorkStyle(),
 }));
 jest.mock('@/features/swipe/api/preferencesApi', () => ({
   getPreferences: jest.fn().mockRejectedValue(new Error('no prefs')),
@@ -100,6 +83,39 @@ jest.mock('@/services/draftStorage', () => ({
 describe('HomeScreen', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
+    mockUseProfile.mockReturnValue({
+      user: { id: 'u1', firstName: 'John', lastName: 'Doe', email: 'a@b.com' },
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+    mockUseBilan.mockReturnValue({
+      bilan: null,
+      loading: false,
+      error: null,
+      refreshBilan: jest.fn(),
+    });
+    mockUseWorkStyle.mockReturnValue({
+      latestResult: null,
+      loading: false,
+      refreshWorkStyle: jest.fn(),
+    });
+    mockUseMatchaProfile.mockReturnValue({
+      profile: {
+        completion: 0,
+        matchingStatus: {
+          unlocked: false,
+          total: 0,
+          remaining: 0,
+          completed: false,
+          liked: 0,
+          disliked: 0,
+        },
+      },
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
   });
 
   it('se rend sans erreur', async () => {
@@ -118,14 +134,119 @@ describe('HomeScreen', () => {
     });
   });
 
-  it('ouvre la synthèse Profil Matcha depuis la card profil', async () => {
+  it('garde la card profil verrouillée tant que les tests ne sont pas terminés', async () => {
     const screen = render(<HomeScreen />);
 
     await waitFor(() => {
-      expect(screen.getByText('Construire mon profil')).toBeTruthy();
+      expect(screen.getByText('Profil Matcha verrouillé')).toBeTruthy();
+      expect(screen.getByText('0%')).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText('Construire mon profil'));
+    fireEvent.press(screen.getByText('Continuer mes tests'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('BilanIntro', { mode: 'start' });
+  });
+
+  it('ouvre le matching quand les 3 tests sont terminés', async () => {
+    mockUseBilan.mockReturnValue({
+      bilan: { createdAt: '2026-01-01T00:00:00.000Z' },
+      loading: false,
+      error: null,
+      refreshBilan: jest.fn(),
+    });
+    mockUseProfile.mockReturnValue({
+      user: {
+        id: 'u1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'a@b.com',
+        personality: { label: 'Profil personnalité' },
+      },
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+    mockUseWorkStyle.mockReturnValue({
+      latestResult: { profile: { title: 'Style pro' }, topAxisLabels: [] },
+      loading: false,
+      refreshWorkStyle: jest.fn(),
+    });
+    mockUseMatchaProfile.mockReturnValue({
+      profile: {
+        completion: 100,
+        matchingStatus: {
+          unlocked: true,
+          total: 20,
+          remaining: 20,
+          completed: false,
+          liked: 0,
+          disliked: 0,
+        },
+      },
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const screen = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Matching métier débloqué')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Lancer mon matching métier'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('JobMatching');
+  });
+
+  it('ouvre le profil complet après le matching terminé', async () => {
+    mockUseBilan.mockReturnValue({
+      bilan: { createdAt: '2026-01-01T00:00:00.000Z' },
+      loading: false,
+      error: null,
+      refreshBilan: jest.fn(),
+    });
+    mockUseProfile.mockReturnValue({
+      user: {
+        id: 'u1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'a@b.com',
+        personality: { label: 'Profil personnalité' },
+      },
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+    mockUseWorkStyle.mockReturnValue({
+      latestResult: { profile: { title: 'Style pro' }, topAxisLabels: [] },
+      loading: false,
+      refreshWorkStyle: jest.fn(),
+    });
+    mockUseMatchaProfile.mockReturnValue({
+      profile: {
+        completion: 100,
+        matchingStatus: {
+          unlocked: true,
+          total: 20,
+          remaining: 0,
+          completed: true,
+          liked: 5,
+          disliked: 15,
+        },
+      },
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const screen = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Ton profil Matcha est prêt')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Voir mon profil complet'));
 
     expect(mockNavigate).toHaveBeenCalledWith('MatchaProfile');
   });
