@@ -293,7 +293,7 @@ export default function JobMatchingScreen() {
         style={styles.absoluteFill}
       />
       <View style={styles.backgroundWash} pointerEvents="none" />
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.matchRoot}>
+      <SafeAreaView edges={['left', 'right']} style={styles.matchRoot}>
         <View style={styles.matchHeader}>
           <View style={styles.headerCopy}>
             <Text style={styles.eyebrow}>MATCHING MÉTIER</Text>
@@ -468,8 +468,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 12,
     paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   headerCopy: {
     flex: 1,
@@ -477,15 +477,15 @@ const styles = StyleSheet.create({
   matchTitle: {
     marginTop: 4,
     fontFamily: titleFontFamily,
-    fontSize: 28,
-    lineHeight: 33,
+    fontSize: 27,
+    lineHeight: 32,
     color: Colors.text.strong,
   },
   matchSubtitle: {
     marginTop: 4,
     fontFamily: bodyFontFamily,
     fontSize: 15,
-    lineHeight: 21,
+    lineHeight: 20,
     color: Colors.text.muted,
   },
   remainingPill: {
@@ -521,8 +521,8 @@ const styles = StyleSheet.create({
   },
   progressCard: {
     paddingHorizontal: 24,
-    paddingBottom: 12,
-    gap: 10,
+    paddingBottom: 8,
+    gap: 8,
   },
   progressTrack: {
     height: 8,
@@ -543,12 +543,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 4,
+    paddingTop: 2,
   },
   cardShadowBackMost: {
     position: 'absolute',
     width: '82%',
-    height: 388,
+    height: 366,
     borderRadius: 8,
     backgroundColor: 'rgba(0,81,58,0.07)',
     transform: [{ translateX: -8 }, { translateY: 18 }, { rotate: '-2deg' }],
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
   cardShadowBack: {
     position: 'absolute',
     width: '85%',
-    height: 390,
+    height: 368,
     borderRadius: 8,
     backgroundColor: 'rgba(255,255,255,0.72)',
     borderWidth: 1,
@@ -565,12 +565,12 @@ const styles = StyleSheet.create({
   },
   swipeCard: {
     width: '90%',
-    height: 400,
+    height: 378,
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
     paddingHorizontal: 18,
-    paddingVertical: 16,
+    paddingVertical: 14,
     borderWidth: 1,
     borderColor: 'rgba(0,81,58,0.10)',
     shadowColor: '#5C5148',
@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: 12,
-    marginBottom: 14,
+    marginBottom: 10,
   },
   sectorTag: {
     flex: 1,
@@ -649,29 +649,29 @@ const styles = StyleSheet.create({
     color: Colors.accent.primary,
   },
   heroPanel: {
-    height: 152,
+    height: 138,
     justifyContent: 'flex-start',
     borderRadius: 8,
     backgroundColor: '#F7FAF8',
     paddingHorizontal: 20,
-    paddingVertical: 22,
+    paddingVertical: 18,
   },
   cardKicker: {
-    marginBottom: 18,
+    marginBottom: 14,
     fontFamily: titleFontFamily,
     fontSize: 12,
     color: Colors.text.muted,
   },
   cardTitle: {
     fontFamily: titleFontFamily,
-    fontSize: 25,
-    lineHeight: 31,
+    fontSize: 23,
+    lineHeight: 29,
     color: Colors.text.strong,
   },
   reasonsPanel: {
-    minHeight: 82,
-    paddingTop: 12,
-    gap: 8,
+    minHeight: 72,
+    paddingTop: 10,
+    gap: 7,
   },
   matchCard: {
     borderRadius: 24,
@@ -803,8 +803,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 24,
-    paddingTop: 10,
-    paddingBottom: 20,
+    paddingTop: 4,
+    paddingBottom: 14,
   },
   actionBtn: {
     width: 64,
