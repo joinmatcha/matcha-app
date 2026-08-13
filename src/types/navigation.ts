@@ -8,7 +8,7 @@ import { PersonalitySummary } from '@/types/user';
 export type BilanIntroMode = 'start' | 'restart' | 'resume';
 
 export type AuthStackParamList = {
-  Login: undefined;
+  Login: { registeredEmail?: string } | undefined;
   Signin: undefined;
   ForgotPassword: undefined;
   ResetPassword: { token: string };

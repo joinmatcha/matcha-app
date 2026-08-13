@@ -6,7 +6,7 @@ import { getToken } from '@/utils/storage';
 
 const instance = axios.create({
   baseURL: API_URL,
-  timeout: 15000,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

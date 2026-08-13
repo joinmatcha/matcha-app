@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { HelperText, TextInput } from 'react-native-paper';
 
+import { resendVerificationEmail } from '@/api/auth';
 import MatchaButton from '@/components/ui/MatchaButton';
 import { useAuth } from '@/hooks/useAuth';
 import { loginSchema } from '@/schemas/login';
@@ -18,6 +19,9 @@ export default function LoginForm() {
   const [password, setMotDePasse] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState('');
 
   const [errors, setErrors] = useState({ email: '', password: '' });
 
@@ -25,6 +29,8 @@ export default function LoginForm() {
 
   const handleLogin = async () => {
     setAuthError('');
+    setNeedsVerification(false);
+    setVerificationMessage('');
 
     const { valid, errors: zodErrors } = validateZod(loginSchema, {
       email,
@@ -50,14 +56,33 @@ export default function LoginForm() {
 
       if (status === 403) {
         setAuthError(
-          'Ton email n’est pas encore vérifié. Vérifie ta boîte mail.',
+          'Ton email n’est pas encore vérifié. Vérifie ta boîte mail, y compris les spams.',
         );
+        setNeedsVerification(true);
         return;
       }
 
       setAuthError(getApiErrorMessage(error, 'Veuillez réessayer.'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setVerificationMessage('');
+    setResendingVerification(true);
+
+    try {
+      await resendVerificationEmail(email);
+      setVerificationMessage(
+        'Si ce compte existe et doit être vérifié, un nouvel email vient d’être envoyé.',
+      );
+    } catch (error) {
+      setVerificationMessage(
+        getApiErrorMessage(error, 'Impossible de renvoyer l’email.'),
+      );
+    } finally {
+      setResendingVerification(false);
     }
   };
 
@@ -119,6 +144,24 @@ export default function LoginForm() {
       {!!authError && (
         <HelperText type="error" visible style={authFormStyles.helper}>
           {authError}
+        </HelperText>
+      )}
+
+      {needsVerification && (
+        <MatchaButton
+          label="Renvoyer l’email"
+          icon="mail-outline"
+          onPress={handleResendVerification}
+          loading={resendingVerification}
+          disabled={resendingVerification}
+          variant="light"
+          fullWidth
+        />
+      )}
+
+      {!!verificationMessage && (
+        <HelperText type="info" visible style={authFormStyles.helper}>
+          {verificationMessage}
         </HelperText>
       )}
 
