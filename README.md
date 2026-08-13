@@ -113,8 +113,8 @@ Le keystore est généré et stocké automatiquement sur Expo (compte `matcha-gp
 | `yarn test`            | Exécute les tests Jest                       |
 | `yarn test:coverage`   | Exécute les tests avec rapport de couverture |
 | `yarn typecheck`       | Vérifie les types TypeScript (sans build)    |
-| `yarn storybook`       | Lance Storybook (composants UI)              |
-| `yarn build-storybook` | Génère le build statique Storybook           |
+| `yarn storybook:dev`   | Lance Storybook (composants UI)              |
+| `yarn storybook:build` | Génère le build statique Storybook           |
 
 ## Tests
 

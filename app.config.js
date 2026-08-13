@@ -46,6 +46,7 @@ export default {
       favicon: './src/assets/icons/favicon.png',
       bundler: 'metro',
     },
+    plugins: ['expo-font'],
     extra: {
       eas: {
         projectId: '8b62f242-c858-4afa-b38b-208fa92060e8',
