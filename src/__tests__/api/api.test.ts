@@ -10,7 +10,7 @@ jest.mock('expo-secure-store', () => ({
 
 describe('api instance', () => {
   it('est une instance axios avec les bons defaults', () => {
-    expect(api.defaults.timeout).toBe(15000);
+    expect(api.defaults.timeout).toBe(60000);
     expect(api.defaults.headers['Content-Type']).toBe('application/json');
     expect(api.defaults.headers['Accept']).toBe('application/json');
   });

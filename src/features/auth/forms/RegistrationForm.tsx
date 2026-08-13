@@ -61,7 +61,7 @@ export default function RegistrationForm() {
     try {
       await register({ email, password, firstName, lastName });
 
-      navigation.navigate('Login');
+      navigation.navigate('Login', { registeredEmail: email.trim() });
     } catch (error) {
       let msg = 'Impossible de créer le compte. Réessaie.';
       const status = getApiErrorStatus(error);

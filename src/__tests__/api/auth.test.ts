@@ -5,6 +5,7 @@ import {
   login,
   register,
   requestPasswordReset,
+  resendVerificationEmail,
   resetPassword,
 } from '@/api/auth';
 
@@ -85,6 +86,20 @@ describe('auth API', () => {
     expect(mockedApi.post).toHaveBeenCalledWith('/api/auth/request-reset', {
       email: 'a@b.com',
     });
+    expect(result).toEqual({ message: 'sent' });
+  });
+
+  it('resendVerificationEmail envoie un POST /api/users/resend-verification', async () => {
+    mockedApi.post.mockResolvedValue({ data: { message: 'sent' } });
+
+    const result = await resendVerificationEmail('a@b.com');
+
+    expect(mockedApi.post).toHaveBeenCalledWith(
+      '/api/users/resend-verification',
+      {
+        email: 'a@b.com',
+      },
+    );
     expect(result).toEqual({ message: 'sent' });
   });
 
