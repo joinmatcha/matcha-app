@@ -19,7 +19,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 import AppScreen from '@/components/layout/AppScreen';
 import MatchaButton from '@/components/ui/MatchaButton';
@@ -64,6 +67,7 @@ function JobListItem({
 
 export default function JobMatchingScreen() {
   const navigation = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
   const [matching, setMatching] = useState<JobMatchingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -404,7 +408,12 @@ export default function JobMatchingScreen() {
           ) : null}
         </View>
 
-        <View style={styles.buttons}>
+        <View
+          style={[
+            styles.buttons,
+            { paddingBottom: Math.max(insets.bottom + 8, 18) },
+          ]}
+        >
           <TouchableOpacity
             style={[styles.actionBtn, styles.dislikeRoundButton]}
             onPress={() => animateDecision('dislike')}
@@ -468,8 +477,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 12,
     paddingHorizontal: 24,
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: 20,
+    paddingBottom: 12,
   },
   headerCopy: {
     flex: 1,
@@ -477,8 +486,8 @@ const styles = StyleSheet.create({
   matchTitle: {
     marginTop: 4,
     fontFamily: titleFontFamily,
-    fontSize: 27,
-    lineHeight: 32,
+    fontSize: 25,
+    lineHeight: 30,
     color: Colors.text.strong,
   },
   matchSubtitle: {
@@ -548,7 +557,7 @@ const styles = StyleSheet.create({
   cardShadowBackMost: {
     position: 'absolute',
     width: '82%',
-    height: 366,
+    height: 340,
     borderRadius: 8,
     backgroundColor: 'rgba(0,81,58,0.07)',
     transform: [{ translateX: -8 }, { translateY: 18 }, { rotate: '-2deg' }],
@@ -556,7 +565,7 @@ const styles = StyleSheet.create({
   cardShadowBack: {
     position: 'absolute',
     width: '85%',
-    height: 368,
+    height: 342,
     borderRadius: 8,
     backgroundColor: 'rgba(255,255,255,0.72)',
     borderWidth: 1,
@@ -565,12 +574,12 @@ const styles = StyleSheet.create({
   },
   swipeCard: {
     width: '90%',
-    height: 378,
+    height: 352,
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 13,
     borderWidth: 1,
     borderColor: 'rgba(0,81,58,0.10)',
     shadowColor: '#5C5148',
@@ -619,7 +628,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: 12,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   sectorTag: {
     flex: 1,
@@ -649,29 +658,29 @@ const styles = StyleSheet.create({
     color: Colors.accent.primary,
   },
   heroPanel: {
-    height: 138,
+    height: 124,
     justifyContent: 'flex-start',
     borderRadius: 8,
     backgroundColor: '#F7FAF8',
     paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingVertical: 16,
   },
   cardKicker: {
-    marginBottom: 14,
+    marginBottom: 10,
     fontFamily: titleFontFamily,
     fontSize: 12,
     color: Colors.text.muted,
   },
   cardTitle: {
     fontFamily: titleFontFamily,
-    fontSize: 23,
-    lineHeight: 29,
+    fontSize: 21,
+    lineHeight: 26,
     color: Colors.text.strong,
   },
   reasonsPanel: {
-    minHeight: 72,
+    minHeight: 66,
     paddingTop: 10,
-    gap: 7,
+    gap: 6,
   },
   matchCard: {
     borderRadius: 24,
@@ -803,8 +812,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 24,
-    paddingTop: 4,
-    paddingBottom: 14,
+    paddingTop: 2,
+    paddingBottom: 18,
   },
   actionBtn: {
     width: 64,

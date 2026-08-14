@@ -38,7 +38,7 @@ export default function PersonalityIntroScreen() {
       stats={[
         { value: '24', label: 'questions' },
         { value: '~3 min', label: 'à ton rythme' },
-        { value: '0', label: 'bonne réponse' },
+        { value: 'Profil', label: 'indicatif' },
       ]}
       flowTitle={hasDraft ? undefined : 'Comment ça marche'}
       flow={hasDraft ? [] : flow}

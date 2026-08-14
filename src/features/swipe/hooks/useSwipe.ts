@@ -12,6 +12,11 @@ export function useSwipe() {
   const [error, setError] = useState<string | null>(null);
 
   const loadingRef = useRef(false);
+  const deckRef = useRef<DeckJob[]>([]);
+
+  useEffect(() => {
+    deckRef.current = deck;
+  }, [deck]);
 
   const loadDeck = useCallback(async () => {
     if (loadingRef.current) return;
@@ -33,9 +38,14 @@ export function useSwipe() {
 
   const swipe = useCallback(
     async (jobId: string, action: 'like' | 'dislike') => {
+      const currentDeck = deckRef.current;
+      const swipedJob = currentDeck.find((job) => job.id === jobId);
+
+      setError(null);
+      setDeck((prev) => prev.filter((job) => job.id !== jobId));
+      setRemaining((prev) => (prev === null ? prev : Math.max(prev - 1, 0)));
+
       try {
-        setError(null);
-        const swipedJob = deck.find((job) => job.id === jobId);
         const data = await postSwipe(jobId, action);
         trackAnalyticsEvent({
           eventType: 'job_swiped',
@@ -49,14 +59,21 @@ export function useSwipe() {
         });
         setRemaining(data.remaining);
         setLimit(data.limit);
-        setDeck((prev) => prev.filter((j) => j.id !== jobId));
       } catch (err) {
+        if (swipedJob) {
+          setDeck((prev) =>
+            prev.some((job) => job.id === swipedJob.id)
+              ? prev
+              : [swipedJob, ...prev],
+          );
+        }
+        setRemaining((prev) => (prev === null ? prev : prev + 1));
         setError(
           getApiErrorMessage(err, 'Impossible d’enregistrer ton swipe.'),
         );
       }
     },
-    [deck],
+    [],
   );
 
   useEffect(() => {

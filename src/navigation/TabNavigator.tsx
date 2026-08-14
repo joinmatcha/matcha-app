@@ -17,9 +17,10 @@ export default function TabNavigator() {
         headerShown: false,
         tabBarActiveTintColor: Colors.accent.primary,
         tabBarInactiveTintColor: '#8B9097',
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
         tabBarStyle: styles.tabBar,
         tabBarItemStyle: styles.tabBarItem,
+        tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
       <Tab.Screen
@@ -66,8 +67,8 @@ export default function TabNavigator() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 74,
-    paddingTop: 10,
+    height: 82,
+    paddingTop: 8,
     paddingBottom: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0, 81, 58, 0.08)',
@@ -79,12 +80,18 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   tabBarItem: {
-    paddingVertical: 0,
+    paddingVertical: 4,
+  },
+  tabBarLabel: {
+    marginTop: 2,
+    fontSize: 11,
+    lineHeight: 13,
+    fontWeight: '600',
   },
   iconShell: {
-    width: 44,
-    height: 38,
-    borderRadius: 19,
+    width: 42,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
   },

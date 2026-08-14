@@ -194,7 +194,7 @@ describe('HomeScreen', () => {
       expect(screen.getByText('Matching métier débloqué')).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText('Lancer mon matching métier'));
+    fireEvent.press(screen.getByText('Lancer le matching'));
 
     expect(mockNavigate).toHaveBeenCalledWith('JobMatching');
   });

@@ -40,7 +40,7 @@ export default function WorkStyleIntroScreen() {
       stats={[
         { value: '16', label: 'questions' },
         { value: '~2 min', label: 'à ton rythme' },
-        { value: '0', label: 'bonne réponse' },
+        { value: 'Profil', label: 'indicatif' },
       ]}
       flowTitle={hasDraft ? undefined : 'Comment ça marche'}
       flow={hasDraft ? [] : flow}

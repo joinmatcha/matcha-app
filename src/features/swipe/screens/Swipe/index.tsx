@@ -16,7 +16,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 import MatchaButton from '@/components/ui/MatchaButton';
 import { useSwipe } from '@/features/swipe/hooks/useSwipe';
@@ -71,6 +74,7 @@ function SwipeBackground({ children }: { children: React.ReactNode }) {
 
 export default function SwipeScreen() {
   const navigation = useNavigation<SwipeNavigation>();
+  const insets = useSafeAreaInsets();
   const { deck, remaining, limit, loading, error, loadDeck, swipe } =
     useSwipe();
 
@@ -418,7 +422,12 @@ export default function SwipeScreen() {
           </Animated.View>
         </View>
 
-        <View style={styles.buttons}>
+        <View
+          style={[
+            styles.buttons,
+            { paddingBottom: Math.max(insets.bottom + 8, 20) },
+          ]}
+        >
           <TouchableOpacity
             style={[styles.actionBtn, styles.dislikeBtn]}
             onPress={() => animateOutRef.current('dislike')}
