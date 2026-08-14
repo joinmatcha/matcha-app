@@ -45,6 +45,10 @@ import { getApiErrorMessage } from '@/utils/apiError';
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 const SWIPE_THRESHOLD = 120;
 
+function pluralize(count: number, singular: string, plural: string) {
+  return count > 1 ? plural : singular;
+}
+
 function JobListItem({
   job,
   onPress,
@@ -238,6 +242,24 @@ export default function JobMatchingScreen() {
     );
   }
 
+  if (matching.total === 0) {
+    return (
+      <AppScreen>
+        <SafeAreaView edges={['left', 'right']} style={styles.center}>
+          <Text style={styles.emptyTitle}>Aucune piste assez cohérente</Text>
+          <Text style={styles.emptyText}>
+            Tes résultats sont bien pris en compte, mais aucun métier ne dépasse
+            le seuil de compatibilité pour le moment.
+          </Text>
+          <MatchaButton
+            label="Retour au profil"
+            onPress={() => navigation.navigate('MatchaProfile')}
+          />
+        </SafeAreaView>
+      </AppScreen>
+    );
+  }
+
   if (matching.completed) {
     return (
       <AppScreen>
@@ -248,7 +270,8 @@ export default function JobMatchingScreen() {
               <Text style={styles.title}>Tes métiers retenus</Text>
               <Text style={styles.subtitle}>
                 Voici les métiers que tu as gardés parmi les {matching.total}{' '}
-                propositions les plus proches de ton profil consolidé.
+                {pluralize(matching.total, 'piste', 'pistes')} les plus proches
+                de ton profil consolidé.
               </Text>
             </View>
 
@@ -303,12 +326,14 @@ export default function JobMatchingScreen() {
             <Text style={styles.eyebrow}>MATCHING MÉTIER</Text>
             <Text style={styles.matchTitle}>Métiers les plus proches</Text>
             <Text style={styles.matchSubtitle}>
-              Garde ou écarte les propositions issues de tes résultats croisés.
+              Garde ou écarte les pistes issues de tes résultats croisés.
             </Text>
           </View>
           <View style={styles.remainingPill}>
             <Text style={styles.remainingValue}>{matching.remaining}</Text>
-            <Text style={styles.remainingLabel}>restants</Text>
+            <Text style={styles.remainingLabel}>
+              {pluralize(matching.remaining, 'restant', 'restants')}
+            </Text>
           </View>
         </View>
 
@@ -319,7 +344,8 @@ export default function JobMatchingScreen() {
             />
           </View>
           <Text style={styles.progressText}>
-            {decidedCount}/{matching.total} métiers évalués
+            {decidedCount}/{matching.total}{' '}
+            {pluralize(matching.total, 'métier évalué', 'métiers évalués')}
           </Text>
         </View>
 
@@ -375,7 +401,12 @@ export default function JobMatchingScreen() {
 
               <View style={styles.heroPanel}>
                 <Text style={styles.cardKicker}>Piste proposée</Text>
-                <Text style={styles.cardTitle} numberOfLines={3}>
+                <Text
+                  style={styles.cardTitle}
+                  numberOfLines={3}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.86}
+                >
                   {currentJob.title}
                 </Text>
               </View>
@@ -388,22 +419,29 @@ export default function JobMatchingScreen() {
                       size={17}
                       color={Colors.accent.primary}
                     />
-                    <Text style={styles.reasonText} numberOfLines={2}>
+                    <Text
+                      style={styles.reasonText}
+                      numberOfLines={2}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.9}
+                    >
                       {reason}
                     </Text>
                   </View>
                 ))}
               </View>
 
-              <MatchaButton
-                label="Voir la fiche"
-                icon="arrow-forward"
-                variant="primary"
-                onPress={() =>
-                  navigation.navigate('JobDetail', { jobId: currentJob.id })
-                }
-                style={styles.cardFooter}
-              />
+              <View style={styles.cardFooterSlot}>
+                <MatchaButton
+                  label="Voir la fiche"
+                  icon="arrow-forward"
+                  variant="primary"
+                  onPress={() =>
+                    navigation.navigate('JobDetail', { jobId: currentJob.id })
+                  }
+                  style={styles.cardFooter}
+                />
+              </View>
             </Animated.View>
           ) : null}
         </View>
@@ -557,7 +595,7 @@ const styles = StyleSheet.create({
   cardShadowBackMost: {
     position: 'absolute',
     width: '82%',
-    height: 340,
+    height: 360,
     borderRadius: 8,
     backgroundColor: 'rgba(0,81,58,0.07)',
     transform: [{ translateX: -8 }, { translateY: 18 }, { rotate: '-2deg' }],
@@ -565,7 +603,7 @@ const styles = StyleSheet.create({
   cardShadowBack: {
     position: 'absolute',
     width: '85%',
-    height: 342,
+    height: 362,
     borderRadius: 8,
     backgroundColor: 'rgba(255,255,255,0.72)',
     borderWidth: 1,
@@ -574,12 +612,13 @@ const styles = StyleSheet.create({
   },
   swipeCard: {
     width: '90%',
-    height: 352,
+    minHeight: 372,
+    maxHeight: 392,
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
     paddingHorizontal: 18,
-    paddingVertical: 13,
+    paddingVertical: 12,
     borderWidth: 1,
     borderColor: 'rgba(0,81,58,0.10)',
     shadowColor: '#5C5148',
@@ -628,7 +667,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: 12,
-    marginBottom: 8,
+    marginBottom: 7,
   },
   sectorTag: {
     flex: 1,
@@ -646,10 +685,10 @@ const styles = StyleSheet.create({
     color: '#0F6F50',
   },
   scoreBadge: {
+    width: 74,
     alignItems: 'center',
     borderRadius: 8,
     backgroundColor: '#F7FAF8',
-    paddingHorizontal: 10,
     paddingVertical: 7,
   },
   scoreValue: {
@@ -658,28 +697,29 @@ const styles = StyleSheet.create({
     color: Colors.accent.primary,
   },
   heroPanel: {
-    height: 124,
-    justifyContent: 'flex-start',
+    height: 112,
+    justifyContent: 'center',
     borderRadius: 8,
     backgroundColor: '#F7FAF8',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
   },
   cardKicker: {
-    marginBottom: 10,
+    marginBottom: 8,
     fontFamily: titleFontFamily,
     fontSize: 12,
     color: Colors.text.muted,
   },
   cardTitle: {
     fontFamily: titleFontFamily,
-    fontSize: 21,
-    lineHeight: 26,
+    fontSize: 20,
+    lineHeight: 25,
     color: Colors.text.strong,
   },
   reasonsPanel: {
-    minHeight: 66,
-    paddingTop: 10,
+    height: 96,
+    justifyContent: 'center',
+    paddingTop: 8,
     gap: 6,
   },
   matchCard: {
@@ -719,16 +759,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     alignItems: 'flex-start',
+    minHeight: 40,
   },
   reasonText: {
     flex: 1,
     fontFamily: bodyFontFamily,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
     color: Colors.text.strong,
   },
-  cardFooter: {
+  cardFooterSlot: {
     marginTop: 'auto',
+    height: 46,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+  },
+  cardFooter: {
     minHeight: 42,
     paddingHorizontal: 18,
     borderRadius: 21,
