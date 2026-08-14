@@ -223,7 +223,7 @@ describe('ProfileSections', () => {
       fireEvent.changeText(getByPlaceholderText('Ville'), 'Par1s!');
       fireEvent.changeText(
         getByPlaceholderText('Code postal'),
-        '927272727272727272',
+        '92a72-727272727272',
       );
       fireEvent.changeText(getByPlaceholderText('Pays'), '12France3');
     });
@@ -235,10 +235,32 @@ describe('ProfileSections', () => {
     expect(mockUpdateProfile).toHaveBeenCalledWith(
       expect.objectContaining({
         addressCity: 'Pars',
-        addressPostalCode: '927272727272',
+        addressPostalCode: '92727',
         addressCountry: 'France',
       }),
     );
+  });
+
+  it('refuse un code postal incomplet', async () => {
+    mockUpdateProfile.mockClear();
+    const { getByPlaceholderText, getByText } = render(
+      <ProfileSections
+        section="address"
+        user={user}
+        onCancel={onCancel}
+        onSaved={onSaved}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Code postal'), '7500');
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText('Enregistrer'));
+    });
+
+    expect(mockUpdateProfile).not.toHaveBeenCalled();
   });
 
   it('sauvegarde les préférences de travail', async () => {

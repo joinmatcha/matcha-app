@@ -52,11 +52,7 @@ const sanitizeHumanName = (value: string) =>
   sanitizeTextField(value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ' -]/g, ''), 60);
 
 const sanitizePostalCode = (value: string) =>
-  value
-    .replace(/[^0-9A-Za-z -]/g, '')
-    .replace(/\s{2,}/g, ' ')
-    .slice(0, 12)
-    .toUpperCase();
+  value.replace(/\D/g, '').slice(0, 5);
 
 export default function ProfileSections({
   section,
@@ -185,10 +181,19 @@ export default function ProfileSections({
 
       if (section === 'address') {
         const normalizedCity = city.trim();
+        const normalizedPostal = postal.trim();
         const normalizedCountry = country.trim();
 
         if (normalizedCity && !lettersRegex.test(normalizedCity)) {
           Alert.alert('Erreur', 'La ville doit contenir au moins une lettre.');
+          return;
+        }
+
+        if (normalizedPostal && !/^\d{5}$/.test(normalizedPostal)) {
+          Alert.alert(
+            'Erreur',
+            'Le code postal doit contenir exactement 5 chiffres.',
+          );
           return;
         }
 
@@ -200,7 +205,7 @@ export default function ProfileSections({
         payload = {
           addressStreet: street.trim(),
           addressCity: normalizedCity,
-          addressPostalCode: postal.trim(),
+          addressPostalCode: normalizedPostal,
           addressCountry: normalizedCountry,
         };
       }
@@ -374,9 +379,8 @@ export default function ProfileSections({
             mode="outlined"
             value={postal}
             onChangeText={(value) => setPostal(sanitizePostalCode(value))}
-            keyboardType="default"
-            autoCapitalize="characters"
-            maxLength={12}
+            keyboardType="number-pad"
+            maxLength={5}
             style={styles.input}
             outlineColor={Colors.ui.borderSoft}
             activeOutlineColor={Colors.accent.primary}

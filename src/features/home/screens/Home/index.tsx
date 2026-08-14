@@ -217,6 +217,12 @@ function ProfileSnapshot({
   onPrimaryPress: () => void;
 }) {
   const isComplete = completion >= 100;
+  const matchingDescription =
+    matchingTotal > 0
+      ? `${matchingTotal} piste${matchingTotal > 1 ? 's' : ''} métier cohérente${
+          matchingTotal > 1 ? 's' : ''
+        } avec tes résultats croisés t’attend${matchingTotal > 1 ? 'ent' : ''}.`
+      : 'Jusqu’à 20 pistes métier cohérentes avec tes résultats croisés peuvent être proposées.';
   const title = !isComplete
     ? 'Profil Matcha verrouillé'
     : matchingCompleted
@@ -226,7 +232,7 @@ function ProfileSnapshot({
     ? 'Termine les 3 tests pour débloquer ton matching métier personnalisé.'
     : matchingCompleted
       ? 'Retrouve tes signaux clés, tes secteurs et les métiers que tu as gardés.'
-      : `${matchingTotal || 20} métiers cohérents avec tes résultats croisés t’attendent.`;
+      : matchingDescription;
   const buttonLabel = !isComplete
     ? 'Continuer mes tests'
     : matchingCompleted
