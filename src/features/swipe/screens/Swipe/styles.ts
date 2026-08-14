@@ -408,7 +408,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 24,
-    paddingTop: 10,
+    paddingTop: 6,
     paddingBottom: 20,
   },
   actionBtn: {

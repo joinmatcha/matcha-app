@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   safeArea: { backgroundColor: 'transparent' },
   container: { flex: 1 },
   scroll: { flex: 1 },
-  scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
+  scrollContent: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 40 },
   spacerLg: { height: 40 },
   spacerMd: { height: 20 },
   insightsRow: {

@@ -231,7 +231,7 @@ function ProfileSnapshot({
     ? 'Continuer mes tests'
     : matchingCompleted
       ? 'Voir mon profil complet'
-      : 'Lancer mon matching métier';
+      : 'Lancer le matching';
 
   return (
     <View style={[styles.profileCard, !isComplete && styles.profileCardLocked]}>

@@ -208,6 +208,39 @@ describe('ProfileSections', () => {
     expect(mockUpdateProfile).toHaveBeenCalled();
   });
 
+  it("nettoie les champs d'adresse avant sauvegarde", async () => {
+    mockUpdateProfile.mockClear();
+    const { getByPlaceholderText, getByText } = render(
+      <ProfileSections
+        section="address"
+        user={user}
+        onCancel={onCancel}
+        onSaved={onSaved}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Ville'), 'Par1s!');
+      fireEvent.changeText(
+        getByPlaceholderText('Code postal'),
+        '927272727272727272',
+      );
+      fireEvent.changeText(getByPlaceholderText('Pays'), '12France3');
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText('Enregistrer'));
+    });
+
+    expect(mockUpdateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        addressCity: 'Pars',
+        addressPostalCode: '927272727272',
+        addressCountry: 'France',
+      }),
+    );
+  });
+
   it('sauvegarde les préférences de travail', async () => {
     mockUpdateProfile.mockClear();
     const { getByText } = render(

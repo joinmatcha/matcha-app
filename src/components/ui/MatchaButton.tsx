@@ -62,6 +62,7 @@ export default function MatchaButton({
             name={disabled ? 'lock-outline' : icon}
             size={16}
             color={colors.text}
+            style={styles.icon}
           />
         </>
       )}
@@ -108,7 +109,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   label: {
+    flexShrink: 1,
     fontSize: 14,
     fontFamily: titleFontFamily,
+  },
+  icon: {
+    flexShrink: 0,
   },
 });

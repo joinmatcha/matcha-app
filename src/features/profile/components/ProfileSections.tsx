@@ -43,6 +43,21 @@ const booleanOptions: ChoiceOption<boolean>[] = [
   { label: 'Non', value: false },
 ];
 
+const lettersRegex = /[A-Za-zÀ-ÖØ-öø-ÿ]/;
+
+const sanitizeTextField = (value: string, maxLength = 80) =>
+  value.replace(/\s{2,}/g, ' ').slice(0, maxLength);
+
+const sanitizeHumanName = (value: string) =>
+  sanitizeTextField(value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ' -]/g, ''), 60);
+
+const sanitizePostalCode = (value: string) =>
+  value
+    .replace(/[^0-9A-Za-z -]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .slice(0, 12)
+    .toUpperCase();
+
 export default function ProfileSections({
   section,
   user,
@@ -161,19 +176,32 @@ export default function ProfileSections({
 
       if (section === 'personal') {
         payload = {
-          firstName,
-          lastName,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
           birthYear: birthDate ? birthDate.getFullYear() : undefined,
           gender,
         };
       }
 
       if (section === 'address') {
+        const normalizedCity = city.trim();
+        const normalizedCountry = country.trim();
+
+        if (normalizedCity && !lettersRegex.test(normalizedCity)) {
+          Alert.alert('Erreur', 'La ville doit contenir au moins une lettre.');
+          return;
+        }
+
+        if (normalizedCountry && !lettersRegex.test(normalizedCountry)) {
+          Alert.alert('Erreur', 'Le pays doit contenir au moins une lettre.');
+          return;
+        }
+
         payload = {
-          addressStreet: street,
-          addressCity: city,
-          addressPostalCode: postal,
-          addressCountry: country,
+          addressStreet: street.trim(),
+          addressCity: normalizedCity,
+          addressPostalCode: postal.trim(),
+          addressCountry: normalizedCountry,
         };
       }
 
@@ -213,7 +241,7 @@ export default function ProfileSections({
             label="Prénom"
             mode="outlined"
             value={firstName}
-            onChangeText={setFirstName}
+            onChangeText={(value) => setFirstName(sanitizeHumanName(value))}
             style={styles.input}
             outlineColor={Colors.ui.borderSoft}
             activeOutlineColor={Colors.accent.primary}
@@ -225,7 +253,7 @@ export default function ProfileSections({
             label="Nom"
             mode="outlined"
             value={lastName}
-            onChangeText={setLastName}
+            onChangeText={(value) => setLastName(sanitizeHumanName(value))}
             style={styles.input}
             outlineColor={Colors.ui.borderSoft}
             activeOutlineColor={Colors.accent.primary}
@@ -320,7 +348,7 @@ export default function ProfileSections({
             label="Rue"
             mode="outlined"
             value={street}
-            onChangeText={setStreet}
+            onChangeText={(value) => setStreet(sanitizeTextField(value, 120))}
             style={styles.input}
             outlineColor={Colors.ui.borderSoft}
             activeOutlineColor={Colors.accent.primary}
@@ -332,7 +360,8 @@ export default function ProfileSections({
             label="Ville"
             mode="outlined"
             value={city}
-            onChangeText={setCity}
+            onChangeText={(value) => setCity(sanitizeHumanName(value))}
+            autoCapitalize="words"
             style={styles.input}
             outlineColor={Colors.ui.borderSoft}
             activeOutlineColor={Colors.accent.primary}
@@ -344,7 +373,10 @@ export default function ProfileSections({
             label="Code postal"
             mode="outlined"
             value={postal}
-            onChangeText={setPostal}
+            onChangeText={(value) => setPostal(sanitizePostalCode(value))}
+            keyboardType="default"
+            autoCapitalize="characters"
+            maxLength={12}
             style={styles.input}
             outlineColor={Colors.ui.borderSoft}
             activeOutlineColor={Colors.accent.primary}
@@ -356,7 +388,8 @@ export default function ProfileSections({
             label="Pays"
             mode="outlined"
             value={country}
-            onChangeText={setCountry}
+            onChangeText={(value) => setCountry(sanitizeHumanName(value))}
+            autoCapitalize="words"
             style={styles.input}
             outlineColor={Colors.ui.borderSoft}
             activeOutlineColor={Colors.accent.primary}
