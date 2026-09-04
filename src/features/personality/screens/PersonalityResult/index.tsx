@@ -1,9 +1,4 @@
-import {
-  CommonActions,
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {
@@ -21,6 +16,7 @@ import PersonalityProfileHeader from '@/features/personality/components/Personal
 import RadarChart from '@/features/personality/components/RadarChart';
 import TagList from '@/features/personality/components/TagList';
 import { useAuth } from '@/hooks/useAuth';
+import { resetToHome } from '@/navigation/navigationActions';
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import {
@@ -61,12 +57,7 @@ export default function PersonalityResultScreen() {
 
   const handleContinue = async () => {
     await refreshUser();
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: 'Main', params: { screen: 'Home' } }],
-      }),
-    );
+    resetToHome(navigation);
   };
 
   const handleRedoTest = async () => {

@@ -1,4 +1,5 @@
 import api from '@/api/api';
+import { JobMarketHighlights } from '@/features/jobs/api/jobsApi';
 
 export type JobMatchingDecision = 'like' | 'dislike' | null;
 
@@ -10,6 +11,7 @@ export type JobMatchingJob = {
   score: number;
   reasons: string[];
   decision: JobMatchingDecision;
+  marketHighlights?: JobMarketHighlights;
 };
 
 export type JobMatchingResponse = {

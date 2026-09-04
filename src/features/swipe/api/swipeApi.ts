@@ -1,4 +1,5 @@
 import api from '@/api/api';
+import { JobMarketHighlights } from '@/features/jobs/api/jobsApi';
 
 export interface DeckJob {
   id: string;
@@ -9,6 +10,7 @@ export interface DeckJob {
   growthOutlook: 'unknown';
   tags: string[];
   riasec: string[];
+  marketHighlights?: JobMarketHighlights;
 }
 
 export interface DeckResponse {

@@ -13,7 +13,11 @@ import {
   BilanQuestionsScreen,
   BilanResultScreen,
 } from '@/features/bilan';
-import { CareerPreferencesScreen, MatchaProfileScreen } from '@/features/home';
+import {
+  CareerPreferencesScreen,
+  MatchaProfileScreen,
+  PricingPlansScreen,
+} from '@/features/home';
 import {
   JobCompareScreen,
   JobDetailScreen,
@@ -36,6 +40,7 @@ import StackBackButton from '@/navigation/StackBackButton';
 import TabNavigator from '@/navigation/TabNavigator';
 import Colors from '@/themes/colors';
 import { RootStackParamList } from '@/types/navigation';
+import { isPremiumSubscription } from '@/utils/subscription';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -68,6 +73,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       BilanIntro: 'professional-self-assessment',
       BilanQuestions: 'professional-self-assessment/questions',
       MatchaProfile: 'matcha-profile',
+      PricingPlans: 'plans',
       JobMatching: 'job-matching',
       CareerPreferences: 'career-preferences',
       WorkStyleIntro: 'work-style',
@@ -94,6 +100,7 @@ const secondaryScreenOptions: NativeStackNavigationOptions = {
 
 export default function AppNavigator() {
   const { user, loading } = useAuth();
+  const hasPremiumAccess = isPremiumSubscription(user?.subscription);
 
   if (loading) {
     return (
@@ -126,27 +133,42 @@ export default function AppNavigator() {
             />
             <RootStack.Screen
               name="BilanIntro"
-              component={BilanIntroScreen}
+              component={
+                hasPremiumAccess ? BilanIntroScreen : PricingPlansScreen
+              }
               options={secondaryScreenOptions}
             />
             <RootStack.Screen
               name="BilanQuestions"
-              component={BilanQuestionsScreen}
+              component={
+                hasPremiumAccess ? BilanQuestionsScreen : PricingPlansScreen
+              }
               options={secondaryScreenOptions}
             />
             <RootStack.Screen
               name="BilanResult"
-              component={BilanResultScreen}
+              component={
+                hasPremiumAccess ? BilanResultScreen : PricingPlansScreen
+              }
               options={secondaryScreenOptions}
             />
             <RootStack.Screen
               name="MatchaProfile"
-              component={MatchaProfileScreen}
+              component={
+                hasPremiumAccess ? MatchaProfileScreen : PricingPlansScreen
+              }
+              options={secondaryScreenOptions}
+            />
+            <RootStack.Screen
+              name="PricingPlans"
+              component={PricingPlansScreen}
               options={secondaryScreenOptions}
             />
             <RootStack.Screen
               name="JobMatching"
-              component={JobMatchingScreen}
+              component={
+                hasPremiumAccess ? JobMatchingScreen : PricingPlansScreen
+              }
               options={secondaryScreenOptions}
             />
             <RootStack.Screen
@@ -156,22 +178,30 @@ export default function AppNavigator() {
             />
             <RootStack.Screen
               name="WorkStyleIntro"
-              component={WorkStyleIntroScreen}
+              component={
+                hasPremiumAccess ? WorkStyleIntroScreen : PricingPlansScreen
+              }
               options={secondaryScreenOptions}
             />
             <RootStack.Screen
               name="WorkStyleQuestions"
-              component={WorkStyleQuestionsScreen}
+              component={
+                hasPremiumAccess ? WorkStyleQuestionsScreen : PricingPlansScreen
+              }
               options={secondaryScreenOptions}
             />
             <RootStack.Screen
               name="WorkStyleResult"
-              component={WorkStyleResultScreen}
+              component={
+                hasPremiumAccess ? WorkStyleResultScreen : PricingPlansScreen
+              }
               options={secondaryScreenOptions}
             />
             <RootStack.Screen
               name="JobCompare"
-              component={JobCompareScreen}
+              component={
+                hasPremiumAccess ? JobCompareScreen : PricingPlansScreen
+              }
               options={secondaryScreenOptions}
             />
             <RootStack.Screen

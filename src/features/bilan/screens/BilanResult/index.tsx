@@ -1,9 +1,4 @@
-import {
-  CommonActions,
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {
@@ -19,6 +14,7 @@ import AppScreen from '@/components/layout/AppScreen';
 import PersonalityProfileHeader from '@/features/personality/components/PersonalityProfileHeader';
 import ProfileSection from '@/features/personality/components/ProfileSection';
 import { useAuth } from '@/hooks/useAuth';
+import { resetToHome } from '@/navigation/navigationActions';
 import { clearDraft, saveDraft } from '@/services/draftStorage';
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
@@ -199,14 +195,7 @@ export default function BilanResultScreen() {
 
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() =>
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: 'Main', params: { screen: 'Home' } }],
-              }),
-            )
-          }
+          onPress={() => resetToHome(navigation)}
         >
           <Text style={styles.backButtonText}>Retour à l’accueil</Text>
         </TouchableOpacity>
