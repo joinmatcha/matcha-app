@@ -1,9 +1,4 @@
-import {
-  CommonActions,
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useMemo } from 'react';
 import {
@@ -20,6 +15,7 @@ import {
   WorkStyleDimension,
   resetWorkStyleTest,
 } from '@/features/workStyle/api/workStyleApi';
+import { resetToHome } from '@/navigation/navigationActions';
 import Colors from '@/themes/colors';
 import { bodyFontFamily, titleFontFamily } from '@/themes/typography';
 import {
@@ -181,14 +177,7 @@ export default function WorkStyleResultScreen() {
 
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={() =>
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [{ name: 'Main', params: { screen: 'Home' } }],
-                }),
-              )
-            }
+            onPress={() => resetToHome(navigation)}
           >
             <Text style={styles.secondaryButtonText}>Retour à l’accueil</Text>
           </TouchableOpacity>

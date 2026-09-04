@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 import MatchaProfileScreen from '@/features/home/screens/MatchaProfile';
@@ -50,7 +50,14 @@ jest.mock('@/features/home/hooks/useMatchaProfile', () => ({
       ],
       keyDimensions: {
         strengths: ['Relation client', 'Pédagogie'],
-        values: ['Impact'],
+        values: [
+          'Impact',
+          'Transmission',
+          'Autonomie',
+          'Créativité',
+          'Stabilité',
+          'Utilité sociale',
+        ],
         environments: ['Contact humain'],
         sectors: ['Relation client'],
       },
@@ -133,5 +140,20 @@ describe('MatchaProfileScreen', () => {
         screen.getAllByText('Conseiller clientèle').length,
       ).toBeGreaterThan(0);
     });
+  });
+
+  it('déplie les dimensions masquées depuis le compteur', async () => {
+    const screen = render(<MatchaProfileScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByText('+2')).toBeTruthy();
+    });
+
+    expect(screen.queryByText('Stabilité')).toBeNull();
+
+    fireEvent.press(screen.getByText('+2'));
+
+    expect(screen.getByText('Stabilité')).toBeTruthy();
+    expect(screen.getByText('Utilité sociale')).toBeTruthy();
   });
 });

@@ -22,6 +22,7 @@ import {
 } from 'react-native-safe-area-context';
 
 import MatchaButton from '@/components/ui/MatchaButton';
+import { getMarketHighlightCards } from '@/features/jobs/utils/marketHighlights';
 import { useSwipe } from '@/features/swipe/hooks/useSwipe';
 import Colors from '@/themes/colors';
 import { RootStackParamList, TabParamList } from '@/types/navigation';
@@ -178,6 +179,9 @@ export default function SwipeScreen() {
   const currentJob = deck[0] ?? null;
   const nextJob = deck[1] ?? null;
   const afterNextJob = deck[2] ?? null;
+  const currentMarketCards = getMarketHighlightCards(
+    currentJob?.marketHighlights,
+  );
   const swipedToday =
     remaining !== null && limit !== null ? Math.max(limit - remaining, 0) : 0;
   const progress =
@@ -384,6 +388,26 @@ export default function SwipeScreen() {
                   {currentJob?.title}
                 </Text>
               </View>
+
+              {currentMarketCards.length > 0 ? (
+                <View style={styles.marketGrid}>
+                  {currentMarketCards.map((item) => (
+                    <View key={item.key} style={styles.marketItem}>
+                      <MaterialIcons
+                        name={item.icon}
+                        size={17}
+                        color={Colors.accent.primary}
+                      />
+                      <Text style={styles.marketValue} numberOfLines={1}>
+                        {item.value}
+                      </Text>
+                      <Text style={styles.marketLabel} numberOfLines={1}>
+                        {item.label}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
 
               {currentJob?.tags && currentJob.tags.length > 0 && (
                 <View style={styles.tagsSection}>

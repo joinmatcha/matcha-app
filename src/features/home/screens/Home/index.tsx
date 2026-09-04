@@ -9,6 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Pressable,
   ScrollView,
   StyleProp,
   StyleSheet,
@@ -40,6 +41,7 @@ import {
 } from '@/themes/typography';
 import { primaryButton } from '@/themes/ui';
 import { RootStackParamList, TabParamList } from '@/types/navigation';
+import { isPremiumSubscription } from '@/utils/subscription';
 
 type BilanDraftData = {
   answers: [string, number | string][];
@@ -54,7 +56,7 @@ type HomeNavigation = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList>
 >;
 type IconName = keyof typeof MaterialIcons.glyphMap;
-type FeatureTone = 'lavender' | 'mint' | 'stone' | 'locked';
+type FeatureTone = 'lavender' | 'mint' | 'stone' | 'sun' | 'locked';
 
 type FeatureCardProps = {
   eyebrow: string;
@@ -90,6 +92,11 @@ const toneStyles: Record<
     card: { backgroundColor: '#F0EDE6' },
     icon: { borderColor: '#82918B' },
     iconColor: '#39443F',
+  },
+  sun: {
+    card: { backgroundColor: '#F7E7B2' },
+    icon: { borderColor: '#B88917' },
+    iconColor: '#7A5A0A',
   },
   locked: {
     card: { backgroundColor: '#ECE9E2' },
@@ -207,37 +214,53 @@ function ProgressRing({ completion }: { completion: number }) {
 
 function ProfileSnapshot({
   completion,
+  hasPremiumAccess,
+  isMatchingStatusLoading,
   matchingCompleted,
   matchingTotal,
   onPrimaryPress,
 }: {
   completion: number;
+  hasPremiumAccess: boolean;
+  isMatchingStatusLoading: boolean;
   matchingCompleted: boolean;
   matchingTotal: number;
   onPrimaryPress: () => void;
 }) {
-  const isComplete = completion >= 100;
+  const isComplete = hasPremiumAccess && completion >= 100;
   const matchingDescription =
     matchingTotal > 0
       ? `${matchingTotal} piste${matchingTotal > 1 ? 's' : ''} métier cohérente${
           matchingTotal > 1 ? 's' : ''
         } avec tes résultats croisés t’attend${matchingTotal > 1 ? 'ent' : ''}.`
       : 'Jusqu’à 20 pistes métier cohérentes avec tes résultats croisés peuvent être proposées.';
-  const title = !isComplete
-    ? 'Profil Matcha verrouillé'
-    : matchingCompleted
-      ? 'Ton profil Matcha est prêt'
-      : 'Matching métier débloqué';
-  const description = !isComplete
-    ? 'Termine les 3 tests pour débloquer ton matching métier personnalisé.'
-    : matchingCompleted
-      ? 'Retrouve tes signaux clés, tes secteurs et les métiers que tu as gardés.'
-      : matchingDescription;
-  const buttonLabel = !isComplete
-    ? 'Continuer mes tests'
-    : matchingCompleted
-      ? 'Voir mon profil complet'
-      : 'Lancer le matching';
+  const title = !hasPremiumAccess
+    ? 'Pass Complet requis'
+    : isComplete && isMatchingStatusLoading
+      ? 'Profil Matcha'
+      : !isComplete
+        ? 'Profil Matcha verrouillé'
+        : matchingCompleted
+          ? 'Ton profil Matcha est prêt'
+          : 'Matching métier débloqué';
+  const description = !hasPremiumAccess
+    ? 'Débloque les tests avancés, le profil Matcha complet et le matching métier personnalisé.'
+    : isComplete && isMatchingStatusLoading
+      ? 'Actualisation de ton matching métier en cours.'
+      : !isComplete
+        ? 'Termine les 3 tests pour débloquer ton matching métier personnalisé.'
+        : matchingCompleted
+          ? 'Retrouve tes signaux clés, tes secteurs et les métiers que tu as gardés.'
+          : matchingDescription;
+  const buttonLabel = !hasPremiumAccess
+    ? 'Voir les plans'
+    : isComplete && isMatchingStatusLoading
+      ? 'Actualisation'
+      : !isComplete
+        ? 'Continuer mes tests'
+        : matchingCompleted
+          ? 'Voir mon profil complet'
+          : 'Lancer le matching';
 
   return (
     <View style={[styles.profileCard, !isComplete && styles.profileCardLocked]}>
@@ -245,7 +268,9 @@ function ProfileSnapshot({
         {!isComplete ? (
           <View style={styles.lockBadge}>
             <MaterialIcons name="lock" size={14} color="#6E7772" />
-            <Text style={styles.lockBadgeText}>Bloqué</Text>
+            <Text style={styles.lockBadgeText}>
+              {hasPremiumAccess ? 'Bloqué' : 'Premium'}
+            </Text>
           </View>
         ) : null}
         <Text style={styles.profileTitle}>{title}</Text>
@@ -253,6 +278,7 @@ function ProfileSnapshot({
         <MatchaButton
           label={buttonLabel}
           onPress={onPrimaryPress}
+          disabled={isComplete && isMatchingStatusLoading}
           variant="primary"
         />
       </View>
@@ -304,20 +330,11 @@ function CareerSignalsCard({
 
 export default function HomeScreen() {
   const navigation = useNavigation<HomeNavigation>();
-  const { user: authUser, logout } = useAuth();
+  const { user: authUser, logout, refreshUser } = useAuth();
   const userId = authUser?.id;
   const { user, loading, error, refresh } = useProfile();
-  const {
-    bilan,
-    loading: bilanLoading,
-    error: bilanError,
-    refreshBilan,
-  } = useBilan();
-  const {
-    latestResult: workStyle,
-    loading: workStyleLoading,
-    refreshWorkStyle,
-  } = useWorkStyle();
+  const { bilan, error: bilanError, refreshBilan } = useBilan();
+  const { latestResult: workStyle, refreshWorkStyle } = useWorkStyle();
   const {
     profile: matchaProfile,
     loading: matchaProfileLoading,
@@ -334,6 +351,7 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      refreshUser();
       refresh();
       refreshBilan();
       refreshWorkStyle();
@@ -405,6 +423,7 @@ export default function HomeScreen() {
         isActive = false;
       };
     }, [
+      refreshUser,
       refresh,
       refreshBilan,
       refreshWorkStyle,
@@ -414,7 +433,7 @@ export default function HomeScreen() {
     ]),
   );
 
-  if (loading || bilanLoading || workStyleLoading || matchaProfileLoading) {
+  if (loading && !user) {
     return (
       <BackgroundRadial bubbles>
         <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
@@ -453,12 +472,21 @@ export default function HomeScreen() {
   const hasBilan = !!bilan && !shouldUseBilanDraft;
   const hasPersonality = Boolean(user?.personality);
   const hasWorkStyle = Boolean(workStyle) && !hasWorkStyleDraft;
+  const hasPremiumAccess = isPremiumSubscription(
+    user?.subscription ?? authUser?.subscription,
+  );
   const completion = Math.round(
     ([hasBilan, hasPersonality, hasWorkStyle].filter(Boolean).length / 3) * 100,
   );
   const matchingCompleted = Boolean(matchaProfile?.matchingStatus?.completed);
   const matchingTotal = matchaProfile?.matchingStatus?.total ?? 0;
+  const isMatchingStatusLoading = !matchaProfile && matchaProfileLoading;
   const openProfileCard = () => {
+    if (!hasPremiumAccess) {
+      navigation.navigate('PricingPlans');
+      return;
+    }
+
     if (completion < 100) {
       if (!hasBilan) {
         if (shouldUseBilanDraft && hasStartedBilanDraft) {
@@ -507,7 +535,9 @@ export default function HomeScreen() {
     ? (bilan?.conclusion?.archetype?.title ?? 'Ta synthèse professionnelle')
     : shouldUseBilanDraft && hasStartedBilanDraft
       ? 'Auto-évaluation en cours'
-      : 'Ton Évaluation';
+      : hasPremiumAccess
+        ? 'Ton Évaluation'
+        : 'Auto-évaluation Premium';
   const bilanDescription = hasBilan
     ? joinSignals(
         bilan?.conclusion?.keyStrengths?.slice(0, 2),
@@ -515,7 +545,9 @@ export default function HomeScreen() {
       )
     : bilanError
       ? 'La synthèse est momentanément indisponible.'
-      : 'Découvre tes forces, tes préférences et tes points forts.';
+      : hasPremiumAccess
+        ? 'Découvre tes forces, tes préférences et tes points forts.'
+        : 'Débloque une synthèse plus complète de tes forces, valeurs et pistes métier.';
 
   const workStyleTitle =
     (hasWorkStyle ? workStyle?.profile?.title : undefined) ??
@@ -544,15 +576,37 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.hero}>
-            <Text style={styles.greeting}>Hello {firstName} !</Text>
-            <Text style={styles.heroSubtitle}>
-              Prêt à découvrir ton prochain match ?
-            </Text>
+            <View style={styles.heroTop}>
+              <View style={styles.heroCopy}>
+                <Text style={styles.greeting}>Hello {firstName} !</Text>
+                <Text style={styles.heroSubtitle}>
+                  Prêt à découvrir ton prochain match ?
+                </Text>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Voir les plans Matcha"
+                hitSlop={8}
+                onPress={() => navigation.navigate('PricingPlans')}
+                style={({ pressed }) => [
+                  styles.plansButton,
+                  pressed && styles.plansButtonPressed,
+                ]}
+              >
+                <MaterialIcons
+                  name="workspace-premium"
+                  size={24}
+                  color={HOME_ACCENT}
+                />
+              </Pressable>
+            </View>
           </View>
 
           <SectionHeader title="Profil" />
           <ProfileSnapshot
             completion={completion}
+            hasPremiumAccess={hasPremiumAccess}
+            isMatchingStatusLoading={isMatchingStatusLoading}
             matchingCompleted={matchingCompleted}
             matchingTotal={matchingTotal}
             onPrimaryPress={openProfileCard}
@@ -565,23 +619,27 @@ export default function HomeScreen() {
               title={bilanTitle}
               description={bilanDescription}
               buttonLabel={
-                hasBilan
-                  ? 'Voir ma synthèse'
-                  : shouldUseBilanDraft && hasStartedBilanDraft
-                    ? 'Reprendre'
-                    : 'Commencer'
+                !hasPremiumAccess
+                  ? 'Voir les plans'
+                  : hasBilan
+                    ? 'Voir ma synthèse'
+                    : shouldUseBilanDraft && hasStartedBilanDraft
+                      ? 'Reprendre'
+                      : 'Commencer'
               }
-              icon="psychology"
-              tone="lavender"
-              accent="#6E3A75"
+              icon={hasPremiumAccess ? 'psychology' : 'lock'}
+              tone={hasPremiumAccess ? 'lavender' : 'locked'}
+              accent={hasPremiumAccess ? '#6E3A75' : undefined}
               onPress={() =>
-                hasBilan && bilan
-                  ? navigation.navigate('BilanResult', { bilan })
-                  : shouldUseBilanDraft && hasStartedBilanDraft
-                    ? navigation.navigate('BilanQuestions')
-                    : navigation.navigate('BilanIntro', {
-                        mode: shouldUseBilanDraft ? 'restart' : 'start',
-                      })
+                !hasPremiumAccess
+                  ? navigation.navigate('PricingPlans')
+                  : hasBilan && bilan
+                    ? navigation.navigate('BilanResult', { bilan })
+                    : shouldUseBilanDraft && hasStartedBilanDraft
+                      ? navigation.navigate('BilanQuestions')
+                      : navigation.navigate('BilanIntro', {
+                          mode: shouldUseBilanDraft ? 'restart' : 'start',
+                        })
               }
             />
 
@@ -614,22 +672,27 @@ export default function HomeScreen() {
               title={workStyleTitle}
               description={workStyleDescription}
               buttonLabel={
-                hasWorkStyle
-                  ? 'Voir mon style'
-                  : hasWorkStyleDraft
-                    ? 'Reprendre'
-                    : 'Découvrir'
+                !hasPremiumAccess
+                  ? 'Voir les plans'
+                  : hasWorkStyle
+                    ? 'Voir mon style'
+                    : hasWorkStyleDraft
+                      ? 'Reprendre'
+                      : 'Découvrir'
               }
-              icon="tune"
-              tone="stone"
+              icon={hasPremiumAccess ? 'tune' : 'lock'}
+              tone={hasPremiumAccess ? 'sun' : 'locked'}
+              accent={hasPremiumAccess ? '#7A5A0A' : undefined}
               onPress={() =>
-                hasWorkStyle && workStyle
-                  ? navigation.navigate('WorkStyleResult', {
-                      result: workStyle,
-                    })
-                  : hasWorkStyleDraft
-                    ? navigation.navigate('WorkStyleQuestions')
-                    : navigation.navigate('WorkStyleIntro')
+                !hasPremiumAccess
+                  ? navigation.navigate('PricingPlans')
+                  : hasWorkStyle && workStyle
+                    ? navigation.navigate('WorkStyleResult', {
+                        result: workStyle,
+                      })
+                    : hasWorkStyleDraft
+                      ? navigation.navigate('WorkStyleQuestions')
+                      : navigation.navigate('WorkStyleIntro')
               }
             />
           </View>
@@ -687,6 +750,33 @@ const styles = StyleSheet.create({
   },
   hero: {
     marginBottom: 20,
+  },
+  heroTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  heroCopy: {
+    flex: 1,
+  },
+  plansButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderWidth: 1,
+    borderColor: 'rgba(0,81,58,0.12)',
+    shadowColor: '#22332C',
+    shadowOpacity: 0.07,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2,
+  },
+  plansButtonPressed: {
+    opacity: 0.72,
   },
   greeting: {
     fontSize: 28,

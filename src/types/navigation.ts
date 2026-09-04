@@ -29,6 +29,7 @@ export type HomeStackParamList = {
     bilan: BilanResult;
   };
   MatchaProfile: undefined;
+  PricingPlans: undefined;
   JobMatching: undefined;
   CareerPreferences: undefined;
   JobDetail: { jobId: string };

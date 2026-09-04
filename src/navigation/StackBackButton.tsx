@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import {
-  CommonActions,
+  NavigationProp,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -9,12 +9,15 @@ import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 
 import Colors from '@/themes/colors';
+import { RootStackParamList } from '@/types/navigation';
+
+import { resetToHome } from './navigationActions';
 
 export default function StackBackButton({
   canGoBack,
   tintColor,
 }: NativeStackHeaderLeftProps) {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute();
 
   if (!canGoBack) return null;
@@ -23,14 +26,10 @@ export default function StackBackButton({
     if (
       route.name === 'PersonalityResult' ||
       route.name === 'BilanResult' ||
-      route.name === 'WorkStyleResult'
+      route.name === 'WorkStyleResult' ||
+      route.name === 'MatchaProfile'
     ) {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'Main', params: { screen: 'Home' } }],
-        }),
-      );
+      resetToHome(navigation);
       return;
     }
 
