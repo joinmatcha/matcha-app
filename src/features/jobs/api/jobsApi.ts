@@ -111,6 +111,28 @@ export type JobMarket = {
   lastSyncedAt?: string;
 };
 
+export type JobMarketHighlights = {
+  territoryLabel?: string;
+  salary?: {
+    label?: string;
+    amount?: number;
+    periodLabel?: string;
+  };
+  offers?: {
+    label?: string;
+    count?: number;
+    periodLabel?: string;
+  };
+  tension?: {
+    label?: string;
+    decimal?: number;
+    rank?: number;
+    rate?: number;
+    periodLabel?: string;
+  };
+  lastSyncedAt?: string;
+} | null;
+
 export type WorkStyleCompatibility = {
   level: 'high' | 'medium' | 'low';
   label: string;
@@ -126,6 +148,7 @@ export interface JobSummary {
   growthOutlook: GrowthOutlook;
   tags: string[];
   riasec: string[];
+  marketHighlights?: JobMarketHighlights;
 }
 
 export type JobListItem = JobSummary;

@@ -1,6 +1,7 @@
 export { default as HomeScreen } from './screens/Home';
 export { default as CareerPreferencesScreen } from './screens/CareerPreferences';
 export { default as MatchaProfileScreen } from './screens/MatchaProfile';
+export { default as PricingPlansScreen } from './screens/PricingPlans';
 
 export { default as BilanSummaryCard } from './components/BilanSummaryCard';
 export { default as PersonalitySummaryCard } from './components/PersonalitySummaryCard';

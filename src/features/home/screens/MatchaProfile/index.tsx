@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -31,12 +32,16 @@ import {
 import { RootStackParamList } from '@/types/navigation';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+type IconName = keyof typeof MaterialIcons.glyphMap;
 type BilanDraftData = {
   answers: [string, number | string][];
 };
 type NumericDraftData = {
   answers: [string, number][];
 };
+type DimensionGroupKey = 'strengths' | 'values' | 'environments' | 'sectors';
+type ExpandedDimensionGroups = Record<DimensionGroupKey, boolean>;
+type TopDimension = { label: string; icon: IconName };
 
 const INK = '#101820';
 const HOME_ACCENT = '#00513A';
@@ -62,6 +67,84 @@ function Pill({ label }: { label: string }) {
       <Text style={styles.pillText} numberOfLines={1}>
         {label}
       </Text>
+    </View>
+  );
+}
+
+function DimensionSpotlight({
+  label,
+  icon,
+}: {
+  label: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+}) {
+  return (
+    <View style={styles.dimensionSpotlight}>
+      <View style={styles.dimensionIcon}>
+        <MaterialIcons name={icon} size={20} color={HOME_ACCENT} />
+      </View>
+      <Text style={styles.dimensionSpotlightText} numberOfLines={2}>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+function DimensionGroup({
+  title,
+  items,
+  expanded,
+  onToggle,
+}: {
+  title: string;
+  items: string[];
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const visibleItems = expanded ? items : items.slice(0, 4);
+  const remaining = Math.max(items.length - visibleItems.length, 0);
+
+  if (!items.length) return null;
+
+  return (
+    <View style={styles.dimensionGroup}>
+      <Text style={styles.dimensionGroupTitle}>{title}</Text>
+      <View style={styles.pillList}>
+        {visibleItems.map((item) => (
+          <Pill key={item} label={item} />
+        ))}
+        {remaining > 0 ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Afficher ${remaining} dimensions supplémentaires pour ${title}`}
+            hitSlop={6}
+            onPress={onToggle}
+            style={({ pressed }) => [
+              styles.morePill,
+              pressed && styles.morePillPressed,
+            ]}
+          >
+            <Text style={styles.morePillText}>+{remaining}</Text>
+          </Pressable>
+        ) : expanded && items.length > 4 ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Réduire les dimensions ${title}`}
+            hitSlop={6}
+            onPress={onToggle}
+            style={({ pressed }) => [
+              styles.morePill,
+              pressed && styles.morePillPressed,
+            ]}
+          >
+            <MaterialIcons
+              name="keyboard-arrow-up"
+              size={16}
+              color={HOME_ACCENT}
+            />
+          </Pressable>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -154,6 +237,13 @@ export default function MatchaProfileScreen() {
   const [hasBilanDraft, setHasBilanDraft] = useState(false);
   const [hasPersonalityDraft, setHasPersonalityDraft] = useState(false);
   const [hasWorkStyleDraft, setHasWorkStyleDraft] = useState(false);
+  const [expandedDimensionGroups, setExpandedDimensionGroups] =
+    useState<ExpandedDimensionGroups>({
+      strengths: false,
+      values: false,
+      environments: false,
+      sectors: false,
+    });
 
   useFocusEffect(
     useCallback(() => {
@@ -231,6 +321,12 @@ export default function MatchaProfileScreen() {
 
     navigation.navigate(action.route);
   };
+  const toggleDimensionGroup = (group: DimensionGroupKey) => {
+    setExpandedDimensionGroups((current) => ({
+      ...current,
+      [group]: !current[group],
+    }));
+  };
 
   if (loading) {
     return (
@@ -263,6 +359,17 @@ export default function MatchaProfileScreen() {
   const values = profile.keyDimensions.values;
   const environments = profile.keyDimensions.environments;
   const sectors = profile.keyDimensions.sectors;
+  const topDimensionCandidates: Array<TopDimension | null> = [
+    strengths[0]
+      ? { label: strengths[0], icon: 'auto-awesome' as const }
+      : null,
+    values[0] ? { label: values[0], icon: 'favorite-border' as const } : null,
+    environments[0] ? { label: environments[0], icon: 'tune' as const } : null,
+    sectors[0] ? { label: sectors[0], icon: 'explore' as const } : null,
+  ];
+  const topDimensions = topDimensionCandidates
+    .filter((item): item is TopDimension => Boolean(item))
+    .slice(0, 3);
   const matchedJobs = profile.matchedJobs;
   const likedJobs = profile.likedJobs;
   const [bilanTest, personalityTest, workStyleTest] = profile.tests;
@@ -370,51 +477,47 @@ export default function MatchaProfileScreen() {
             )}
           </View>
 
-          <SectionTitle title="Tes dimensions clés" />
-          <View style={styles.card}>
-            {strengths.length ? (
-              <>
-                <Text style={styles.groupTitle}>Forces</Text>
-                <View style={styles.pillList}>
-                  {strengths.map((item) => (
-                    <Pill key={item} label={item} />
-                  ))}
-                </View>
-              </>
+          <SectionTitle
+            title="Tes dimensions clés"
+            subtitle="Les repères les plus utiles pour lire tes pistes métier."
+          />
+          <View style={styles.dimensionsCard}>
+            {topDimensions.length ? (
+              <View style={styles.dimensionSpotlightGrid}>
+                {topDimensions.map((item) => (
+                  <DimensionSpotlight
+                    key={`${item.icon}-${item.label}`}
+                    label={item.label}
+                    icon={item.icon}
+                  />
+                ))}
+              </View>
             ) : null}
 
-            {values.length ? (
-              <>
-                <Text style={styles.groupTitle}>Valeurs et intérêts</Text>
-                <View style={styles.pillList}>
-                  {values.map((item) => (
-                    <Pill key={item} label={item} />
-                  ))}
-                </View>
-              </>
-            ) : null}
-
-            {environments.length ? (
-              <>
-                <Text style={styles.groupTitle}>Environnements favorables</Text>
-                <View style={styles.pillList}>
-                  {environments.map((item) => (
-                    <Pill key={item} label={item} />
-                  ))}
-                </View>
-              </>
-            ) : null}
-
-            {sectors.length ? (
-              <>
-                <Text style={styles.groupTitle}>Secteurs attirants</Text>
-                <View style={styles.pillList}>
-                  {sectors.map((item) => (
-                    <Pill key={item} label={item} />
-                  ))}
-                </View>
-              </>
-            ) : null}
+            <DimensionGroup
+              title="Forces"
+              items={strengths}
+              expanded={expandedDimensionGroups.strengths}
+              onToggle={() => toggleDimensionGroup('strengths')}
+            />
+            <DimensionGroup
+              title="Valeurs et intérêts"
+              items={values}
+              expanded={expandedDimensionGroups.values}
+              onToggle={() => toggleDimensionGroup('values')}
+            />
+            <DimensionGroup
+              title="Environnements favorables"
+              items={environments}
+              expanded={expandedDimensionGroups.environments}
+              onToggle={() => toggleDimensionGroup('environments')}
+            />
+            <DimensionGroup
+              title="Secteurs attirants"
+              items={sectors}
+              expanded={expandedDimensionGroups.sectors}
+              onToggle={() => toggleDimensionGroup('sectors')}
+            />
 
             {!strengths.length &&
             !values.length &&
@@ -662,6 +765,56 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.accent.border,
   },
+  dimensionsCard: {
+    marginBottom: 20,
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: '#F7FBF7',
+    borderWidth: 1,
+    borderColor: 'rgba(0,81,58,0.14)',
+  },
+  dimensionSpotlightGrid: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 14,
+  },
+  dimensionSpotlight: {
+    flex: 1,
+    minHeight: 100,
+    minWidth: 0,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(0,81,58,0.10)',
+  },
+  dimensionIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.accent.soft,
+  },
+  dimensionSpotlightText: {
+    marginTop: 10,
+    fontSize: 13,
+    lineHeight: 17,
+    fontFamily: titleFontFamily,
+    color: INK,
+  },
+  dimensionGroup: {
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,81,58,0.08)',
+  },
+  dimensionGroupTitle: {
+    marginBottom: 9,
+    fontSize: 13,
+    lineHeight: 16,
+    fontFamily: labelFontFamily,
+    color: HOME_ACCENT,
+  },
   signalRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -710,6 +863,26 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: titleFontFamily,
     color: Colors.accent.strong,
+  },
+  morePill: {
+    minWidth: 40,
+    minHeight: 34,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(0,81,58,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  morePillPressed: {
+    opacity: 0.72,
+  },
+  morePillText: {
+    fontSize: 13,
+    fontFamily: titleFontFamily,
+    color: HOME_ACCENT,
   },
   emptyText: {
     fontSize: 14,

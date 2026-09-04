@@ -33,6 +33,8 @@ import {
   getJobMatching,
   resetJobMatching,
 } from '@/features/jobs/api/jobMatchingApi';
+import { getMarketHighlightCards } from '@/features/jobs/utils/marketHighlights';
+import { resetToMatchaProfile } from '@/navigation/navigationActions';
 import Colors from '@/themes/colors';
 import {
   bodyFontFamily,
@@ -56,13 +58,22 @@ function JobListItem({
   job: JobMatchingJob;
   onPress: () => void;
 }) {
+  const salary = getMarketHighlightCards(job.marketHighlights).find(
+    (item) => item.key === 'salary',
+  );
+  const meta = [
+    job.sector ?? 'Secteur non précisé',
+    `${job.score}% de cohérence`,
+    salary ? `${salary.value} salaire` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
     <TouchableOpacity style={styles.likedRow} onPress={onPress}>
       <View style={styles.likedCopy}>
         <Text style={styles.likedTitle}>{job.title}</Text>
-        <Text style={styles.likedMeta}>
-          {job.sector ?? 'Secteur non précisé'} · {job.score}% de cohérence
-        </Text>
+        <Text style={styles.likedMeta}>{meta}</Text>
       </View>
       <MaterialIcons name="chevron-right" size={22} color={Colors.text.muted} />
     </TouchableOpacity>
@@ -107,6 +118,9 @@ export default function JobMatchingScreen() {
   const isAnimating = useRef(false);
   const currentJobRef = useRef<JobMatchingJob | null>(null);
   currentJobRef.current = currentJob;
+  const currentMarketCards = getMarketHighlightCards(
+    currentJob?.marketHighlights,
+  );
 
   useEffect(() => {
     pan.x.setValue(0);
@@ -235,7 +249,7 @@ export default function JobMatchingScreen() {
           </Text>
           <MatchaButton
             label="Retour au profil"
-            onPress={() => navigation.navigate('MatchaProfile')}
+            onPress={() => resetToMatchaProfile(navigation)}
           />
         </SafeAreaView>
       </AppScreen>
@@ -253,7 +267,7 @@ export default function JobMatchingScreen() {
           </Text>
           <MatchaButton
             label="Retour au profil"
-            onPress={() => navigation.navigate('MatchaProfile')}
+            onPress={() => resetToMatchaProfile(navigation)}
           />
         </SafeAreaView>
       </AppScreen>
@@ -304,7 +318,7 @@ export default function JobMatchingScreen() {
               <MatchaButton
                 label="Retour au profil"
                 fullWidth
-                onPress={() => navigation.navigate('MatchaProfile')}
+                onPress={() => resetToMatchaProfile(navigation)}
               />
             </View>
           </ScrollView>
@@ -411,6 +425,26 @@ export default function JobMatchingScreen() {
                 </Text>
               </View>
 
+              {currentMarketCards.length > 0 ? (
+                <View style={styles.marketGrid}>
+                  {currentMarketCards.map((item) => (
+                    <View key={item.key} style={styles.marketItem}>
+                      <MaterialIcons
+                        name={item.icon}
+                        size={17}
+                        color={Colors.accent.primary}
+                      />
+                      <Text style={styles.marketValue} numberOfLines={1}>
+                        {item.value}
+                      </Text>
+                      <Text style={styles.marketLabel} numberOfLines={1}>
+                        {item.label}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+
               <View style={styles.reasonsPanel}>
                 {currentJob.reasons.slice(0, 2).map((reason) => (
                   <View key={reason} style={styles.reasonRow}>
@@ -419,12 +453,7 @@ export default function JobMatchingScreen() {
                       size={17}
                       color={Colors.accent.primary}
                     />
-                    <Text
-                      style={styles.reasonText}
-                      numberOfLines={2}
-                      adjustsFontSizeToFit
-                      minimumFontScale={0.9}
-                    >
+                    <Text style={styles.reasonText} numberOfLines={2}>
                       {reason}
                     </Text>
                   </View>
@@ -595,7 +624,7 @@ const styles = StyleSheet.create({
   cardShadowBackMost: {
     position: 'absolute',
     width: '82%',
-    height: 360,
+    height: 382,
     borderRadius: 8,
     backgroundColor: 'rgba(0,81,58,0.07)',
     transform: [{ translateX: -8 }, { translateY: 18 }, { rotate: '-2deg' }],
@@ -603,7 +632,7 @@ const styles = StyleSheet.create({
   cardShadowBack: {
     position: 'absolute',
     width: '85%',
-    height: 362,
+    height: 384,
     borderRadius: 8,
     backgroundColor: 'rgba(255,255,255,0.72)',
     borderWidth: 1,
@@ -612,8 +641,8 @@ const styles = StyleSheet.create({
   },
   swipeCard: {
     width: '90%',
-    minHeight: 372,
-    maxHeight: 392,
+    minHeight: 394,
+    maxHeight: 424,
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
@@ -697,7 +726,7 @@ const styles = StyleSheet.create({
     color: Colors.accent.primary,
   },
   heroPanel: {
-    height: 112,
+    height: 104,
     justifyContent: 'center',
     borderRadius: 8,
     backgroundColor: '#F7FAF8',
@@ -716,8 +745,38 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     color: Colors.text.strong,
   },
+  marketGrid: {
+    minHeight: 70,
+    flexDirection: 'row',
+    gap: 8,
+    paddingTop: 10,
+  },
+  marketItem: {
+    flex: 1,
+    minWidth: 0,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0,81,58,0.10)',
+    backgroundColor: 'rgba(247,250,248,0.92)',
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    gap: 2,
+  },
+  marketValue: {
+    fontFamily: titleFontFamily,
+    fontSize: 15,
+    lineHeight: 18,
+    fontWeight: '700',
+    color: Colors.text.strong,
+  },
+  marketLabel: {
+    fontFamily: bodyFontFamily,
+    fontSize: 10,
+    lineHeight: 12,
+    color: Colors.text.muted,
+  },
   reasonsPanel: {
-    height: 96,
+    height: 94,
     justifyContent: 'center',
     paddingTop: 8,
     gap: 6,
@@ -759,7 +818,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     alignItems: 'flex-start',
-    minHeight: 40,
+    minHeight: 34,
   },
   reasonText: {
     flex: 1,

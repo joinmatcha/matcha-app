@@ -1,5 +1,11 @@
 import { jwtDecode } from 'jwt-decode';
-import React, { createContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import {
   deleteAccount as apiDeleteAccount,
@@ -52,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     try {
       const token = await getToken();
       if (!token) {
@@ -77,60 +83,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadUser();
-  }, []);
+  }, [loadUser]);
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     const { token, user } = await apiLogin(email, password);
     await storeToken(token);
     setUser(normalizeUser(user));
-  };
+  }, []);
 
-  const register = async (data: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-  }) => {
-    const registrationData = {
-      ...data,
-      consentAccepted: true,
-    };
-    await apiRegister(registrationData);
-    // await login(data.email, data.password);
-  };
+  const register = useCallback(
+    async (data: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+    }) => {
+      const registrationData = {
+        ...data,
+        consentAccepted: true,
+      };
+      await apiRegister(registrationData);
+      // await login(data.email, data.password);
+    },
+    [],
+  );
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await removeToken();
     setUser(null);
-  };
+  }, []);
 
-  const deleteAccount = async () => {
+  const deleteAccount = useCallback(async () => {
     await apiDeleteAccount();
     await removeToken();
     setUser(null);
-  };
+  }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     await loadUser();
-  };
+  }, [loadUser]);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        deleteAccount,
-        refreshUser,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      login,
+      register,
+      logout,
+      deleteAccount,
+      refreshUser,
+    }),
+    [user, loading, login, register, logout, deleteAccount, refreshUser],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
