@@ -207,7 +207,7 @@ export const styles = StyleSheet.create({
   cardShadowBackMost: {
     position: 'absolute',
     width: '82%',
-    height: 388,
+    height: 404,
     backgroundColor: 'rgba(0,81,58,0.07)',
     borderRadius: 8,
     transform: [{ translateX: -8 }, { translateY: 18 }, { rotate: '-2deg' }],
@@ -215,7 +215,7 @@ export const styles = StyleSheet.create({
   cardShadowBack: {
     position: 'absolute',
     width: '85%',
-    height: 390,
+    height: 400,
     ...cardSurface,
     backgroundColor: 'rgba(255,255,255,0.72)',
     borderRadius: 8,
@@ -226,7 +226,6 @@ export const styles = StyleSheet.create({
   },
   card: {
     width: '90%',
-    height: 400,
     ...cardSurface,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
@@ -286,11 +285,12 @@ export const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   cardTop: {
+    minHeight: 32,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: 12,
-    marginBottom: 14,
+    marginBottom: 10,
   },
   cardTopLeft: {
     flex: 1,
@@ -311,7 +311,7 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   heroPanel: {
-    height: 145,
+    height: 126,
     backgroundColor: '#F7FAF8',
     borderRadius: 8,
     paddingHorizontal: 20,
@@ -323,7 +323,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   titleAccent: {
     width: 46,
@@ -347,7 +347,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   marketGrid: {
-    minHeight: 70,
+    height: 70,
     flexDirection: 'row',
     gap: 8,
     paddingTop: 10,
@@ -377,8 +377,7 @@ export const styles = StyleSheet.create({
     color: 'rgba(31,31,31,0.56)',
   },
   tagsSection: {
-    minHeight: 54,
-    maxHeight: 54,
+    height: 54,
     paddingTop: 10,
     overflow: 'hidden',
   },
@@ -392,13 +391,15 @@ export const styles = StyleSheet.create({
   },
   tagsRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
     gap: 8,
-    maxHeight: 34,
+    height: 30,
     overflow: 'hidden',
   },
   tag: {
-    maxWidth: '82%',
+    maxWidth: '78%',
+    flexShrink: 1,
     backgroundColor: 'rgba(31,31,31,0.06)',
     borderRadius: 999,
     paddingHorizontal: 11,
@@ -413,6 +414,7 @@ export const styles = StyleSheet.create({
   },
   tagCount: {
     minWidth: 34,
+    flexShrink: 0,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -426,8 +428,13 @@ export const styles = StyleSheet.create({
     color: Colors.accent.primary,
     fontWeight: '700',
   },
-  cardFooter: {
+  cardFooterSlot: {
     marginTop: 'auto',
+    height: 50,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+  },
+  cardFooter: {
     minHeight: 42,
     paddingHorizontal: 18,
     borderRadius: 21,

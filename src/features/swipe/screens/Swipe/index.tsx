@@ -15,6 +15,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import {
   SafeAreaView,
@@ -76,6 +77,7 @@ function SwipeBackground({ children }: { children: React.ReactNode }) {
 export default function SwipeScreen() {
   const navigation = useNavigation<SwipeNavigation>();
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const { deck, remaining, limit, loading, error, loadDeck, swipe } =
     useSwipe();
 
@@ -186,6 +188,10 @@ export default function SwipeScreen() {
     remaining !== null && limit !== null ? Math.max(limit - remaining, 0) : 0;
   const progress =
     remaining !== null && limit ? Math.min(swipedToday / limit, 1) : 0;
+  const cardHeight = Math.max(
+    380,
+    Math.min(430, windowHeight - insets.top - insets.bottom - 312),
+  );
 
   const openCurrentJob = useCallback(() => {
     if (!currentJob) return;
@@ -316,13 +322,22 @@ export default function SwipeScreen() {
         ) : null}
 
         <View style={styles.cardArea}>
-          {afterNextJob && <View style={styles.cardShadowBackMost} />}
+          {afterNextJob && (
+            <View
+              style={[styles.cardShadowBackMost, { height: cardHeight - 6 }]}
+            />
+          )}
 
-          {nextJob && <View style={styles.cardShadowBack} />}
+          {nextJob && (
+            <View
+              style={[styles.cardShadowBack, { height: cardHeight - 10 }]}
+            />
+          )}
 
           <Animated.View
             style={[
               styles.card,
+              { height: cardHeight },
               {
                 transform: [{ translateX: pan.x }, { rotate: cardRotation }],
               },
@@ -384,7 +399,12 @@ export default function SwipeScreen() {
                   <View style={styles.titleAccent} />
                   <Text style={styles.cardKicker}>Piste proposée</Text>
                 </View>
-                <Text style={styles.cardTitle} numberOfLines={3}>
+                <Text
+                  style={styles.cardTitle}
+                  numberOfLines={3}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.84}
+                >
                   {currentJob?.title}
                 </Text>
               </View>
@@ -435,13 +455,15 @@ export default function SwipeScreen() {
                 </View>
               )}
 
-              <MatchaButton
-                label="Voir la fiche"
-                icon="arrow-forward"
-                variant="primary"
-                onPress={openCurrentJob}
-                style={styles.cardFooter}
-              />
+              <View style={styles.cardFooterSlot}>
+                <MatchaButton
+                  label="Voir la fiche"
+                  icon="arrow-forward"
+                  variant="primary"
+                  onPress={openCurrentJob}
+                  style={styles.cardFooter}
+                />
+              </View>
             </View>
           </Animated.View>
         </View>
