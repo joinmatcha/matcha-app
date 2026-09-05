@@ -18,6 +18,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import {
   SafeAreaView,
@@ -83,6 +84,7 @@ function JobListItem({
 export default function JobMatchingScreen() {
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const [matching, setMatching] = useState<JobMatchingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -129,6 +131,10 @@ export default function JobMatchingScreen() {
 
   const decidedCount = matching ? matching.total - matching.remaining : 0;
   const progress = matching?.total ? decidedCount / matching.total : 0;
+  const swipeCardHeight = Math.max(
+    400,
+    Math.min(438, windowHeight - insets.top - insets.bottom - 324),
+  );
 
   const decide = async (action: 'like' | 'dislike') => {
     if (!currentJob || submitting) return;
@@ -364,13 +370,25 @@ export default function JobMatchingScreen() {
         </View>
 
         <View style={styles.cardArea}>
-          {nextJobs[1] ? <View style={styles.cardShadowBackMost} /> : null}
-          {nextJobs[0] ? <View style={styles.cardShadowBack} /> : null}
+          {nextJobs[1] ? (
+            <View
+              style={[
+                styles.cardShadowBackMost,
+                { height: swipeCardHeight - 8 },
+              ]}
+            />
+          ) : null}
+          {nextJobs[0] ? (
+            <View
+              style={[styles.cardShadowBack, { height: swipeCardHeight - 14 }]}
+            />
+          ) : null}
 
           {currentJob ? (
             <Animated.View
               style={[
                 styles.swipeCard,
+                { height: swipeCardHeight },
                 {
                   transform: [{ translateX: pan.x }, { rotate: cardRotation }],
                 },
@@ -624,7 +642,6 @@ const styles = StyleSheet.create({
   cardShadowBackMost: {
     position: 'absolute',
     width: '82%',
-    height: 382,
     borderRadius: 8,
     backgroundColor: 'rgba(0,81,58,0.07)',
     transform: [{ translateX: -8 }, { translateY: 18 }, { rotate: '-2deg' }],
@@ -632,7 +649,6 @@ const styles = StyleSheet.create({
   cardShadowBack: {
     position: 'absolute',
     width: '85%',
-    height: 384,
     borderRadius: 8,
     backgroundColor: 'rgba(255,255,255,0.72)',
     borderWidth: 1,
@@ -641,8 +657,6 @@ const styles = StyleSheet.create({
   },
   swipeCard: {
     width: '90%',
-    minHeight: 394,
-    maxHeight: 424,
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
@@ -692,6 +706,7 @@ const styles = StyleSheet.create({
     color: '#B42348',
   },
   cardTop: {
+    minHeight: 58,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -701,7 +716,7 @@ const styles = StyleSheet.create({
   sectorTag: {
     flex: 1,
     alignSelf: 'flex-start',
-    maxWidth: '68%',
+    maxWidth: '66%',
     borderRadius: 999,
     backgroundColor: 'rgba(45,190,139,0.11)',
     paddingHorizontal: 11,
@@ -715,7 +730,9 @@ const styles = StyleSheet.create({
   },
   scoreBadge: {
     width: 74,
+    height: 58,
     alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 8,
     backgroundColor: '#F7FAF8',
     paddingVertical: 7,
@@ -726,7 +743,7 @@ const styles = StyleSheet.create({
     color: Colors.accent.primary,
   },
   heroPanel: {
-    height: 104,
+    height: 112,
     justifyContent: 'center',
     borderRadius: 8,
     backgroundColor: '#F7FAF8',
@@ -746,7 +763,7 @@ const styles = StyleSheet.create({
     color: Colors.text.strong,
   },
   marketGrid: {
-    minHeight: 70,
+    height: 70,
     flexDirection: 'row',
     gap: 8,
     paddingTop: 10,
@@ -776,8 +793,8 @@ const styles = StyleSheet.create({
     color: Colors.text.muted,
   },
   reasonsPanel: {
-    height: 94,
-    justifyContent: 'center',
+    height: 82,
+    justifyContent: 'flex-start',
     paddingTop: 8,
     gap: 6,
   },
