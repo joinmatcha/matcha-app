@@ -401,7 +401,7 @@ export default function SwipeScreen() {
                 </View>
                 <Text
                   style={styles.cardTitle}
-                  numberOfLines={3}
+                  numberOfLines={2}
                   adjustsFontSizeToFit
                   minimumFontScale={0.84}
                 >
@@ -418,12 +418,14 @@ export default function SwipeScreen() {
                         size={17}
                         color={Colors.accent.primary}
                       />
-                      <Text style={styles.marketValue} numberOfLines={1}>
-                        {item.value}
-                      </Text>
-                      <Text style={styles.marketLabel} numberOfLines={1}>
-                        {item.label}
-                      </Text>
+                      <View style={styles.marketItemText}>
+                        <Text style={styles.marketValue} numberOfLines={1}>
+                          {item.value}
+                        </Text>
+                        <Text style={styles.marketLabel} numberOfLines={1}>
+                          {item.label}
+                        </Text>
+                      </View>
                     </View>
                   ))}
                 </View>
