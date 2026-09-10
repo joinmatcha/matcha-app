@@ -452,12 +452,14 @@ export default function JobMatchingScreen() {
                         size={17}
                         color={Colors.accent.primary}
                       />
-                      <Text style={styles.marketValue} numberOfLines={1}>
-                        {item.value}
-                      </Text>
-                      <Text style={styles.marketLabel} numberOfLines={1}>
-                        {item.label}
-                      </Text>
+                      <View style={styles.marketItemText}>
+                        <Text style={styles.marketValue} numberOfLines={1}>
+                          {item.value}
+                        </Text>
+                        <Text style={styles.marketLabel} numberOfLines={1}>
+                          {item.label}
+                        </Text>
+                      </View>
                     </View>
                   ))}
                 </View>
@@ -772,12 +774,19 @@ const styles = StyleSheet.create({
   marketItem: {
     flex: 1,
     minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(0,81,58,0.10)',
     backgroundColor: 'rgba(247,250,248,0.92)',
     paddingHorizontal: 8,
     paddingVertical: 8,
+    gap: 8,
+  },
+  marketItemText: {
+    flex: 1,
+    minWidth: 0,
     gap: 2,
   },
   marketValue: {
